@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.dto.request.CategoryDTO;
 import com.minh.shopee.domain.model.Category;
 import com.minh.shopee.services.CategoryService;
@@ -32,6 +33,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping()
+    @ApiDescription("Lấy danh sách danh mục")
     public ResponseEntity<Page<CategoryDTO>> getAllCategories(@PageableDefault(page = 0, size = 20) Pageable pageable) {
         Page<CategoryDTO> categories = this.categoryService.getAllCategories(CategoryDTO.class, pageable);
 
@@ -39,6 +41,7 @@ public class CategoryController {
     }
 
     @PostMapping()
+    @ApiDescription("Tạo danh sách danh mục")
     public ResponseEntity<String> createCategory(
             @RequestParam(value = "fileCategoryExcel", required = false) MultipartFile file,
             @ModelAttribute Category category) throws IOException {
@@ -54,6 +57,7 @@ public class CategoryController {
     }
 
     @PutMapping()
+    @ApiDescription("Sửa danh mục")
     public ResponseEntity<Category> updateCategory(@RequestBody Category entity) {
         Category categoryUpdated = this.categoryService.updateCategory(entity);
         log.info("Category updated: {}", categoryUpdated);
@@ -62,6 +66,7 @@ public class CategoryController {
     }
 
     @DeleteMapping()
+    @ApiDescription("Xoá danh mục")
     public ResponseEntity<Void> deleteCategory(Long id) {
         this.categoryService.deleteCategory(id);
         log.info("Category deleted with id: {}", id);

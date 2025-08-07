@@ -1,7 +1,6 @@
 package com.minh.shopee.services;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +14,6 @@ public interface UserService {
 
     User createUser(User user);
 
-
     User findByUsername(String username);
 
     <T> T findByUsername(String username, Class<T> type);
@@ -26,9 +24,9 @@ public interface UserService {
 
     <T> T findByEmailAndRefreshToken(String email, String refreshToken, Class<T> type);
 
-    UpdateUserResDTO updateProfile(String email, UserReqDTO userReqDTO ,MultipartFile avatarFile) throws IOException;
-    
+    UpdateUserResDTO updateProfile(String email, UserReqDTO userReqDTO, MultipartFile avatarFile) throws IOException;
+
     boolean isExistEmail(String email);
 
-     Page<UserDTO> searchUsers (String keyword, org.springframework.data.domain.Pageable pageable);
+    Page<UserDTO> searchUsers(String keyword, org.springframework.data.domain.Pageable pageable);
 }

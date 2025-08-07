@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.dto.request.AddProductDTO;
 import com.minh.shopee.domain.dto.request.ListIdCartDetailDTO;
 import com.minh.shopee.domain.dto.request.ProductReqDTO;
@@ -43,6 +44,7 @@ public class ProductController {
     private final ProductSerivce productSerivce;
 
     @PostMapping("")
+    @ApiDescription("Tạo mới sản phẩm")
     public ResponseEntity<ProductResDTO> createAProduct(@ModelAttribute @Valid ProductReqDTO productDTO,
             @RequestParam(value = "imageProduct", required = false) List<MultipartFile> imagesProduct) {
         ProductResDTO productCreate = productSerivce.createAProduct(productDTO, imagesProduct);
@@ -53,6 +55,7 @@ public class ProductController {
     }
 
     @PostMapping("/import")
+    @ApiDescription("Tạo danh sách sản phẩm từ file Excel")
     public ResponseEntity<String> createListProduct(
             @RequestParam(value = "fileProductExcel", required = false) MultipartFile file) {
         if (file != null) {
@@ -63,6 +66,7 @@ public class ProductController {
     }
 
     @GetMapping("")
+    @ApiDescription("Lấy danh sách sản phẩm")
     public ResponseEntity<Page<ProductResDTO>> getAllProducts(@PageableDefault(page = 0, size = 20) Pageable pageable) {
 
         Page<ProductResDTO> products = productSerivce.getAllProducts(pageable);
@@ -70,6 +74,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
+    @ApiDescription("Tìm kiếm sản phẩm theo từ khoá")
     public ResponseEntity<Page<ProductResDTO>> searchProducts(
             @RequestParam(value = "keyword", required = false) String keyword,
             FiltersProduct filter, SortFilter sortFilter,
@@ -81,6 +86,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
+    @ApiDescription("Lấy thông tin sản phẩm theo ID")
     public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
 
         Product product = productSerivce.getProductById(id, Product.class);
@@ -88,6 +94,7 @@ public class ProductController {
     }
 
     @PostMapping("/add-to-cart")
+    @ApiDescription("Thêm sản phẩm vào giỏ hàng")
     public ResponseEntity<String> addToCart(@RequestBody @Valid AddProductDTO productReq) {
         JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> userClaim = auth.getToken().getClaim("user");
@@ -103,6 +110,7 @@ public class ProductController {
     }
 
     @GetMapping("/get-cart")
+    @ApiDescription("Xem giỏ hàng")
     public ResponseEntity<CartDTO> getCart() {
         JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> userClaim = auth.getToken().getClaim("user");
@@ -117,6 +125,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/remove-from-cart")
+    @ApiDescription("Xoá sản phẩm khỏi giỏ hàng")
     public ResponseEntity<String> removeFromCart(@RequestBody AddProductDTO productReq) {
         Long productIdLong = productReq.getProductId();
 
@@ -137,6 +146,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/remove-list-from-cart")
+    @ApiDescription("Xoá danh sách sản phẩm khỏi giỏ hàng")
     public ResponseEntity<String> removeListFromCart(@RequestBody ListIdCartDetailDTO req) {
 
         JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

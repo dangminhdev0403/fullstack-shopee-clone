@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.dto.request.AddAddressDTO;
 import com.minh.shopee.domain.dto.request.EditAddressDTO;
 import com.minh.shopee.domain.model.Address;
@@ -30,6 +31,7 @@ public class AddressController {
     private final AddressService addressService;
 
     @GetMapping("")
+    @ApiDescription("Lấy danh sách địa chỉ")
     public ResponseEntity<List<Address>> getMyAddresses() {
         JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> userClaim = auth.getToken().getClaim("user");
@@ -45,6 +47,7 @@ public class AddressController {
     }
 
     @PostMapping("")
+    @ApiDescription("Thêm địa chỉ mới ")
     public ResponseEntity<String> addAddress(@RequestBody @Valid AddAddressDTO request) {
         Long userId = SecurityUtils.getCurrentUserId();
         this.addressService.addAddress(request, userId);
@@ -53,6 +56,7 @@ public class AddressController {
     }
 
     @PutMapping("")
+    @ApiDescription("Cập nhật địa chỉ")
     public ResponseEntity<String> updateAddress(@RequestBody EditAddressDTO request) {
         if (request.getId() == null) {
             throw new AppException(400, "Bad Request", "ID địa chỉ không được để trống");
@@ -64,4 +68,5 @@ public class AddressController {
 
     }
 
+    
 }
