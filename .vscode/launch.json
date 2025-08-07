@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-ShopeeApplication<shopee>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.minh.shopee.ShopeeApplication",
+      "projectName": "shopee",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

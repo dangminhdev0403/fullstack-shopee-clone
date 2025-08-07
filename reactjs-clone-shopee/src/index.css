@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+html,
+body {
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #ccc;
+}
+
+.divider:not(:empty)::before {
+  margin-right: 10px;
+}
+
+.divider:not(:empty)::after {
+  margin-left: 10px;
+}
+
+.divider span {
+  color: #aaa;
+  font-size: 14px;
+  letter-spacing: 2px;
+  position: relative;
+}
