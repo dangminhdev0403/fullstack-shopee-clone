@@ -1,6 +1,6 @@
 package com.minh.shopee.domain.model;
 
-import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.minh.shopee.domain.base.BaseEntity;
@@ -22,12 +22,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Table(name = "roles")
 public class Role extends BaseEntity {
+
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    private List<User> users;
+    private Set<User> users;
 
     @ManyToMany
     @JoinTable(name = "role_has_permission", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     @JsonIgnore
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
+
 }

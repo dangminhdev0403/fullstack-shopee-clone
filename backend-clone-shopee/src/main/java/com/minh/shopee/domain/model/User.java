@@ -1,6 +1,7 @@
 package com.minh.shopee.domain.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.minh.shopee.domain.base.BaseEntity;
 
@@ -47,6 +48,6 @@ public class User extends BaseEntity {
     private List<Address> addresses;
     @ManyToMany
     @JoinTable(name = "user_has_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles;
+    private Set<Role> roles;
 
 }

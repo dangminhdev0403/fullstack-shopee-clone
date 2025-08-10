@@ -1,6 +1,6 @@
 package com.minh.shopee.domain.model;
 
-import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -40,5 +40,11 @@ public class Permission {
 
     @ManyToMany(mappedBy = "permissions")
     @JsonIgnore
-    private List<Role> roles;
+    private Set<Role> roles;
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
 }

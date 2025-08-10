@@ -2,6 +2,7 @@ package com.minh.shopee.services.impl;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 import com.minh.shopee.domain.dto.request.UserReqDTO;
 import com.minh.shopee.domain.dto.response.users.UpdateUserResDTO;
 import com.minh.shopee.domain.dto.response.users.UserDTO;
+import com.minh.shopee.domain.model.Role;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.domain.specification.UserSpecification;
 import com.minh.shopee.repository.GenericRepositoryCustom;
+import com.minh.shopee.repository.RoleRepository;
 import com.minh.shopee.repository.UserRepository;
 import com.minh.shopee.services.UserService;
 import com.minh.shopee.services.utils.error.DuplicateException;
@@ -33,10 +36,10 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UploadCloud uploadCloud;
     private final GenericRepositoryCustom<User> userCustomRepo;
-
 
     @Override
     public User createUser(User user) {
@@ -50,7 +53,12 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.hasText(user.getPassword())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            log.info("Assigning default role to user: {}", user.getEmail());
+            Role defaultRole = roleRepository.findById(3L)
+                    .orElseThrow(() -> new RuntimeException("Role ID=3 not found"));
+            user.setRoles(Set.of(defaultRole));
+        }
         User savedUser = userRepository.save(user);
         log.info("User created successfully with email: {}", savedUser.getEmail());
         return savedUser;
