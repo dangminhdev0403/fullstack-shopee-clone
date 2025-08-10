@@ -14,7 +14,7 @@ public class ApiRoutes {
         public static final List<String> API_VERSIONS = List.of("v1", "v2", "v3");
 
         public static final String[] PUBLIC_VERSIONED_ENDPOINTS = {
-                        "/posts/**", "/auth/login", "/auth/refresh",
+                        "/posts/**", "/auth/login", "/auth/refresh", "/auth/logout", "/auth/register",
                         "/provinces/**", "/districts/**", "/wards/**"
         };
 

@@ -26,9 +26,8 @@ public class AddAddressDTO {
     @NotNull(message = "Mã xã không được để trống")
     private Long wardId;
 
-    @NotBlank(message = "Địa chỉ đầy đủ không được để trống")
     private String fullAddress;
-    
+
     private Boolean isDefault = false;
 
     private String type = "home"; // home, office, other

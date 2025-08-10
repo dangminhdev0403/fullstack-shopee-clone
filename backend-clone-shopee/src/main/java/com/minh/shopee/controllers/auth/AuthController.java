@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.dto.request.LoginRequest;
+import com.minh.shopee.domain.dto.request.UserResgisterDTO;
 import com.minh.shopee.domain.dto.response.users.ResLoginDTO;
 import com.minh.shopee.domain.dto.response.users.UserDTO;
 import com.minh.shopee.domain.model.User;
@@ -181,7 +182,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ApiDescription("API Register")
-    public ResponseEntity<ResLoginDTO> register(@RequestBody @Valid User userRequest) {
+    public ResponseEntity<ResLoginDTO> register(@RequestBody @Valid UserResgisterDTO userRequest) {
         log.info("Register request received for email: {}", userRequest.getEmail());
 
         User createUser = this.userService.createUser(userRequest);

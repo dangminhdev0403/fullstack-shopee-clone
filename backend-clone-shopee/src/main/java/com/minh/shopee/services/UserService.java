@@ -6,13 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.minh.shopee.domain.dto.request.UserReqDTO;
+import com.minh.shopee.domain.dto.request.UserResgisterDTO;
 import com.minh.shopee.domain.dto.response.users.UpdateUserResDTO;
 import com.minh.shopee.domain.dto.response.users.UserDTO;
 import com.minh.shopee.domain.model.User;
 
 public interface UserService {
 
-    User createUser(User user);
+    User createUser(UserResgisterDTO user);
 
     User findByUsername(String username);
 

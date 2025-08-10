@@ -30,68 +30,80 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class PermissionInterceptor implements HandlerInterceptor {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper; // Dùng để trả JSON response
+    private final UserService userService; // Lấy thông tin User từ DB
+    private final PermissionRepository permissionRepository; // Lấy thông tin Permission từ DB
 
-    private final UserService userService;
-
-    private final PermissionRepository permissionRepository;
-
+    /**
+     * Interceptor này sẽ chạy trước khi request vào Controller (preHandle)
+     * 
+     * Mục tiêu:
+     * - Kiểm tra user hiện tại có quyền truy cập endpoint đang gọi hay không
+     * - Dựa trên cơ chế RBAC (Role-Based Access Control)
+     */
     @Override
     @Transactional
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws IOException {
+
+        // Lấy ra pattern khớp nhất với request, ví dụ: "/admin/api/v1/users"
         String path = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+
+        // Lấy method HTTP (GET, POST, PUT, DELETE)
         String httpMethod = request.getMethod();
 
+        // Lấy username từ Security Context (Spring Security)
         Optional<String> usernameOptional = SecurityUtils.getCurrentUserLogin();
         String username = usernameOptional.orElse(null);
+
+        // Nếu có đăng nhập
         if (username != null && !username.isEmpty()) {
-            User user = this.userService.findByUsername(username);
+            User user = this.userService.findByUsername(username); // Lấy thông tin user từ DB
 
-            // ! RBAC
-
+            // Lấy danh sách role của user
             Set<Role> roles = user.getRoles();
+
             if (!roles.isEmpty()) {
+                // Tìm permission tương ứng với method + path trong DB
                 Permission currentPermission = permissionRepository.findByMethodAndPath(httpMethod, path);
 
-                boolean isRole = roles.stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")
-                        || role.getPermissions().contains(currentPermission));
+                // Kiểm tra user có phải ROLE_ADMIN hoặc có permission tương ứng hay không
+                boolean isRole = roles.stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN") ||
+                        role.getPermissions().contains(currentPermission));
 
+                // Nếu có quyền thì cho phép đi tiếp
                 if (isRole) {
                     return true;
                 } else {
-                    response.setContentType("application/json;charset=UTF-8");
-
-                    int statusCode = HttpStatus.FORBIDDEN.value();
-                    response.setStatus(statusCode);
-                    ResponseData<Object> data = ResponseData.<Object>builder()
-                            .status(statusCode)
-                            .data(null)
-                            .error("403")
-                            .message("Không có quyền hạn")
-                            .build();
-
-                    response.getWriter().write(objectMapper.writeValueAsString(data));
+                    // Nếu không có quyền -> trả về 403
+                    writeErrorResponse(response, HttpStatus.FORBIDDEN, "Không có quyền hạn");
                     return false;
                 }
             } else {
-                response.setContentType("application/json;charset=UTF-8");
-
-                int statusCode = HttpStatus.FORBIDDEN.value();
-                response.setStatus(statusCode);
-                ResponseData<Object> data = ResponseData.<Object>builder()
-                        .status(statusCode)
-                        .data(null)
-                        .error("403")
-                        .message("Không có quyền hạn")
-                        .build();
-
-                response.getWriter().write(objectMapper.writeValueAsString(data));
+                // User không có role nào -> 403
+                writeErrorResponse(response, HttpStatus.FORBIDDEN, "Không có quyền hạn");
                 return false;
             }
-
         }
-        return true;
 
+        // Nếu user chưa đăng nhập → vẫn cho qua, để AuthenticationEntryPoint xử lý 401
+
+        return true;
+    }
+
+    /**
+     * Helper method để viết JSON trả về khi bị từ chối
+     */
+    private void writeErrorResponse(HttpServletResponse response, HttpStatus status, String message)
+            throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(status.value());
+        ResponseData<Object> data = ResponseData.<Object>builder()
+                .status(status.value())
+                .data(null)
+                .error(String.valueOf(status.value()))
+                .message(message)
+                .build();
+        response.getWriter().write(objectMapper.writeValueAsString(data));
     }
 }

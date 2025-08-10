@@ -8,12 +8,12 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minh.shopee.domain.dto.response.ResponseData;
@@ -24,7 +24,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component("authenticationEntryPoint")
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    private final AuthenticationEntryPoint delegate = new BearerTokenAuthenticationEntryPoint();
     private final ObjectMapper objectMapper;
     private final PathMatcher pathMatcher = new AntPathMatcher(); // Thêm PathMatcher để khớp route
     private final RequestMappingHandlerMapping handlerMapping; // Inject từ ApplicationContext
@@ -39,7 +38,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType("application/json");
         String path = request.getRequestURI();
 
         // Kiểm tra xem route có hợp lệ không
@@ -80,7 +79,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 .flatMap(info -> {
                     if (info.getPathPatternsCondition() != null) {
                         return info.getPathPatternsCondition().getPatterns().stream()
-                                .map(pattern -> pattern.getPatternString()); // Lấy đường dẫn thực tế
+                                .map(PathPattern::getPatternString); // Lấy đường dẫn thực tế
                     }
                     return Stream.empty();
                 })

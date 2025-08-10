@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.minh.shopee.domain.dto.request.UserReqDTO;
+import com.minh.shopee.domain.dto.request.UserResgisterDTO;
 import com.minh.shopee.domain.dto.response.users.UpdateUserResDTO;
 import com.minh.shopee.domain.dto.response.users.UserDTO;
 import com.minh.shopee.domain.model.Role;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
     private final GenericRepositoryCustom<User> userCustomRepo;
 
     @Override
-    public User createUser(User user) {
+    public User createUser(UserResgisterDTO user) {
         log.info("Creating user with email: {}", user.getEmail());
 
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
@@ -53,13 +54,18 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.hasText(user.getPassword())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            log.info("Assigning default role to user: {}", user.getEmail());
-            Role defaultRole = roleRepository.findById(3L)
-                    .orElseThrow(() -> new RuntimeException("Role ID=3 not found"));
-            user.setRoles(Set.of(defaultRole));
-        }
-        User savedUser = userRepository.save(user);
+        User newUser = User.builder()
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .name(user.getName())
+                .build();
+
+        log.info("Assigning default role to user: {}", user.getEmail());
+        Role defaultRole = roleRepository.findById(3L)
+                .orElseThrow(() -> new RuntimeException("Role ID=3 not found"));
+        newUser.setRoles(Set.of(defaultRole));
+
+        User savedUser = userRepository.save(newUser);
         log.info("User created successfully with email: {}", savedUser.getEmail());
         return savedUser;
     }
