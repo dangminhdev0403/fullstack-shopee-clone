@@ -12,10 +12,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.minh.shopee.config.routes.ApiRoutes;
 import com.minh.shopee.config.routes.CommonRoutes;
 import com.minh.shopee.config.routes.ProductRoutes;
 import com.minh.shopee.config.routes.UserRoutes;
+import com.minh.shopee.domain.constant.ApiRoutes;
 
 @Configuration
 public class SecurityConfiguration {

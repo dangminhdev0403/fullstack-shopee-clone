@@ -38,7 +38,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType("application/json");
+        response.setContentType("application/json;charset=UTF-8");
         String path = request.getRequestURI();
 
         // Kiểm tra xem route có hợp lệ không

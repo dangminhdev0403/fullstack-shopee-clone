@@ -96,7 +96,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
      */
     private void writeErrorResponse(HttpServletResponse response, HttpStatus status, String message)
             throws IOException {
-        response.setContentType("application/json");
+        response.setContentType("application/json;charset=UTF-8");
         response.setStatus(status.value());
         ResponseData<Object> data = ResponseData.<Object>builder()
                 .status(status.value())

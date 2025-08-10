@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
+import com.minh.shopee.domain.constant.ApiRoutes;
+import com.minh.shopee.domain.dto.request.UserResgisterDTO;
 import com.minh.shopee.domain.dto.response.users.UserDTO;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.services.UserService;
@@ -18,7 +20,7 @@ import com.minh.shopee.services.UserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(ApiRoutes.USERS)
 @RequiredArgsConstructor
 public class UserController {
 
@@ -26,7 +28,7 @@ public class UserController {
 
     @PostMapping("")
     @ApiDescription("Tạo người dùng")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody UserResgisterDTO user) {
         User userCreated = userService.createUser(user);
         return ResponseEntity.ok().body(userCreated);
 

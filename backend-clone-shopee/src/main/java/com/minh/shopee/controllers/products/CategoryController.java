@@ -1,4 +1,4 @@
-package com.minh.shopee.controllers.admin;
+package com.minh.shopee.controllers.products;
 
 import java.io.IOException;
 
@@ -26,7 +26,7 @@ import com.minh.shopee.services.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RestController("categoryAdminController")
+@RestController
 @RequestMapping(ApiRoutes.API_BASE_V1 + ApiRoutes.CATEGORIES)
 @RequiredArgsConstructor
 @Slf4j(topic = "CategoryController")
@@ -41,37 +41,6 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    @PostMapping()
-    @ApiDescription("Tạo danh sách danh mục")
-    public ResponseEntity<String> createCategory(
-            @RequestParam(value = "fileCategoryExcel", required = false) MultipartFile file,
-            @ModelAttribute Category category) throws IOException {
-        if (file != null) {
-            this.categoryService.createListCategory(file);
-            return ResponseEntity.ok("Tạo danh mục thành công: ");
-
-        }
-
-        Category categoryCreated = this.categoryService.createCategory(category);
-
-        return ResponseEntity.ok("Tạo danh mục " + categoryCreated.getName() + " thành công ");
-    }
-
-    @PutMapping()
-    @ApiDescription("Sửa danh mục")
-    public ResponseEntity<Category> updateCategory(@RequestBody Category entity) {
-        Category categoryUpdated = this.categoryService.updateCategory(entity);
-        log.info("Category updated: {}", categoryUpdated);
-        return ResponseEntity.ok(categoryUpdated);
-
-    }
-
-    @DeleteMapping()
-    @ApiDescription("Xoá danh mục")
-    public ResponseEntity<Void> deleteCategory(Long id) {
-        this.categoryService.deleteCategory(id);
-        log.info("Category deleted with id: {}", id);
-        return ResponseEntity.ok().build();
-    }
+  
 
 }

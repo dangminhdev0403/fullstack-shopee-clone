@@ -1,5 +1,7 @@
 package com.minh.shopee.config.routes;
 
+import com.minh.shopee.domain.constant.ApiRoutes;
+
 public class ProductRoutes {
     public static final String BASE = ApiRoutes.API_BASE;
 

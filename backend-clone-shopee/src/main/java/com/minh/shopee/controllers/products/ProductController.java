@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
+import com.minh.shopee.domain.constant.ApiRoutes;
 import com.minh.shopee.domain.dto.request.AddProductDTO;
 import com.minh.shopee.domain.dto.request.ListIdCartDetailDTO;
 import com.minh.shopee.domain.dto.request.ProductReqDTO;
@@ -37,7 +38,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/v1/products")
+@RequestMapping(ApiRoutes.API_BASE_V1 + ApiRoutes.PRODUCTS)
 @RequiredArgsConstructor
 public class ProductController {
 

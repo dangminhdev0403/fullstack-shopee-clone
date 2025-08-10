@@ -5,10 +5,12 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.minh.shopee.config.interceptor.PermissionInterceptor;
+import com.minh.shopee.domain.constant.ApiRoutes;
 
 @Configuration
 public class PermissionInterceptorConfiguration implements WebMvcConfigurer {
 
+    private static final String ADMIN_API = ApiRoutes.API_BASE_V1 + ApiRoutes.ADMIN;
     private final PermissionInterceptor permissionInterceptor;
 
     public PermissionInterceptorConfiguration(PermissionInterceptor permissionInterceptor) {
@@ -16,9 +18,8 @@ public class PermissionInterceptorConfiguration implements WebMvcConfigurer {
     }
 
     @Override
-
-    public void addInterceptors(InterceptorRegistry  registry) {
-        String[] whiteList = { "/admin/**" };
+    public void addInterceptors(InterceptorRegistry registry) {
+        String[] whiteList = { ADMIN_API + "/**" };
         registry.addInterceptor(permissionInterceptor).addPathPatterns(whiteList);
     }
 }

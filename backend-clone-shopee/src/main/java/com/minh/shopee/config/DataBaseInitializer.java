@@ -63,7 +63,7 @@ public class DataBaseInitializer implements CommandLineRunner {
     public void initializeRoles() {
         if (roleRepository.count() == 0) {
             log.info("📌 No roles found, creating default roles...");
-            String[] listRoleName = { "ROLE_ADMIN", "ROLE_USER", "ROLE_SELLER" };
+            String[] listRoleName = { "ROLE_ADMIN", "ROLE_SELLER", "ROLE_USER" };
             List<Role> listRole = Arrays.stream(listRoleName).map(roleName -> {
                 Role role = new Role();
                 role.setName(roleName);
