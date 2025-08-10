@@ -11,6 +11,7 @@ public class ApiRoutes {
         }
 
         public static final String ROLES = "/roles";
+        public static final String PERMISSIONS = "/permissions";
         public static final String USERS = "/users";
         public static final String ADMIN = "/admin";
         public static final String API_BASE = "/api";

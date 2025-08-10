@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
-import com.minh.shopee.domain.dto.request.RoleDTO;
+import com.minh.shopee.domain.dto.request.rbac.RoleRequest;
+import com.minh.shopee.domain.dto.response.projection.RoleProjection;
+import com.minh.shopee.domain.dto.response.rbac.RoleDTO;
 import com.minh.shopee.domain.model.Role;
 import com.minh.shopee.services.RoleService;
 
@@ -39,7 +41,7 @@ public class RoleController {
 
     @PostMapping("")
     @ApiDescription("Tạo vai trò")
-    public ResponseEntity<String> createRole(@RequestBody Role entity) {
+    public ResponseEntity<String> createRole(@RequestBody RoleRequest entity) {
         Role roleCreated = this.roleService.createRole(entity);
         return ResponseEntity.ok("Tạo vai trò " + roleCreated.getName() + " thành công ");
 
@@ -47,13 +49,14 @@ public class RoleController {
 
     @GetMapping("/{id}")
     @ApiDescription("Lấy vai trò theo ID")
-    public ResponseEntity<RoleDTO> getRoleById(@PathVariable Long id) {
-        RoleDTO role = this.roleService.getRoleById(id, RoleDTO.class);
+    public ResponseEntity<RoleProjection> getRoleById(@PathVariable Long id) {
+        // RoleDTO role = this.roleService.getRoleById(id, RoleDTO.class);
+        RoleProjection role = this.roleService.getRoleById(id);
         return ResponseEntity.ok(role);
     }
 
     @PutMapping("")
-    public ResponseEntity<String> putMethodName(@RequestBody Role entity) {
+    public ResponseEntity<String> putMethodName(@RequestBody RoleRequest entity) {
         this.roleService.updateRole(entity);
 
         return ResponseEntity.ok("Cập nhật vai trò thành công");
