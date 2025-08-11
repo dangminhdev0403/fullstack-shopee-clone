@@ -1,5 +1,7 @@
 
 package com.minh.shopee.domain.dto.response.rbac;
+import java.util.Set;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,4 +13,5 @@ public class PermissionDTO {
     private Long id;
     private String method;
     private String descrition;
+    
 }

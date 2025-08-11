@@ -106,4 +106,11 @@ public class RoleServiceImp implements RoleService {
                         "Role with id " + id + " not found")); // Placeholder exception
     }
 
+    @Override
+    public Page<RoleProjection> getAllRoles(Pageable pageable) {
+        log.info("Fetching all roles with projection");
+        return this.roleRepository.findAllProjectedBy(pageable);
+
+    }
+
 }

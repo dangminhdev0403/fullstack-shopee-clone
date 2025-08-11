@@ -13,6 +13,8 @@ import com.minh.shopee.domain.model.Role;
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
     <T> Page<T> findAllBy(Class<T> type, Pageable pageable);
 
+    Page<RoleProjection> findAllProjectedBy(Pageable pageable);
+
     boolean existsByName(String name);
 
     <T> Optional<T> findById(Long id, Class<T> type);

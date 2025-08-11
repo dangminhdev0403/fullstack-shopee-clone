@@ -33,8 +33,9 @@ public class RoleController {
     @ApiDescription("Lấy danh sách các vai trò")
 
     public ResponseEntity<Page<RoleDTO>> getAllRoles(@PageableDefault(page = 0, size = 20) Pageable pageable) {
-        Page<RoleDTO> roles = this.roleService.getAllRoles(RoleDTO.class, pageable); // Placeholder response
-
+        Page<RoleDTO> roles = this.roleService.getAllRoles(RoleDTO.class, pageable);
+        // // Placeholder response
+        // Page<RoleProjection> roles = this.roleService.getAllRoles(pageable);
         return ResponseEntity.ok(roles);
 
     }
@@ -50,7 +51,6 @@ public class RoleController {
     @GetMapping("/{id}")
     @ApiDescription("Lấy vai trò theo ID")
     public ResponseEntity<RoleProjection> getRoleById(@PathVariable Long id) {
-        // RoleDTO role = this.roleService.getRoleById(id, RoleDTO.class);
         RoleProjection role = this.roleService.getRoleById(id);
         return ResponseEntity.ok(role);
     }
