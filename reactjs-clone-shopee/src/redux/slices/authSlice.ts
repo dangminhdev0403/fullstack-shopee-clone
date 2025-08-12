@@ -5,8 +5,12 @@ interface AuthState {
   isAuthenticated: boolean;
   accessToken?: string;
   user?: {
+    id: string;
     name: string;
     email: string;
+    roles: {
+      name: string;
+    }[];
   } | null;
 }
 

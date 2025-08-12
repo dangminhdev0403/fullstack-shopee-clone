@@ -125,7 +125,7 @@ public class DataBaseInitializer implements CommandLineRunner {
                                     .map(path -> m.name() + ":" + path + ":" + description));
                 })
                 // 🚫 Bỏ swagger / openapi endpoints
-                .filter(e -> !e.contains("/swagger") && !e.contains("/v3/api-docs"))
+                .filter(e -> !e.contains("/swagger") && !e.contains("/v3/api-docs") && !e.contains("/auth"))
                 .collect(Collectors.toSet());
 
         // 2. Lấy toàn bộ permission từ DB

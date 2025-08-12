@@ -5,6 +5,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.minh.shopee.domain.base.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -27,7 +28,8 @@ public class Role extends BaseEntity {
     @JsonIgnore
     private Set<User> users;
 
-    @ManyToMany
+    @ManyToMany(cascade = { CascadeType.MERGE,
+            CascadeType.PERSIST })
     @JoinTable(name = "role_has_permission", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     @JsonIgnore
     private Set<Permission> permissions;

@@ -31,7 +31,6 @@ import com.minh.shopee.domain.dto.request.LoginRequest;
 import com.minh.shopee.domain.dto.request.UserResgisterDTO;
 import com.minh.shopee.domain.dto.response.projection.RoleProjection;
 import com.minh.shopee.domain.dto.response.projection.UserLoginProjection;
-import com.minh.shopee.domain.dto.response.rbac.PermissionDTO;
 import com.minh.shopee.domain.dto.response.rbac.RoleDTO;
 import com.minh.shopee.domain.dto.response.users.ResLoginDTO;
 import com.minh.shopee.domain.model.User;
@@ -200,24 +199,16 @@ public class AuthController {
                 log.info("Register request received for email: {}", userRequest.getEmail());
 
                 User createUser = userService.createUser(userRequest);
-                String email = createUser.getEmail();
-                String name = createUser.getName();
 
-                Set<RoleDTO> roleDTOs = createUser.getRoles().stream()
-                                .map(r -> new RoleDTO(
-                                                r.getId(),
-                                                r.getName(),
-                                                r.getPermissions().stream()
-                                                                .map(p -> new PermissionDTO(p.getMethod(), p.getPath(),
-                                                                                p.getDescrition()))
-                                                                .collect(Collectors.toSet())))
+                Set<RoleProjection> roleProjections = createUser.getRoles().stream()
+                                .map(RoleProjection.class::cast)
                                 .collect(Collectors.toSet());
-                ResLoginDTO.UserLogin userLogin = ResLoginDTO.UserLogin.builder()
-                                .email(email)
-                                .name(name)
-                                .id(createUser.getId())
-                                .roles(roleDTOs)
-                                .build();
+                ResLoginDTO.UserLogin userLogin = buildUserLogin(
+                                createUser.getId(),
+                                createUser.getEmail(),
+                                createUser.getName(),
+                                mapRoles(roleProjections));
+                String email = createUser.getEmail();
 
                 String accessToken = this.securityUtils.createAccessToken(email, userLogin);
                 ResLoginDTO resLoginDTO = ResLoginDTO.builder().accessToken(accessToken).user(userLogin).build();
@@ -247,13 +238,21 @@ public class AuthController {
 
         private Set<RoleDTO> mapRoles(Set<? extends RoleProjection> roleProjections) {
                 return roleProjections.stream()
-                                .map(r -> new RoleDTO(
-                                                r.getId(),
-                                                r.getName(),
-                                                r.getPermissions().stream()
-                                                                .map(p -> new PermissionDTO(p.getMethod(), p.getPath(),
-                                                                                p.getDescrition()))
-                                                                .collect(Collectors.toSet())))
+                                .map(r -> {
+                                        int permissionCount = r.getPermissions() != null ? r.getPermissions().size()
+                                                        : 0;
+
+                                        String roleName;
+                                        if (permissionCount > 1 || r.getId() == 1) {
+                                                roleName = "ROLE_ADMIN";
+                                        } else {
+                                                roleName = "ROLE_USER";
+                                        }
+
+                                        return new RoleDTO(
+                                                        r.getId(),
+                                                        roleName);
+                                })
                                 .collect(Collectors.toSet());
         }
 

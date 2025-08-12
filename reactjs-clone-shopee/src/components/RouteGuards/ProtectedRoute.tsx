@@ -1,14 +1,15 @@
+// src/components/RouteGuards/ProtectedRoute.tsx
 import { RootState } from "@redux/store";
 import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const isAuthenticated: boolean = useSelector(
+  const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated,
   );
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;
