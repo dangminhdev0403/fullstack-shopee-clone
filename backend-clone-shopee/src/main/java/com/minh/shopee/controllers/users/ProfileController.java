@@ -18,6 +18,8 @@ import com.minh.shopee.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -38,5 +40,11 @@ public class ProfileController {
 
         return ResponseEntity.ok().body(updatUser);
     }
+
+    @GetMapping("")
+    public String getMethodName(@RequestParam String param) {
+        return new String();
+    }
+    
 
 }

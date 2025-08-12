@@ -36,7 +36,8 @@ public class UserController {
 
     @GetMapping("/search")
     @ApiDescription("Tìm kiếm người dùng theo từ khoá")
-    public ResponseEntity<Page<UserDTO>> searchUsers(@RequestParam("keyword") String keyword,
+    public ResponseEntity<Page<UserDTO>> searchUsers(
+            @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
             Pageable pageable) {
         Page<UserDTO> user = userService.searchUsers(keyword, pageable);
         return ResponseEntity.ok(user);

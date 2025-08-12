@@ -1,7 +1,7 @@
 
 package com.minh.shopee.domain.dto.response.rbac;
-import java.util.Set;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,9 +9,11 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
+@AllArgsConstructor
 public class PermissionDTO {
-    private Long id;
+
     private String method;
+    private String path;
     private String descrition;
-    
+
 }

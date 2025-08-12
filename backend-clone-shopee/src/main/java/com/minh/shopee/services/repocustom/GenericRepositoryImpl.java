@@ -2,12 +2,20 @@ package com.minh.shopee.services.repocustom;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.data.projection.ProjectionFactory;
@@ -15,8 +23,17 @@ import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 
 import com.minh.shopee.repository.GenericRepositoryCustom;
 
-import jakarta.persistence.*;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TupleElement;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
 
 /**
  * GenericRepositoryImpl
@@ -30,13 +47,11 @@ public class GenericRepositoryImpl<T> implements GenericRepositoryCustom<T> {
     private EntityManager entityManager; // EntityManager để thao tác trực tiếp Criteria API
 
     private final Class<T> domainClass; // Entity class (vd: Product.class)
-    private final ProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory(); // Tạo projection
-                                                                                               // interface từ Map
-                                                                                               // values
+    private final ProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory(); // Tạo projection values
     private final ParameterNameDiscoverer paramNameDiscoverer = new DefaultParameterNameDiscoverer(); // Lấy tên tham số
                                                                                                       // của constructor
-
     // Constructor bắt buộc truyền class entity
+
     public GenericRepositoryImpl(Class<T> domainClass) {
         this.domainClass = domainClass;
     }
@@ -159,7 +174,7 @@ public class GenericRepositoryImpl<T> implements GenericRepositoryCustom<T> {
                     // projectionFactory map values → projection interface
                     return projectionFactory.createProjection(projection, values);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
