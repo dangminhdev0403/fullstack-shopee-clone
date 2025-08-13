@@ -35,3 +35,7 @@ body {
   letter-spacing: 2px;
   position: relative;
 }
+
+button {
+  cursor: pointer;
+}

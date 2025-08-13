@@ -8,7 +8,7 @@ import { ApiResponse, DataUserLogin } from "@utils/constants/types/response";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { toast } from "react-toastify";
 
 interface UserLogin {
@@ -19,6 +19,7 @@ interface UserLogin {
 const Login = () => {
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -27,7 +28,6 @@ const Login = () => {
   } = useForm<UserLogin>({
     mode: "onChange",
   });
-  const navigate = useNavigate();
   const onSubmit = handleSubmit(async (dataLogin: UserLogin) => {
     try {
       const res: ApiResponse<DataUserLogin> = await login(dataLogin).unwrap();
@@ -38,14 +38,13 @@ const Login = () => {
         }),
       );
 
-      toast.success("Đăng nhập thành công");
-
       const roles = res.data.user?.roles?.map((r) => r.name) || [];
       if (roles.includes("ROLE_ADMIN")) {
-        navigate(ROUTES.ADMIN.BASE);
+        window.location.href = ROUTES.ADMIN.BASE;
       } else {
-        navigate(ROUTES.HOME);
+        window.location.href = ROUTES.HOME;
       }
+      toast.success("Đăng nhập thành công");
     } catch (error) {
       const err = error as ErrorResponse;
       toast.error(err.data.message);

@@ -1,18 +1,22 @@
 "use client";
 
+import { authSlice } from "@redux/slices/authSlice";
 import { ROUTES } from "@utils/constants/route";
 import {
   Activity,
   BarChart3,
   Crown,
   LayoutDashboard,
+  LogOut,
   Package,
-  Settings,
   Shield,
   ShoppingCart,
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -31,7 +35,8 @@ export function SidebarAdmin({
   const [user, setUser] = useState({
     role: "admin", // or "super-admin"
   });
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const menuItems = [
     {
       id: "dashboard",
@@ -76,15 +81,20 @@ export function SidebarAdmin({
     },
     {
       id: "settings",
-      label: "Cài đặt",
-      icon: Settings,
+      label: "Đăng Xuất",
+      icon: LogOut,
       color: "text-gray-500",
       gradient: "from-gray-500 to-gray-600",
-      path: ROUTES.ADMIN.ABS.SETTING,
+      path: ROUTES.LOGOUT,
     },
   ];
 
   const handleNavigate = (path: string) => {
+    if (path === ROUTES.LOGOUT) {
+      dispatch(authSlice.actions.setLogOut());
+      toast.success("Đăng xuất thành công");
+      navigate(ROUTES.LOGIN);
+    }
     onNavigate(path);
   };
   return (

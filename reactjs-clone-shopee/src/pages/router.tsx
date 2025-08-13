@@ -1,12 +1,11 @@
 import App from "@App";
 import Login from "@components/Login";
 import Register from "@components/Register";
-import AdminRoute from "@components/RouteGuards/AdminRoute";
 import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import AdminLayout from "@layouts/AdminLayout";
-import { Dashboard } from "@mui/icons-material";
 import Analytics from "@pages/admin/Analytics";
+import Dashboard from "@pages/admin/Dashboard";
 import Orders from "@pages/admin/Orders";
 import Products from "@pages/admin/Product";
 import UserManagement from "@pages/admin/UserManagement";
@@ -41,7 +40,7 @@ export const router = createBrowserRouter([
   },
   {
     path: ROUTES.ADMIN.BASE,
-    element: <AdminRoute />, // chỉ admin
+    element: <ProtectedRoute />, // chỉ admin
     children: [
       {
         element: <AdminLayout />,

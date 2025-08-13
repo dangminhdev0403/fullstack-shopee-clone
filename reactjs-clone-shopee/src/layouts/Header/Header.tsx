@@ -34,6 +34,13 @@ const Header = () => {
   const [logOut] = useLogOutMutation();
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isAmdmin = (user?.roles?.map((r) => r.name) || []).every(
+    (role) => role === "ROLE_ADMIN",
+  );
+  console.log(user);
+
+  console.log(isAmdmin);
 
   const { data: cart } = useGetCartQuery();
 
@@ -44,7 +51,6 @@ const Header = () => {
   };
 
   const handleProfileClick = async (value: string) => {
-    console.log("Item clicked:", value);
     switch (value) {
       case "profile":
         break;
@@ -76,12 +82,16 @@ const Header = () => {
     <header className="max-w-6xl bg-[#fb5831] lg:max-w-full">
       <nav className="hidden justify-around pt-1.5 text-sm font-medium text-white lg:flex">
         <div className="flex gap-1">
-          <NavLink to={"/"} className="relative mr-2 pr-2">
-            Kênh Người Bán <BorderRight />{" "}
-          </NavLink>
-          <NavLink to={"/sellers"} className="relative mr-2 pr-2">
-            Trở thành Người bán Shopee <BorderRight />{" "}
-          </NavLink>
+          {isAmdmin ? (
+            <NavLink to={ROUTES.ADMIN.BASE} className="relative mr-2 pr-2">
+              Kênh Người Bán <BorderRight />{" "}
+            </NavLink>
+          ) : (
+            <NavLink to={"/sellers"} className="relative mr-2 pr-2">
+              Trở thành Người bán Shopee <BorderRight />{" "}
+            </NavLink>
+          )}
+
           <NavLink to={"/download"} className="relative mr-2 pr-2">
             Tải ứng dụng <BorderRight />{" "}
           </NavLink>

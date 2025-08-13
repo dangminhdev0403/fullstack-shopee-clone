@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
-  Search,
+  BarChart3,
   LayoutDashboard,
   Package,
+  Search,
+  Settings,
   ShoppingCart,
   Users,
-  BarChart3,
-  Settings,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -68,10 +68,10 @@ export function CommandPalette({
     },
     {
       id: "settings",
-      title: "Cài đặt",
-      description: "Cấu hình hệ thống",
+      title: "Đăng Xuất",
+      description: "Đăng Xuất",
       icon: Settings,
-      action: () => onNavigate("settings"),
+      action: () => onNavigate("logout"),
       category: "Navigation",
     },
   ];

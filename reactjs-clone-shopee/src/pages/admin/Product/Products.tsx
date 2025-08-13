@@ -1,5 +1,8 @@
 "use client";
 
+import ProductForm from "@components/admin/ProductForm";
+import { useProducts } from "@hooks/useProdcutAdmin";
+import { Product } from "@utils/constants/types/product-admin";
 import {
   AlertCircle,
   CheckCircle,
@@ -15,60 +18,24 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const products = [
-  {
-    id: "SP001",
-    name: "iPhone 15 Pro Max 256GB",
-    category: "Điện thoại",
-    price: 29990000,
-    originalPrice: 32990000,
-    stock: 45,
-    sold: 234,
-    rating: 4.8,
-    status: "active",
-    featured: true,
-  },
-  {
-    id: "SP002",
-    name: "Samsung Galaxy S24 Ultra",
-    category: "Điện thoại",
-    price: 26990000,
-    originalPrice: 29990000,
-    stock: 23,
-    sold: 189,
-    rating: 4.7,
-    status: "active",
-    featured: false,
-  },
-  {
-    id: "SP003",
-    name: "MacBook Air M3 13 inch",
-    category: "Laptop",
-    price: 28990000,
-    originalPrice: 31990000,
-    stock: 0,
-    sold: 156,
-    rating: 4.9,
-    status: "out_of_stock",
-    featured: true,
-  },
-  {
-    id: "SP004",
-    name: "AirPods Pro 2nd Gen",
-    category: "Phụ kiện",
-    price: 6490000,
-    originalPrice: 7490000,
-    stock: 78,
-    sold: 298,
-    rating: 4.6,
-    status: "active",
-    featured: false,
-  },
-];
-
-export function Products() {
+export default function Products() {
+  const {
+    products,
+    isLoading,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    getStats,
+  } = useProducts();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | undefined>();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
+    null,
+  );
+
+  const stats = getStats();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -111,6 +78,31 @@ export function Products() {
     return matchesSearch && matchesCategory;
   });
 
+  const handleAddProduct = () => {
+    setEditingProduct(undefined);
+    setShowForm(true);
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setShowForm(true);
+  };
+
+  const handleFormSubmit = (formData: any) => {
+    if (editingProduct) {
+      updateProduct(editingProduct.id, formData);
+    } else {
+      addProduct(formData);
+    }
+    setShowForm(false);
+    setEditingProduct(undefined);
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    deleteProduct(id);
+    setShowDeleteConfirm(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -123,7 +115,10 @@ export function Products() {
             Quản lý toàn bộ sản phẩm trong cửa hàng của bạn
           </p>
         </div>
-        <button className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-orange-600 hover:to-red-600 hover:shadow-xl">
+        <button
+          onClick={handleAddProduct}
+          className="flex cursor-pointer items-center space-x-2 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-orange-600 hover:to-red-600 hover:shadow-xl"
+        >
           <Plus className="h-5 w-5" />
           <span>Thêm sản phẩm mới</span>
         </button>
@@ -137,7 +132,7 @@ export function Products() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Tổng sản phẩm
               </p>
-              <p className="text-3xl font-bold">2,847</p>
+              <p className="text-3xl font-bold">{stats.totalProducts}</p>
             </div>
             <div className="rounded-2xl bg-blue-100 p-3 dark:bg-blue-900/20">
               <Package className="h-6 w-6 text-blue-600" />
@@ -148,7 +143,7 @@ export function Products() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Đã bán</p>
-              <p className="text-3xl font-bold">1,234</p>
+              <p className="text-3xl font-bold">{stats.totalSold}</p>
             </div>
             <div className="rounded-2xl bg-green-100 p-3 dark:bg-green-900/20">
               <TrendingUp className="h-6 w-6 text-green-600" />
@@ -161,7 +156,7 @@ export function Products() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Hết hàng
               </p>
-              <p className="text-3xl font-bold">23</p>
+              <p className="text-3xl font-bold">{stats.outOfStock}</p>
             </div>
             <div className="rounded-2xl bg-red-100 p-3 dark:bg-red-900/20">
               <AlertCircle className="h-6 w-6 text-red-600" />
@@ -174,7 +169,9 @@ export function Products() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Đánh giá TB
               </p>
-              <p className="text-3xl font-bold">4.7</p>
+              <p className="text-3xl font-bold">
+                {stats.averageRating.toFixed(1)}
+              </p>
             </div>
             <div className="rounded-2xl bg-yellow-100 p-3 dark:bg-yellow-900/20">
               <Star className="h-6 w-6 text-yellow-600" />
@@ -208,6 +205,8 @@ export function Products() {
                 <option value="Điện thoại">Điện thoại</option>
                 <option value="Laptop">Laptop</option>
                 <option value="Phụ kiện">Phụ kiện</option>
+                <option value="Tablet">Tablet</option>
+                <option value="Đồng hồ">Đồng hồ</option>
               </select>
               <button className="flex items-center space-x-2 rounded-xl border border-gray-200 px-4 py-2 transition-colors duration-200 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700">
                 <Filter className="h-4 w-4" />
@@ -311,10 +310,16 @@ export function Products() {
                       <button className="rounded-lg p-2 transition-colors duration-200 hover:bg-blue-100 dark:hover:bg-blue-900/20">
                         <Eye className="h-4 w-4 text-blue-600" />
                       </button>
-                      <button className="rounded-lg p-2 transition-colors duration-200 hover:bg-green-100 dark:hover:bg-green-900/20">
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="rounded-lg p-2 transition-colors duration-200 hover:bg-green-100 dark:hover:bg-green-900/20"
+                      >
                         <Edit className="h-4 w-4 text-green-600" />
                       </button>
-                      <button className="rounded-lg p-2 transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/20">
+                      <button
+                        onClick={() => setShowDeleteConfirm(product.id)}
+                        className="rounded-lg p-2 transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/20"
+                      >
                         <Trash2 className="h-4 w-4 text-red-600" />
                       </button>
                     </div>
@@ -325,6 +330,46 @@ export function Products() {
           </table>
         </div>
       </div>
+
+      {/* Product Form Modal */}
+      {showForm && (
+        <ProductForm
+          product={editingProduct}
+          onSubmit={handleFormSubmit}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingProduct(undefined);
+          }}
+          isLoading={isLoading}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+            <h3 className="mb-4 text-lg font-semibold">Xác nhận xóa</h3>
+            <p className="mb-6 text-gray-600 dark:text-gray-400">
+              Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không
+              thể hoàn tác.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowDeleteConfirm(null)}
+                className="rounded-xl border border-gray-200 px-4 py-2 transition-colors duration-200 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() => handleDeleteProduct(showDeleteConfirm)}
+                className="rounded-xl bg-red-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-red-700"
+              >
+                Xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
