@@ -70,7 +70,7 @@ const CartItem = ({
 
             <div className="flex items-center">
               <IconButton
-                size="small"
+                size="large"
                 onClick={() =>
                   onQuantityChange(
                     item.product.id,
@@ -79,7 +79,7 @@ const CartItem = ({
                   )
                 }
                 disabled={item.quantity <= 1}
-                className="border border-gray-300"
+                className="!text-red-500"
               >
                 <Minus className="h-4 w-4" />
               </IconButton>
@@ -94,7 +94,7 @@ const CartItem = ({
                   )
                 }
                 className="mx-2 w-16"
-                size="small"
+                size="medium"
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { border: "none" },
@@ -103,7 +103,7 @@ const CartItem = ({
                 }}
               />
               <IconButton
-                size="small"
+                size="large"
                 onClick={() =>
                   onQuantityChange(
                     item.product.id,
@@ -112,7 +112,7 @@ const CartItem = ({
                   )
                 }
                 disabled={item.quantity >= item.product.stock}
-                className="border border-gray-300"
+                className="!text-blue-500"
               >
                 <Plus className="h-4 w-4" />
               </IconButton>
@@ -125,9 +125,9 @@ const CartItem = ({
             <Tooltip title="Xóa sản phẩm">
               <IconButton
                 onClick={() => onRemove(item.product.id)}
-                className="text-red-500 hover:bg-red-50"
+                className="text-red-700 hover:bg-red-50"
               >
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5" color="red" />
               </IconButton>
             </Tooltip>
           </div>

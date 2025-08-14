@@ -260,8 +260,11 @@ export default function CartPage() {
                   {/* Right Side - Total & Checkout */}
                   <div className="flex flex-col items-end gap-4 sm:flex-row sm:items-center">
                     <div className="text-right">
-                      <Typography variant="body2" className="text-gray-600">
-                        Tổng thanh toán ({totalItems} sản phẩm):
+                      <Typography
+                        variant="body2"
+                        className="font-medium text-gray-600 lg:!text-2xl"
+                      >
+                        Tổng thanh toán :
                       </Typography>
                       <Typography
                         variant="h5"

@@ -38,9 +38,6 @@ const Header = () => {
   const isAmdmin = (user?.roles?.map((r) => r.name) || []).every(
     (role) => role === "ROLE_ADMIN",
   );
-  console.log(user);
-
-  console.log(isAmdmin);
 
   const { data: cart } = useGetCartQuery();
 

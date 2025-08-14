@@ -42,6 +42,9 @@ public class Product extends BaseEntity {
     @ManyToOne
     private Category category;
 
+    @ManyToOne
+    private Shop shop;
+
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<CartDetail> cartDetails;

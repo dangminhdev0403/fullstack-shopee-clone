@@ -29,7 +29,10 @@ export const addressApi = rootApi.injectEndpoints({
         url: `${API_ROUTES.ADDRESS.ADDRESSES}`,
         method: "GET",
       }),
-      transformResponse: (response: ApiResponse<AddressDTO[]>) => response.data,
+      transformResponse: (response: ApiResponse<AddressDTO[]>) => {
+        // Đảo ngược mảng
+        return [...response.data].reverse();
+      },
       providesTags: (result) =>
         result
           ? [

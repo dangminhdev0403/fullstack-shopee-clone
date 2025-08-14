@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -50,8 +51,6 @@ public class GlobalExceptionHandler {
             message = "URL " + request.getRequestURL() + " không tồn tại";
             log.warn("⚠️ [404 NOT FOUND] URL: {} | Message: {}", request.getRequestURL(), ex.getMessage());
 
-
-            
         } else if (ex instanceof HttpRequestMethodNotSupportedException) {
             statusCode = HttpStatus.METHOD_NOT_ALLOWED.value();
             error = "Method không hỗ trợ";
@@ -78,11 +77,20 @@ public class GlobalExceptionHandler {
             message = "Thông tin đăng nhập không chính xác";
             log.warn("⚠️ [401 BadCredentialsException] URL: {} | Message: {}", request.getRequestURL(),
                     ex.getMessage());
+        } else if (ex instanceof HttpMessageNotReadableException) {
+            statusCode = HttpStatus.BAD_REQUEST.value();
+            error = "Lỗi  truyền JSON";
+            message = "Chưa truyền hoặc truyền sai Data JSON";
+            log.warn("⚠️ [400 HttpMessageNotReadableException] Required request body is missing",
+                    request.getRequestURL(),
+                    ex.getMessage());
         } else if (ex instanceof AppException e) {
             statusCode = e.getStatus();
             error = e.getError();
             message = e.getMessage();
-        } else {
+        }
+
+        else {
             log.error("❌ [COMMON EXCEPTION] URL: {} | Message: {}", request.getRequestURL(), ex.getMessage(), ex);
         }
 

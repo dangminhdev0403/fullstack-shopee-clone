@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -58,5 +59,12 @@ public class Order {
             this.prevStatus = this.status; // Lưu trạng thái hiện tại vào prevStatus
         }
         this.status = newStatus; // Cập nhật trạng thái mới
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (status == null) {
+            status = OrderStatus.PENDING; // Gán mặc định trước khi lưu
+        }
     }
 }

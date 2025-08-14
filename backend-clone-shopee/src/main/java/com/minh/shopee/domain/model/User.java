@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.minh.shopee.domain.base.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -44,8 +45,12 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user")
     private Cart cart;
 
+    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL)
+    private Shop shop;
+
     @OneToMany(mappedBy = "user")
     private List<Address> addresses;
+
     @ManyToMany
     @JoinTable(name = "user_has_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;

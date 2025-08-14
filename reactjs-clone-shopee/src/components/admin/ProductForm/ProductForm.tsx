@@ -73,6 +73,7 @@ export function ProductForm({
             {product ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
           </h2>
           <button
+            title="Close"
             onClick={onCancel}
             className="rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
@@ -102,6 +103,7 @@ export function ProductForm({
               Danh mục *
             </label>
             <select
+              title="category"
               value={formData.category}
               onChange={(e) => handleChange("category", e.target.value)}
               className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"

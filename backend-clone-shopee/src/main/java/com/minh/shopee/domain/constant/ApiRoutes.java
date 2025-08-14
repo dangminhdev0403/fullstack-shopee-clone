@@ -12,6 +12,7 @@ public class ApiRoutes {
 
         public static final String ROLES = "/roles";
         public static final String PERMISSIONS = "/permissions";
+        public static final String SHOPS = "/shops";
         public static final String USERS = "/users";
         public static final String ADMIN = "/admin";
         public static final String API_BASE = "/api";
@@ -19,6 +20,7 @@ public class ApiRoutes {
         public static final List<String> API_VERSIONS = List.of("v1", "v2", "v3");
         public static final String CATEGORIES = "/categories";
         public static final String PRODUCTS = "/products";
+        public static final String CHECKOUT = "/checkout";
 
         public static final String[] PUBLIC_VERSIONED_ENDPOINTS = {
                         "/posts/**", "/auth/login", "/auth/refresh", "/auth/logout", "/auth/register",

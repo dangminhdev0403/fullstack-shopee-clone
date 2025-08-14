@@ -76,6 +76,10 @@ export default function AddressDialog({
     placeholderData: keepPreviousData,
   });
 
+  const reversedProvinces = [
+    ...(Array.isArray(provinces) ? provinces : (provinces?.data ?? [])),
+  ].reverse();
+
   // Quận/Huyện
   const { data: districts = [], isLoading: isLoadingDistricts } = useQuery({
     queryKey: ["districts", newAddress.provinceId],
@@ -218,7 +222,7 @@ export default function AddressDialog({
     });
   };
 
-  const handleWardChange = (value: number) => {
+  const handleWardChange = (value: string) => {
     const updatedAddress = {
       ...newAddress,
       wardId: value ? String(value) : "0",
@@ -610,7 +614,7 @@ export default function AddressDialog({
                         "Chọn tỉnh/thành"
                       )}
                     </MenuItem>
-                    {provinces.map((province) => (
+                    {reversedProvinces.map((province) => (
                       <MenuItem
                         key={province.ProvinceID}
                         value={province.ProvinceID}
@@ -668,14 +672,21 @@ export default function AddressDialog({
                         "Chọn quận/huyện"
                       )}
                     </MenuItem>
-                    {districts.map((district) => (
-                      <MenuItem
-                        key={district.DistrictID}
-                        value={district.DistrictID}
-                      >
-                        {district.DistrictName}
-                      </MenuItem>
-                    ))}
+
+                    {[
+                      ...(Array.isArray(districts)
+                        ? districts
+                        : (districts?.data ?? [])),
+                    ]
+                      .reverse()
+                      .map((district) => (
+                        <MenuItem
+                          key={district.DistrictID}
+                          value={district.DistrictID}
+                        >
+                          {district.DistrictName}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
 
@@ -724,7 +735,10 @@ export default function AddressDialog({
                         "Chọn phường/xã"
                       )}
                     </MenuItem>
-                    {wards.map((ward) => (
+
+                    {[
+                      ...(Array.isArray(wards) ? wards : (wards?.data ?? [])),
+                    ].map((ward) => (
                       <MenuItem key={ward.WardCode} value={ward.WardCode}>
                         {ward.WardName}
                       </MenuItem>
