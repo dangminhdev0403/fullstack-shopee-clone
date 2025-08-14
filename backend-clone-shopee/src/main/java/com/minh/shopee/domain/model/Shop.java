@@ -15,7 +15,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -24,6 +26,8 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +48,8 @@ public class Shop {
     private User owner;
     @OneToMany(mappedBy = "shop")
     private List<Product> products;
-        @PrePersist
+
+    @PrePersist
     public void prePersist() {
         if (status == null) {
             status = ShopStatus.PENDING; // Gán mặc định trước khi lưu

@@ -21,6 +21,10 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public void createShop(CreateShopDTO request, Long userId) {
+        if (shopRepository.existsByOwnerId(userId)) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Shop is already exist",
+                    "Không thể gửi yêu cầu tạo shop");
+        }
         boolean isEmailExist = shopRepository.existsByEmail(request.getEmail());
 
         if (isEmailExist)

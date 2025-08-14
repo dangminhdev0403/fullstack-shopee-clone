@@ -33,6 +33,7 @@ import com.minh.shopee.domain.model.CartDetail;
 import com.minh.shopee.domain.model.Category;
 import com.minh.shopee.domain.model.Product;
 import com.minh.shopee.domain.model.ProductImage;
+import com.minh.shopee.domain.model.Shop;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.domain.specification.ProductImageSpecs;
 import com.minh.shopee.domain.specification.ProductSpecification;
@@ -41,7 +42,9 @@ import com.minh.shopee.repository.CartRepository;
 import com.minh.shopee.repository.GenericRepositoryCustom;
 import com.minh.shopee.repository.ProductImageRepository;
 import com.minh.shopee.repository.ProductRepository;
+import com.minh.shopee.repository.ShopRepository;
 import com.minh.shopee.services.ProductSerivce;
+import com.minh.shopee.services.utils.SecurityUtils;
 import com.minh.shopee.services.utils.error.AppException;
 import com.minh.shopee.services.utils.files.ExcelHelper;
 import com.minh.shopee.services.utils.files.UploadCloud;
@@ -63,6 +66,7 @@ public class ProductServiceImpl implements ProductSerivce {
     private final GenericRepositoryCustom<ProductImage> productImageCustomRepo;
     private final CartDetailRepository cartDetailRepository;
     private final CartRepository cartRepository;
+    private final ShopRepository shopRepository;
 
     @Override
     public <T> Set<T> getAllProducts(Class<T> type) {
@@ -136,12 +140,15 @@ public class ProductServiceImpl implements ProductSerivce {
 
     @Override
     public ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imagesProduct) {
+        long userId = SecurityUtils.getCurrentUserId();
+        Shop shop = this.shopRepository.findByOwnerId(userId);
         Category category = new Category();
         category.setId(productDTO.getCategoryId());
         Product product = Product.builder()
                 .name(productDTO.getName())
                 .description(productDTO.getDescription())
                 .price(productDTO.getPrice())
+                .shop(shop)
                 .stock(productDTO.getStock())
                 .category(category)
                 .build();

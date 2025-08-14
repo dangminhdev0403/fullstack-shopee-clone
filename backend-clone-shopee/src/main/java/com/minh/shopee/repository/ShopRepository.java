@@ -7,4 +7,9 @@ import com.minh.shopee.domain.model.Shop;
 
 public interface ShopRepository extends JpaRepository<Shop, Long>, JpaSpecificationExecutor<Shop> {
     boolean existsByEmail(String email);
+
+    Shop findByOwnerId(Long ownerId);
+
+    boolean existsByOwnerId(Long ownerId);
+
 }

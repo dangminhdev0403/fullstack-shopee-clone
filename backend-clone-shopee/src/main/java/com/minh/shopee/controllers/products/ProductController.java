@@ -50,7 +50,7 @@ public class ProductController {
             @RequestParam(value = "imageProduct", required = false) List<MultipartFile> imagesProduct) {
         ProductResDTO productCreate = productSerivce.createAProduct(productDTO, imagesProduct);
 
-        URI location = URI.create("/api/v1/products");
+        URI location = URI.create(ApiRoutes.API_BASE_V1 + ApiRoutes.PRODUCTS);
         return ResponseEntity.created(location)
                 .body(productCreate);
     }
