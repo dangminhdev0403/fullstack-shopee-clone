@@ -141,7 +141,9 @@ public class ProductServiceImpl implements ProductSerivce {
     @Override
     public ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imagesProduct) {
         long userId = SecurityUtils.getCurrentUserId();
-        Shop shop = this.shopRepository.findByOwnerId(userId);
+        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
+                        "Không tìm thấy shop của User này"));
         Category category = new Category();
         category.setId(productDTO.getCategoryId());
         Product product = Product.builder()

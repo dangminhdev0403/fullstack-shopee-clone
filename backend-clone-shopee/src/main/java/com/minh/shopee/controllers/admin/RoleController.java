@@ -34,8 +34,6 @@ public class RoleController {
 
     public ResponseEntity<Page<RoleDTO>> getAllRoles(@PageableDefault(page = 0, size = 20) Pageable pageable) {
         Page<RoleDTO> roles = this.roleService.getAllRoles(RoleDTO.class, pageable);
-        // // Placeholder response
-        // Page<RoleProjection> roles = this.roleService.getAllRoles(pageable);
         return ResponseEntity.ok(roles);
 
     }

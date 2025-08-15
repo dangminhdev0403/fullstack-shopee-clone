@@ -51,7 +51,7 @@ public class AddressServiceImpl implements AddressService {
         Address address = addressRepository.findById(dto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Address not found"));
 
-        BeanUtils.copyProperties(dto, address, getNullPropertyNames(dto));
+        BeanUtils.copyProperties(dto, address, ShopUpdateStatusDTO(dto));
         addressRepository.save(address);
     }
 
@@ -61,7 +61,7 @@ public class AddressServiceImpl implements AddressService {
         throw new UnsupportedOperationException("Unimplemented method 'deleteAddress'");
     }
 
-    private String[] getNullPropertyNames(Object source) {
+    private String[] ShopUpdateStatusDTO(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);
         return Arrays.stream(src.getPropertyDescriptors())
                 .map(pd -> pd.getName())

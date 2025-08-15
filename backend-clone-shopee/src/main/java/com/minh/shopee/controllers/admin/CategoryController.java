@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController("categoryAdminController")
-@RequestMapping(ApiRoutes.API_BASE_V1 + ApiRoutes.CATEGORIES)
+@RequestMapping(ApiRoutes.CATEGORIES)
 @RequiredArgsConstructor
 @Slf4j(topic = "CategoryController")
 public class CategoryController {

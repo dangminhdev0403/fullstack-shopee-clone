@@ -1,13 +1,18 @@
 package com.minh.shopee.services.impl;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.minh.shopee.domain.dto.request.CreateShopDTO;
+import com.minh.shopee.domain.dto.request.ShopUpdateStatusDTO;
+import com.minh.shopee.domain.dto.request.UpdateShopDTO;
 import com.minh.shopee.domain.model.Shop;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.repository.ShopRepository;
 import com.minh.shopee.services.ShopService;
+import com.minh.shopee.services.utils.CommonUtils;
+import com.minh.shopee.services.utils.SecurityUtils;
 import com.minh.shopee.services.utils.error.AppException;
 
 import lombok.RequiredArgsConstructor;
@@ -36,6 +41,26 @@ public class ShopServiceImpl implements ShopService {
                 .districtId(request.getDistrictId()).wardCode(request.getWardCode()).owner(user).build();
         this.shopRepository.save(shop);
         log.info("Shop created: {}", shop.getId());
+    }
+
+    @Override
+    public void updateShopStatus(ShopUpdateStatusDTO request) {
+        Shop shop = this.shopRepository.findById(request.getId()).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
+
+        shop.setStatus(request.getStatus());
+        this.shopRepository.save(shop);
+    }
+
+    @Override
+    public void updateShop(UpdateShopDTO request) {
+        long userId = SecurityUtils.getCurrentUserId();
+
+        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
+
+        BeanUtils.copyProperties(request, shop, CommonUtils.getNullPropertyNames(request));
+        this.shopRepository.save(shop);
     }
 
 }

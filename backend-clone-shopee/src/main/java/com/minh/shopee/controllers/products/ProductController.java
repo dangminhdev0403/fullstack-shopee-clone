@@ -44,27 +44,7 @@ public class ProductController {
 
     private final ProductSerivce productSerivce;
 
-    @PostMapping("")
-    @ApiDescription("Tạo mới sản phẩm")
-    public ResponseEntity<ProductResDTO> createAProduct(@ModelAttribute @Valid ProductReqDTO productDTO,
-            @RequestParam(value = "imageProduct", required = false) List<MultipartFile> imagesProduct) {
-        ProductResDTO productCreate = productSerivce.createAProduct(productDTO, imagesProduct);
-
-        URI location = URI.create(ApiRoutes.API_BASE_V1 + ApiRoutes.PRODUCTS);
-        return ResponseEntity.created(location)
-                .body(productCreate);
-    }
-
-    @PostMapping("/import")
-    @ApiDescription("Tạo danh sách sản phẩm từ file Excel")
-    public ResponseEntity<String> createListProduct(
-            @RequestParam(value = "fileProductExcel", required = false) MultipartFile file) {
-        if (file != null) {
-            this.productSerivce.createListProduct(file);
-            return ResponseEntity.ok("Tạo danh sách sản phẩm thành công: ");
-        }
-        return ResponseEntity.ok("Tạo danh sách sản phẩm không thành công: ");
-    }
+   
 
     @GetMapping("")
     @ApiDescription("Lấy danh sách sản phẩm")
