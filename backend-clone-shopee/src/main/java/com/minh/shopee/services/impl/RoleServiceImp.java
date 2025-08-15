@@ -31,6 +31,8 @@ public class RoleServiceImp implements RoleService {
 
     @Override
     public Role createRole(RoleRequest roleReq) {
+        if (roleReq.getId() == 1)
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Role not allowed", "Role not allowed");
         Set<Long> permissionIds = roleReq.getPermissionIds();
 
         log.info("Creating role with name: {}", roleReq.getName().trim());
@@ -52,6 +54,8 @@ public class RoleServiceImp implements RoleService {
 
     @Override
     public void deleteRole(Long id) {
+        if (id == 1)
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Role not allowed", "Role not allowed");
         if (!this.roleRepository.existsById(id)) {
             log.error("Role with id {} not found", id);
             throw new AppException(HttpStatus.NOT_FOUND.value(), "Role not found",

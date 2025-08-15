@@ -1,7 +1,5 @@
 package com.minh.shopee.controllers.products;
 
-import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -12,20 +10,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
 import com.minh.shopee.domain.dto.request.AddProductDTO;
 import com.minh.shopee.domain.dto.request.ListIdCartDetailDTO;
-import com.minh.shopee.domain.dto.request.ProductReqDTO;
 import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
@@ -43,8 +38,6 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
 
     private final ProductSerivce productSerivce;
-
-   
 
     @GetMapping("")
     @ApiDescription("Lấy danh sách sản phẩm")
