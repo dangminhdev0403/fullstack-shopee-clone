@@ -36,8 +36,7 @@ public enum OrderStatus {
                 return newStatus == DELIVERED || newStatus == RETURNED;
             case DELIVERED:
                 return newStatus == RETURNED; // chỉ có thể trả hàng
-            case RETURNED:
-            case CANCELED:
+            case RETURNED, CANCELED:
                 return false; // không thay đổi nữa
             default:
                 return false;

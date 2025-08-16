@@ -45,7 +45,7 @@ public class OrderController {
 
     @PutMapping("")
     public ResponseEntity<String> cancelOrder(@Valid @RequestBody UpdateOrderDTO req) {
-
+        this.orderService.cancelOrder(req);
         return ResponseEntity.ok("Huỷ đơn hàng thành công");
     }
 }

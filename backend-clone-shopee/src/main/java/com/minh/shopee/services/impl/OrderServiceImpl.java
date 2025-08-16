@@ -122,13 +122,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void cancelOrder(UpdateOrderDTO req) {
-        Order order = this.orderRepository.findById(req.getOrderId())
+        long userId = SecurityUtils.getCurrentUserId();
+        Order order = this.orderRepository.findOne(OrderSpecification.hasIdAndUser(req.getOrderId(), userId))
                 .orElseThrow(
                         () -> new AppException(HttpStatus.NOT_FOUND.value(), "Order not found",
                                 "Order witdh id" + req.getOrderId() + " not found"));
 
-        if (!order.getStatus().canCancel())
+        if (!order.getStatus().canCancel()) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Order can't be canceled", "Order không được hủy");
+
+        }
         order.setStatus(OrderStatus.CANCELED);
         this.orderRepository.save(order);
     }

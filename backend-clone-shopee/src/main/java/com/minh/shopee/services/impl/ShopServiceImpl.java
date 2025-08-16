@@ -78,10 +78,9 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public Page<OrderProjection> getOrdersList(Pageable pageable) {
-        long userId = SecurityUtils.getCurrentUserId();
-        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
-                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
-        return this.orderCustomRepo.findAll(OrderSpecification.hasShopId(shop.getId()), pageable,
+        long shopId = this.getShopId();
+        return this.orderCustomRepo.findAll(OrderSpecification.hasShopId(
+                shopId), pageable,
                 OrderProjection.class);
 
     }
@@ -90,9 +89,12 @@ public class ShopServiceImpl implements ShopService {
     public Order updateOrder(UpdateOrderDTO req) {
         if (req.getStatus() == null)
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Status is required", "Chưa truyền trạng thái ");
+        long shopId = this.getShopId();
 
-        Order order = this.orderRepository.findById(req.getOrderId()).orElseThrow(
-                () -> new AppException(HttpStatus.NOT_FOUND.value(), "Order not found", "Không tìm thấy order"));
+        Order order = this.orderRepository.findOne(OrderSpecification.hasIdAndShop(req.getOrderId(), shopId))
+                .orElseThrow(
+                        () -> new AppException(HttpStatus.NOT_FOUND.value(), "Order not found",
+                                "Không tìm thấy order "));
 
         OrderStatus oldStatus = order.getStatus();
         OrderStatus newStatus = req.getStatus();
@@ -103,4 +105,10 @@ public class ShopServiceImpl implements ShopService {
         return this.orderRepository.save(order);
     }
 
+    private long getShopId() {
+        long userId = SecurityUtils.getCurrentUserId();
+        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
+        return shop.getId();
+    }
 }
