@@ -44,13 +44,10 @@ public class OrderServiceImpl implements OrderService {
         for (Map.Entry<Long, List<OrderItemRequest>> entry : groupedByShop.entrySet()) {
             Long shopId = entry.getKey();
             this.shopRepository.findById(shopId)
-                    .orElseThrow(() -> {
-                        log.error("Shop with id {} not found", shopId);
-                        return new AppException(
-                                HttpStatus.NOT_FOUND.value(),
-                                "Shop not found",
-                                "Không tìm thấy cửa hàng");
-                    });
+                    .orElseThrow(() -> new AppException(
+                            HttpStatus.NOT_FOUND.value(),
+                            "Shop not found with id " + shopId,
+                            "Không tìm thấy cửa hàng"));
             // Tạo Order
             Order order = new Order();
             order.setUser(currentUser);
