@@ -60,6 +60,7 @@ public class ShopServiceImpl implements ShopService {
                 () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
 
         BeanUtils.copyProperties(request, shop, CommonUtils.getNullPropertyNames(request));
+
         this.shopRepository.save(shop);
     }
 

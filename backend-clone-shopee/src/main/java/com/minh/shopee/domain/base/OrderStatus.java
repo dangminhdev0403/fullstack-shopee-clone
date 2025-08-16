@@ -1,4 +1,4 @@
-package com.minh.shopee.domain.model.constants;
+package com.minh.shopee.domain.base;
 
 public enum OrderStatus {
     PENDING("Đang chờ"),

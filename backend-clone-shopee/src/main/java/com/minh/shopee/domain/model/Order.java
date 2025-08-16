@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.minh.shopee.domain.model.constants.OrderStatus;
+import com.minh.shopee.domain.base.OrderStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
