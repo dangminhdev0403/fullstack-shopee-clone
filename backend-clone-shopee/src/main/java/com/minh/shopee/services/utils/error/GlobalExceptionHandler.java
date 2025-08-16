@@ -1,5 +1,6 @@
 package com.minh.shopee.services.utils.error;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,34 +40,35 @@ public class GlobalExceptionHandler {
         String titleError = ex.getClass().getSimpleName();
         String error = "Lỗi chưa xử lí:" + titleError;
         Object message = ex.getMessage();
+        log.error("⚠️ [500 SERVER ERROR]   Message: {}", message);
 
         if (ex instanceof MethodArgumentNotValidException e) {
             statusCode = HttpStatus.BAD_REQUEST.value();
             error = "Lỗi validation";
             message = extractFieldErrors(e.getBindingResult());
-            log.warn("⚠️ [400 VALIDATION ERROR]   Message: {}", message);
+            log.error("⚠️ [400 VALIDATION ERROR]   Message: {}", message);
         } else if (ex instanceof NoResourceFoundException) {
             statusCode = HttpStatus.NOT_FOUND.value();
             error = "Endpoint không tồn tại";
             message = "URL " + request.getRequestURL() + " không tồn tại";
-            log.warn("⚠️ [404 NOT FOUND] URL: {} | Message: {}", request.getRequestURL(), ex.getMessage());
+            log.error("⚠️ [404 NOT FOUND] URL: {} | Message: {}", request.getRequestURL(), ex.getMessage());
 
         } else if (ex instanceof HttpRequestMethodNotSupportedException) {
             statusCode = HttpStatus.METHOD_NOT_ALLOWED.value();
             error = "Method không hỗ trợ";
             message = "Phương thức " + request.getMethod() + " không hỗ trợ";
-            log.warn("⚠️ [405 NOT ALLOWED] Method: {} | URL: {}", request.getMethod(), request.getRequestURL());
+            log.error("⚠️ [405 NOT ALLOWED] Method: {} | URL: {}", request.getMethod(), request.getRequestURL());
         } else if (ex instanceof DuplicateException e) {
             statusCode = HttpStatus.CONFLICT.value();
             error = "Trùng dữ liệu";
             message = String.format("%s %s", e.getFieldName(), ex.getMessage());
-            log.warn("⚠️ [409 DUPLICATE DATA] Field: {} | URL: {} | Message: {}", e.getFieldName(),
+            log.error("⚠️ [409 DUPLICATE DATA] Field: {} | URL: {} | Message: {}", e.getFieldName(),
                     request.getRequestURL(), ex.getMessage());
         } else if (ex instanceof DataIntegrityViolationException e) {
             statusCode = HttpStatus.CONFLICT.value();
             error = "Lỗi ràng buộc dữ liệu";
             message = "Lỗi khi thao tác dữ liệu: " + getRootCauseMessage(e);
-            log.warn("⚠️ [409 DATA INTEGRITY VIOLATION] URL: {} | Message: {}", request.getRequestURL(), message, e);
+            log.error("⚠️ [409 DATA INTEGRITY VIOLATION] URL: {} | Message: {}", request.getRequestURL(), message, e);
         } else if (ex instanceof ResponseStatusException e) {
             statusCode = e.getStatusCode().value();
             error = e.getStatusCode().toString();
@@ -75,19 +77,20 @@ public class GlobalExceptionHandler {
             statusCode = HttpStatus.UNAUTHORIZED.value();
             error = "Lỗi xác thực";
             message = "Thông tin đăng nhập không chính xác";
-            log.warn("⚠️ [401 BadCredentialsException] URL: {} | Message: {}", request.getRequestURL(),
+            log.error("⚠️ [401 BadCredentialsException] URL: {} | Message: {}", request.getRequestURL(),
                     ex.getMessage());
         } else if (ex instanceof HttpMessageNotReadableException) {
             statusCode = HttpStatus.BAD_REQUEST.value();
             error = "Lỗi  truyền JSON";
             message = "Chưa truyền hoặc truyền sai Data JSON";
-            log.warn("⚠️ [400 HttpMessageNotReadableException] Required request body is missing",
+            log.error("⚠️ [400 HttpMessageNotReadableException] Required request body is missing",
                     request.getRequestURL(),
                     ex.getMessage());
         } else if (ex instanceof AppException e) {
             statusCode = e.getStatus();
             error = e.getError();
             message = e.getMessage();
+            log.error("❌ [APP EXCEPTION] URL: {} | Message: {}", request.getRequestURL(), ex.getMessage(), ex);
         }
 
         else {
@@ -110,7 +113,18 @@ public class GlobalExceptionHandler {
     private List<Map<String, String>> extractFieldErrors(BindingResult result) {
         return result.getFieldErrors()
                 .stream()
-                .map(fieldError -> Map.of(fieldError.getField(), fieldError.getDefaultMessage()))
+                .map(fieldError -> {
+                    Map<String, String> errorMap = new HashMap<>();
+
+                    String field = fieldError.getField();
+                    String message = fieldError.getDefaultMessage();
+
+                    errorMap.put(
+                            field != null ? field : "unknownField",
+                            message != null ? message : "Lỗi không xác định");
+
+                    return errorMap;
+                })
                 .toList();
     }
 

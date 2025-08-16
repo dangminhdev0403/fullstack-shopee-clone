@@ -6,4 +6,5 @@ import com.minh.shopee.domain.model.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    
 }

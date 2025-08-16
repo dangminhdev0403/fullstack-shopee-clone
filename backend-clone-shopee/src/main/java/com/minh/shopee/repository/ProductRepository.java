@@ -21,4 +21,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     <T> Optional<T> findById(Long id, Class<T> type);
 
+    Optional<Product> findByIdAndShopId(Long productId, Long shopId);
+
 }

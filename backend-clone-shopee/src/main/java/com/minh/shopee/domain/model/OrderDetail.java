@@ -1,5 +1,7 @@
 package com.minh.shopee.domain.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,7 +26,7 @@ public class OrderDetail {
     private long id;
 
     private long quantity;
-    private double price;
+    private BigDecimal price;
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;

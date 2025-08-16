@@ -5,13 +5,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.minh.shopee.domain.base.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.OrderItemRequest;
 import com.minh.shopee.domain.model.Order;
+import com.minh.shopee.domain.model.OrderDetail;
+import com.minh.shopee.domain.model.Product;
 import com.minh.shopee.domain.model.User;
+import com.minh.shopee.repository.OrderRepository;
+import com.minh.shopee.repository.ProductRepository;
+import com.minh.shopee.repository.ShopRepository;
 import com.minh.shopee.services.OrderService;
+import com.minh.shopee.services.utils.error.AppException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,18 +28,77 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "orderService")
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
+    private final OrderRepository orderRepository;
+    private final ShopRepository shopRepository;
+    private final ProductRepository productRepository;
+
     @Override
     public void createOrder(CreateOrderRequest req, long userId) {
+        log.info("Creating order for user: {}", userId);
         User currentUser = User.builder().id(userId).build();
         // Nhóm sản phẩm theo shopId
         Map<Long, List<OrderItemRequest>> groupedByShop = req.getItems()
                 .stream()
                 .collect(Collectors.groupingBy(OrderItemRequest::getShopId));
 
-        List<Order> createdOrders = new ArrayList<>();
-        
+        for (Map.Entry<Long, List<OrderItemRequest>> entry : groupedByShop.entrySet()) {
+            Long shopId = entry.getKey();
+            this.shopRepository.findById(shopId)
+                    .orElseThrow(() -> {
+                        log.error("Shop with id {} not found", shopId);
+                        return new AppException(
+                                HttpStatus.NOT_FOUND.value(),
+                                "Shop not found",
+                                "Không tìm thấy cửa hàng");
+                    });
+            // Tạo Order
+            Order order = new Order();
+            order.setUser(currentUser);
+            order.setReceiverName(req.getReceiverName());
+            order.setReceiverAddress(req.getReceiverAddress());
+            order.setReceiverPhone(req.getReceiverPhone());
+            order.setStatus(OrderStatus.PENDING); // enum: PENDING, CONFIRMED,...
 
-        throw new UnsupportedOperationException("Unimplemented method 'createOrder'");
+            List<OrderDetail> orderItems = new ArrayList<>();
+
+            for (OrderItemRequest itemReq : entry.getValue()) {
+                Long productId = itemReq.getProductId();
+                Product product = this.productRepository.findByIdAndShopId(productId, shopId)
+                        .orElseThrow(() -> {
+                            log.error("Product with id {} not found in shop {}", productId, shopId);
+                            return new AppException(
+                                    HttpStatus.NOT_FOUND.value(),
+                                    "Product not found",
+                                    "Không tìm thấy sản phẩm trong cửa hàng");
+                        });
+
+                // Kiểm tra tồn kho (nếu có)
+                if (product.getStock() < itemReq.getQuantity()) {
+                    throw new AppException(HttpStatus.BAD_REQUEST.value(),
+                            "Product " + product.getName()
+                                    + " does not have enough quantity",
+                            "Sản phẩm " + product.getName() + " không đúng số lượng");
+                }
+
+                OrderDetail item = new OrderDetail();
+                item.setOrder(order);
+                item.setProduct(product);
+                item.setQuantity(itemReq.getQuantity());
+                item.setPrice(product.getPrice());
+
+                orderItems.add(item);
+
+                // Giảm tồn kho
+                product.setStock(product.getStock() - itemReq.getQuantity());
+                productRepository.save(product);
+            }
+
+            order.setOrderDetail(orderItems);
+            order.setOrderDetail(orderItems);
+
+            orderRepository.save(order);
+            log.info("Order created successfully: {}", order.getId());
+        }
+
     }
-
 }

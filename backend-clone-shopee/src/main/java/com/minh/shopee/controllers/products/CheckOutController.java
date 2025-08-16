@@ -11,6 +11,7 @@ import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.services.OrderService;
 import com.minh.shopee.services.utils.SecurityUtils;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,11 +21,10 @@ public class CheckOutController {
     private final OrderService orderService;
 
     @PostMapping("")
-    public ResponseEntity<CreateOrderRequest> checkout(@RequestBody CreateOrderRequest entity) {
+    public ResponseEntity<CreateOrderRequest> checkout(@RequestBody @Valid CreateOrderRequest entity) {
 
         Long userId = SecurityUtils.getCurrentUserId();
         this.orderService.createOrder(entity, userId);
-
         return ResponseEntity.ok(entity);
 
     }
