@@ -14,6 +14,7 @@ public class ApiRoutes {
         public static final String PERMISSIONS = "/permissions";
         public static final String SHOPS = "/shops";
         public static final String USERS = "/users";
+        public static final String ORDERS = "/orders";
         public static final String ADMIN = "/admin";
         public static final String API_BASE = "/api";
         public static final String API_BASE_V1 = "/api/v1";

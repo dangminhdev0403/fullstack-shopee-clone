@@ -5,20 +5,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.minh.shopee.domain.base.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.OrderItemRequest;
+import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
+import com.minh.shopee.domain.dto.response.projection.OrderProjection;
 import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.domain.model.Product;
 import com.minh.shopee.domain.model.User;
+import com.minh.shopee.domain.specification.OrderSpecification;
+import com.minh.shopee.repository.GenericRepositoryCustom;
+import com.minh.shopee.repository.OrderDetailRepository;
 import com.minh.shopee.repository.OrderRepository;
 import com.minh.shopee.repository.ProductRepository;
 import com.minh.shopee.repository.ShopRepository;
 import com.minh.shopee.services.OrderService;
+import com.minh.shopee.services.utils.SecurityUtils;
 import com.minh.shopee.services.utils.error.AppException;
 
 import lombok.RequiredArgsConstructor;
@@ -28,9 +36,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "orderService")
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
+
+    private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
+    private final GenericRepositoryCustom<Order> orderCustomRepo;
 
     @Override
     public void createOrder(CreateOrderRequest req, long userId) {
@@ -93,9 +104,33 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderDetail(orderItems);
             order.setOrderDetail(orderItems);
 
-            orderRepository.save(order);
+            this.orderRepository.save(order);
+            this.orderDetailRepository.saveAll(orderItems);
+
             log.info("Order created successfully: {}", order.getId());
         }
 
     }
+
+    @Override
+    public Page<OrderProjection> getOrdersListByUser(Pageable pageable) {
+        long userId = SecurityUtils.getCurrentUserId();
+        return this.orderCustomRepo.findAll(OrderSpecification.hasUserId(
+                userId), pageable,
+                OrderProjection.class);
+    }
+
+    @Override
+    public void cancelOrder(UpdateOrderDTO req) {
+        Order order = this.orderRepository.findById(req.getOrderId())
+                .orElseThrow(
+                        () -> new AppException(HttpStatus.NOT_FOUND.value(), "Order not found",
+                                "Order witdh id" + req.getOrderId() + " not found"));
+
+        if (!order.getStatus().canCancel())
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Order can't be canceled", "Order không được hủy");
+        order.setStatus(OrderStatus.CANCELED);
+        this.orderRepository.save(order);
+    }
+
 }

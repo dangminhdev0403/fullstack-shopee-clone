@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.minh.shopee.domain.base.OrderStatus;
 
 import jakarta.persistence.Column;
@@ -44,6 +45,7 @@ public class Order {
     private Instant createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true) // nullable để hỗ trợ khi User bị xóa
+    @JsonIgnore
     private User user;
 
     @Enumerated(EnumType.STRING) // Lưu trạng thái dưới dạng chuỗi
@@ -66,5 +68,9 @@ public class Order {
         if (status == null) {
             status = OrderStatus.PENDING; // Gán mặc định trước khi lưu
         }
+        if (createdAt == null) {
+            this.createdAt = Instant.now();
+        }
+
     }
 }

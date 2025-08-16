@@ -1,14 +1,23 @@
 package com.minh.shopee.services.impl;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.minh.shopee.domain.base.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateShopDTO;
 import com.minh.shopee.domain.dto.request.ShopUpdateStatusDTO;
+import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.request.UpdateShopDTO;
+import com.minh.shopee.domain.dto.response.projection.OrderProjection;
+import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.Shop;
 import com.minh.shopee.domain.model.User;
+import com.minh.shopee.domain.specification.OrderSpecification;
+import com.minh.shopee.repository.GenericRepositoryCustom;
+import com.minh.shopee.repository.OrderRepository;
 import com.minh.shopee.repository.ShopRepository;
 import com.minh.shopee.services.ShopService;
 import com.minh.shopee.services.utils.CommonUtils;
@@ -22,7 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j(topic = "ShopService")
 public class ShopServiceImpl implements ShopService {
+
     private final ShopRepository shopRepository;
+    private final GenericRepositoryCustom<Order> orderCustomRepo;
+    private final OrderRepository orderRepository;
 
     @Override
     public void createShop(CreateShopDTO request, Long userId) {
@@ -62,6 +74,33 @@ public class ShopServiceImpl implements ShopService {
         BeanUtils.copyProperties(request, shop, CommonUtils.getNullPropertyNames(request));
 
         this.shopRepository.save(shop);
+    }
+
+    @Override
+    public Page<OrderProjection> getOrdersList(Pageable pageable) {
+        long userId = SecurityUtils.getCurrentUserId();
+        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
+        return this.orderCustomRepo.findAll(OrderSpecification.hasShopId(shop.getId()), pageable,
+                OrderProjection.class);
+
+    }
+
+    @Override
+    public Order updateOrder(UpdateOrderDTO req) {
+        if (req.getStatus() == null)
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Status is required", "Chưa truyền trạng thái ");
+
+        Order order = this.orderRepository.findById(req.getOrderId()).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND.value(), "Order not found", "Không tìm thấy order"));
+
+        OrderStatus oldStatus = order.getStatus();
+        OrderStatus newStatus = req.getStatus();
+        if (!oldStatus.canChangeTo(newStatus)) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Status is invalid", "Trạng thái không hợp lý");
+        }
+        order.setStatus(req.getStatus());
+        return this.orderRepository.save(order);
     }
 
 }

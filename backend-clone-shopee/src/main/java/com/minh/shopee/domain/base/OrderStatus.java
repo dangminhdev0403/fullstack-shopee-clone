@@ -17,4 +17,30 @@ public enum OrderStatus {
     public String getDisplayName() {
         return displayName;
     }
+
+    // check trạng thái có cho phép user hủy không
+    public boolean canCancel() {
+        return this == PENDING || this == PROCESSING;
+    }
+
+    /**
+     * Định nghĩa rule chuyển trạng thái hợp lệ
+     */
+    public boolean canChangeTo(OrderStatus newStatus) {
+        switch (this) {
+            case PENDING:
+                return newStatus == PROCESSING || newStatus == CANCELED;
+            case PROCESSING:
+                return newStatus == SHIPPING || newStatus == CANCELED;
+            case SHIPPING:
+                return newStatus == DELIVERED || newStatus == RETURNED;
+            case DELIVERED:
+                return newStatus == RETURNED; // chỉ có thể trả hàng
+            case RETURNED:
+            case CANCELED:
+                return false; // không thay đổi nữa
+            default:
+                return false;
+        }
+    }
 }
