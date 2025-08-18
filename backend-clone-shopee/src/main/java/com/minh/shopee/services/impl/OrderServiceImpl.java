@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.minh.shopee.domain.base.OrderStatus;
+import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.OrderItemRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;

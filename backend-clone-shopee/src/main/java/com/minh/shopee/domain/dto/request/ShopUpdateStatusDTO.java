@@ -1,6 +1,6 @@
 package com.minh.shopee.domain.dto.request;
 
-import com.minh.shopee.domain.base.ShopStatus;
+import com.minh.shopee.domain.constant.ShopStatus;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

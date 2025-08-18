@@ -8,6 +8,7 @@ export const ROUTES = {
   CART: "/cart",
   CHECKOUT: "/checkout",
   ORDER_HISTORY: "/order-history",
+  PROFILE: "/profile",
 
   ADMIN: {
     BASE: "/admin",

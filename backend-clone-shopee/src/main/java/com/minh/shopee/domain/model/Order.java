@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.minh.shopee.domain.base.OrderStatus;
+import com.minh.shopee.domain.constant.OrderStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

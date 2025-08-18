@@ -19,5 +19,14 @@ public class ProductResDTO {
     private BigDecimal price;
     private String imageUrl;
     private Integer stock;
+    private ShopDTO shop;
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Setter
+    public static class ShopDTO {
+
+        private long id;
+    }
 }

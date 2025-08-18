@@ -3,6 +3,10 @@ package com.minh.shopee.domain.dto.request;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.minh.shopee.domain.constant.PaymentMethod;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -26,8 +30,9 @@ public class CreateOrderRequest {
     @Pattern(regexp = "^(0|\\+84)\\d{9,10}$", message = "Số điện thoại không hợp lệ")
     private String receiverPhone;
 
-    @NotBlank(message = "Phương thức thanh toán không được để trống")
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING) // lưu COD/MOMO thay vì số thứ tự
+    @NotNull(message = "Phương thức thanh toán không được để trống")
+    private PaymentMethod paymentMethod;
 
     @NotNull(message = "Phí vận chuyển không được để trống")
     @DecimalMin(value = "0.0", inclusive = true, message = "Phí vận chuyển phải >= 0")

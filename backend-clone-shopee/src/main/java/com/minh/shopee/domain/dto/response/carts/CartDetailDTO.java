@@ -11,5 +11,5 @@ public class CartDetailDTO {
     private long id;
     private Integer quantity;
     private ProductResDTO product;
+
 }
- 

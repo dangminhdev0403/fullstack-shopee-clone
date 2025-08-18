@@ -154,6 +154,7 @@ export default function CartPage() {
       image: item.product.imageUrl,
       price: item.product.price,
       quantity: item.quantity,
+      shop: item.product.shop.id,
     }));
     dispatch(checkoutSlice.actions.setCart(selectedCartItemsForCheckout));
 

@@ -4,6 +4,7 @@ import Register from "@components/Register";
 import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import AdminLayout from "@layouts/AdminLayout";
+import AccountPage from "@pages/AccountPage";
 import Analytics from "@pages/admin/Analytics";
 import Dashboard from "@pages/admin/Dashboard";
 import Orders from "@pages/admin/Orders";
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
         children: [
           { path: ROUTES.CART, element: <CartPage /> },
           { path: ROUTES.CHECKOUT, element: <CheckOutPage /> },
+          { path: ROUTES.PROFILE, element: <AccountPage /> },
         ],
       },
     ],

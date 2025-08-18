@@ -6,6 +6,7 @@ interface CartItem {
   image: string;
   price: number;
   quantity: number;
+  shop: number;
 }
 
 interface ShippingInfo {

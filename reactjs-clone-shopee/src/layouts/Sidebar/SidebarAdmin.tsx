@@ -24,7 +24,7 @@ interface SidebarProps {
   realtimeData: any;
 }
 
-export function SidebarAdmin({
+export default function SidebarAdmin({
   isOpen,
   currentPath,
   onNavigate,
@@ -114,10 +114,8 @@ export function SidebarAdmin({
               </h1>
               <div className="flex items-center space-x-2">
                 <span className="inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-xs font-medium text-orange-800 dark:bg-orange-900/20 dark:text-orange-200">
-                 
-                    <Shield className="mr-1 h-3 w-3" />
-                    Admin
-                  
+                  <Shield className="mr-1 h-3 w-3" />
+                  Admin
                 </span>
                 <div className="flex items-center text-xs text-green-600 dark:text-green-400">
                   <Activity className="mr-1 h-3 w-3" />

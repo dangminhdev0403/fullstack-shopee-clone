@@ -7,6 +7,7 @@ export interface ProductDTO {
   price: number;
   imageUrl: string;
   stock: number;
+  shop: { id: number };
 }
 
 export interface CartDetailDTO {

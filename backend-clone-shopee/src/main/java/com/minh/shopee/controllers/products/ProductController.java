@@ -25,7 +25,7 @@ import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
-import com.minh.shopee.domain.model.Product;
+import com.minh.shopee.domain.dto.response.projection.ProductProjection;
 import com.minh.shopee.services.ProductSerivce;
 import com.minh.shopee.services.utils.error.AppException;
 
@@ -61,9 +61,9 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @ApiDescription("Lấy thông tin sản phẩm theo ID")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
+    public ResponseEntity<ProductProjection> getProductById(@PathVariable("id") Long id) {
 
-        Product product = productSerivce.getProductById(id, Product.class);
+        ProductProjection product = productSerivce.getProductById(id, ProductProjection.class);
         return ResponseEntity.ok(product);
     }
 

@@ -2,7 +2,7 @@ package com.minh.shopee.domain.model;
 
 import java.util.List;
 
-import com.minh.shopee.domain.base.ShopStatus;
+import com.minh.shopee.domain.constant.ShopStatus;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -28,6 +28,7 @@ import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductImageDTO;
 import com.minh.shopee.domain.dto.response.products.ProductProjection;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
+import com.minh.shopee.domain.dto.response.projection.CartProjection;
 import com.minh.shopee.domain.model.Cart;
 import com.minh.shopee.domain.model.CartDetail;
 import com.minh.shopee.domain.model.Category;
@@ -329,10 +330,9 @@ public class ProductServiceImpl implements ProductSerivce {
     @Override
     public CartDTO getCart(Long userId) {
 
-        Cart cart = this.cartRepository.findByUserId(userId)
+        CartProjection cart = this.cartRepository.findProjectedByUserId(userId)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Cart not found",
                         "Cart for user with id " + userId + " not found"));
-
         return CartMapper.toCartDTO(cart);
     }
 

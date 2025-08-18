@@ -50,6 +50,7 @@ const Header = () => {
   const handleProfileClick = async (value: string) => {
     switch (value) {
       case "profile":
+        navigate(ROUTES.PROFILE);
         break;
       case "order":
         break;

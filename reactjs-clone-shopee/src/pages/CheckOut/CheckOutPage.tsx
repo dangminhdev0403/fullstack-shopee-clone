@@ -330,15 +330,16 @@ export default function CheckOutPage() {
 
   const handlePlaceOrder = () => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    // setTimeout(() => {
+    //   setLoading(false);
 
-      setNotification({
-        open: true,
-        message: "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.",
-        type: "success",
-      });
-    }, 3000);
+    //   setNotification({
+    //     open: true,
+    //     message: "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.",
+    //     type: "success",
+    //   });
+    // }, 3000);
+    console.log(checkoutCart);
   };
 
   if (pageLoading) {
