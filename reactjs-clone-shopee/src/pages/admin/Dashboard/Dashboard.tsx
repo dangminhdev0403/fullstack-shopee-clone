@@ -525,36 +525,6 @@ export function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Quick Actions */}
-      <div className="rounded-2xl border-0 bg-gradient-to-r from-gray-50 to-white shadow-xl dark:from-gray-800 dark:to-gray-900">
-        <div className="border-b border-gray-200 p-6 dark:border-gray-700">
-          <h3 className="flex items-center space-x-2 text-xl font-bold">
-            <Zap className="h-5 w-5 text-orange-500" />
-            <span>Thao tác nhanh</span>
-          </h3>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <button className="flex h-24 flex-col items-center justify-center space-y-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl">
-              <Package className="h-8 w-8" />
-              <span className="font-medium">Thêm sản phẩm</span>
-            </button>
-            <button className="flex h-24 flex-col items-center justify-center space-y-3 rounded-2xl bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-green-600 hover:to-green-700 hover:shadow-xl">
-              <ShoppingCart className="h-8 w-8" />
-              <span className="font-medium">Xử lý đơn hàng</span>
-            </button>
-            <button className="flex h-24 flex-col items-center justify-center space-y-3 rounded-2xl bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-purple-600 hover:to-purple-700 hover:shadow-xl">
-              <Users className="h-8 w-8" />
-              <span className="font-medium">Quản lý khách hàng</span>
-            </button>
-            <button className="flex h-24 flex-col items-center justify-center space-y-3 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-orange-600 hover:to-red-600 hover:shadow-xl">
-              <TrendingUp className="h-8 w-8" />
-              <span className="font-medium">Xem báo cáo</span>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

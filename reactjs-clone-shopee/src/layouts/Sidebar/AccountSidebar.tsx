@@ -1,3 +1,4 @@
+import { RootState } from "@redux/store";
 import { ROUTES } from "@utils/constants/route";
 import {
   Bell,
@@ -7,9 +8,12 @@ import {
   ShoppingBag,
   User,
 } from "lucide-react";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router";
 
 export default function AccountSidebar() {
+  const user = useSelector((state: RootState) => state.auth.user);
+
   const menuItems = [
     {
       id: "profile",
@@ -56,16 +60,16 @@ export default function AccountSidebar() {
           <div className="relative">
             <div className="bg-primary flex h-16 w-16 items-center justify-center rounded-full shadow-lg">
               <span className="text-primary-foreground text-lg font-bold">
-                U
+                {user?.name?.charAt(0) || "U"}
               </span>
             </div>
             <div className="border-sidebar absolute -right-1 -bottom-1 h-5 w-5 rounded-full border-2 bg-green-500"></div>
           </div>
           <div>
             <h3 className="text-sidebar-foreground text-lg font-bold">
-              Nguyễn Văn A
+              {user?.name || "User"}
             </h3>
-            <p className="text-muted-foreground text-sm">user@example.com</p>
+            <p className="text-muted-foreground text-sm">{user?.email || ""}</p>
             <div className="mt-1 flex items-center">
               <div className="bg-primary mr-2 h-2 w-2 rounded-full"></div>
               <span className="text-muted-foreground text-xs">
