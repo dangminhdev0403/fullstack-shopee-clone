@@ -1,74 +1,50 @@
+import { ROUTES } from "@utils/constants/route";
 import {
   Bell,
   ChevronRight,
-  HelpCircle,
   Lock,
   MapPin,
-  Shield,
   ShoppingBag,
   User,
 } from "lucide-react";
+import { NavLink } from "react-router";
 
-type ActiveSection =
-  | "profile"
-  | "address"
-  | "password"
-  | "notification"
-  | "privacy"
-  | "help"
-  | "orders";
-
-interface AccountSidebarProps {
-  activeSection: ActiveSection;
-  onSectionChange: (section: ActiveSection) => void;
-}
-
-export default function AccountSidebar({
-  activeSection,
-  onSectionChange,
-}: AccountSidebarProps) {
+export default function AccountSidebar() {
   const menuItems = [
     {
-      id: "profile" as ActiveSection,
+      id: "profile",
       label: "Hồ sơ của tôi",
       icon: User,
       description: "Quản lý thông tin hồ sơ để bảo mật tài khoản",
+      path: ROUTES.PROFILE,
     },
     {
-      id: "orders" as ActiveSection,
+      id: "orders",
       label: "Đơn mua của tôi",
       icon: ShoppingBag,
       description: "Quản lý và theo dõi đơn hàng",
+      path: ROUTES.ACCOUNT.ORDER,
     },
     {
-      id: "address" as ActiveSection,
+      id: "address",
       label: "Địa chỉ",
       icon: MapPin,
       description: "Quản lý địa chỉ nhận hàng",
+      path: ROUTES.ACCOUNT.ADDRESS,
     },
     {
-      id: "password" as ActiveSection,
+      id: "password",
       label: "Đổi mật khẩu",
       icon: Lock,
       description: "Đổi mật khẩu để bảo mật tài khoản",
+      path: ROUTES.ACCOUNT.PASSWORD,
     },
     {
-      id: "notification" as ActiveSection,
+      id: "notification",
       label: "Cài đặt thông báo",
       icon: Bell,
       description: "Quản lý thông báo qua email và SMS",
-    },
-    {
-      id: "privacy" as ActiveSection,
-      label: "Thiết lập riêng tư",
-      icon: Shield,
-      description: "Quản lý quyền riêng tư của bạn",
-    },
-    {
-      id: "help" as ActiveSection,
-      label: "Trung tâm trợ giúp",
-      icon: HelpCircle,
-      description: "Hỗ trợ và câu hỏi thường gặp",
+      path: ROUTES.ACCOUNT.NOTIFICATION,
     },
   ];
 
@@ -102,61 +78,71 @@ export default function AccountSidebar({
 
       {/* Menu Items */}
       <nav className="p-3">
-        {menuItems.map((item, index) => {
+        {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeSection === item.id;
 
           return (
-            <button
+            <NavLink
               key={item.id}
-              onClick={() => onSectionChange(item.id)}
-              className={`group hover-lift mb-2 flex w-full items-center justify-between rounded-xl p-4 transition-all duration-200 ${
-                isActive
-                  ? "bg-primary text-primary-foreground scale-[1.02] transform shadow-md"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              }`}
+              to={item.path}
+              end
+              className={({ isActive }) =>
+                `group hover-lift mb-2 flex w-full items-center justify-between rounded-xl p-4 transition-all duration-200 ${
+                  isActive
+                    ? "bg-primary text-primary-foreground scale-[1.02] transform shadow-md"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                }`
+              }
             >
-              <div className="flex items-center space-x-4">
-                <div
-                  className={`rounded-lg p-2 transition-colors ${
-                    isActive
-                      ? "bg-primary-foreground/20"
-                      : "bg-muted group-hover:bg-sidebar-accent-foreground/10"
-                  }`}
-                >
-                  <Icon
-                    className={`h-5 w-5 ${
+              {({ isActive }) => (
+                <>
+                  <div className="flex items-center space-x-4">
+                    <div
+                      className={`rounded-lg p-2 transition-colors ${
+                        isActive
+                          ? "bg-primary-foreground/20"
+                          : "bg-muted group-hover:bg-sidebar-accent-foreground/10"
+                      }`}
+                    >
+                      <Icon
+                        className={`h-5 w-5 ${
+                          isActive
+                            ? "text-primary-foreground"
+                            : "text-muted-foreground group-hover:text-sidebar-accent-foreground"
+                        }`}
+                      />
+                    </div>
+                    <div className="text-left">
+                      <div
+                        className={`text-sm font-semibold ${
+                          isActive
+                            ? "text-primary-foreground"
+                            : "text-sidebar-foreground group-hover:text-sidebar-accent-foreground"
+                        }`}
+                      >
+                        {item.label}
+                      </div>
+                      <div
+                        className={`mt-0.5 text-xs ${
+                          isActive
+                            ? "text-primary-foreground/80"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight
+                    className={`h-4 w-4 transition-transform ${
                       isActive
-                        ? "text-primary-foreground"
-                        : "text-muted-foreground group-hover:text-sidebar-accent-foreground"
+                        ? "text-primary-foreground rotate-90 transform"
+                        : "text-muted-foreground group-hover:text-sidebar-accent-foreground group-hover:translate-x-1"
                     }`}
                   />
-                </div>
-                <div className="text-left">
-                  <div
-                    className={`text-sm font-semibold ${
-                      isActive
-                        ? "text-primary-foreground"
-                        : "text-sidebar-foreground group-hover:text-sidebar-accent-foreground"
-                    }`}
-                  >
-                    {item.label}
-                  </div>
-                  <div
-                    className={`mt-0.5 text-xs ${isActive ? "text-primary-foreground/80" : "text-muted-foreground"}`}
-                  >
-                    {item.description}
-                  </div>
-                </div>
-              </div>
-              <ChevronRight
-                className={`h-4 w-4 transition-transform ${
-                  isActive
-                    ? "text-primary-foreground rotate-90 transform"
-                    : "text-muted-foreground group-hover:text-sidebar-accent-foreground group-hover:translate-x-1"
-                }`}
-              />
-            </button>
+                </>
+              )}
+            </NavLink>
           );
         })}
       </nav>

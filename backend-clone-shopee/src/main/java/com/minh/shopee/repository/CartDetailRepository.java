@@ -17,4 +17,7 @@ public interface CartDetailRepository extends JpaRepository<CartDetail, Long>, J
     List<CartDetail> findAllById(Iterable<Long> ids);
 
     List<CartDetail> findByCartId(Long cartId);
+
+    void deleteByCartIdAndProductIdIn(Long cartId, List<Long> productIds);
+
 }

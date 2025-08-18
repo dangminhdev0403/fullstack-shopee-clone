@@ -40,6 +40,7 @@ export default function CartPage() {
         cartDetails: [],
       },
   );
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -149,13 +150,14 @@ export default function CartPage() {
       return;
     }
     const selectedCartItemsForCheckout = selectedCartItems.map((item) => ({
-      id: item.id,
+      id: item.product.id,
       name: item.product.name,
       image: item.product.imageUrl,
       price: item.product.price,
       quantity: item.quantity,
       shop: item.product.shop.id,
     }));
+
     dispatch(checkoutSlice.actions.setCart(selectedCartItemsForCheckout));
 
     // Navigate to checkout page with selected items

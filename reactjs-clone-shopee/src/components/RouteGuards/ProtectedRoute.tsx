@@ -25,7 +25,7 @@ const ProtectedRoute = () => {
 
   // Nếu không phải admin → chặn
   if (roles.length === 0 || roles.every((role) => role === "ROLE_USER")) {
-    console.log(roles);
+ 
 
     return <Navigate to={ROUTES.HOME} replace />;
   }

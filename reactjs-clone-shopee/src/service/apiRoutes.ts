@@ -35,5 +35,6 @@ export const API_ROUTES = {
     FEE: `${apiLocation}/v2/shipping-order/fee`, // ✅ Chỉ tính phí
     GET: `${version}/orders/get-order`,
     CREATE: `${version}/orders/create-order`, // ✅ Lưu đơn hàng
+    CHECKOUT: `${version}/orders/checkout`, // ✅ Lưu đơn hàng
   },
 };

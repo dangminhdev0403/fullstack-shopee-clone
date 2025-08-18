@@ -5,6 +5,13 @@ import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import AdminLayout from "@layouts/AdminLayout";
 import AccountPage from "@pages/AccountPage";
+import {
+  AddressSection,
+  NotificationSection,
+  PasswordSection,
+  ProfileSection,
+} from "@pages/AccountPage/section";
+import OrderSection from "@pages/AccountPage/section/OrderSection/OrderSection";
 import Analytics from "@pages/admin/Analytics";
 import Dashboard from "@pages/admin/Dashboard";
 import Orders from "@pages/admin/Orders";
@@ -35,7 +42,21 @@ export const router = createBrowserRouter([
         children: [
           { path: ROUTES.CART, element: <CartPage /> },
           { path: ROUTES.CHECKOUT, element: <CheckOutPage /> },
-          { path: ROUTES.PROFILE, element: <AccountPage /> },
+          {
+            path: ROUTES.PROFILE,
+            element: <AccountPage />,
+            children: [
+              { index: true, element: <ProfileSection /> },
+              { path: "*", element: <NotFound /> },
+              { path: ROUTES.ACCOUNT.ADDRESS, element: <AddressSection /> },
+              {
+                path: ROUTES.ACCOUNT.NOTIFICATION,
+                element: <NotificationSection />,
+              },
+              { path: ROUTES.ACCOUNT.ORDER, element: <OrderSection /> },
+              { path: ROUTES.ACCOUNT.PASSWORD, element: <PasswordSection /> },
+            ],
+          },
         ],
       },
     ],

@@ -43,4 +43,8 @@ public class OrderSpecification {
             return cb.and(cb.equal(root.get("id"), orderId), cb.equal(shop.get("id"), shopId));
         };
     }
+
+    public static Specification<Order> hasUser(Long userId) {
+        return (root, query, cb) -> cb.equal(root.get("user").get("id"), userId);
+    }
 }

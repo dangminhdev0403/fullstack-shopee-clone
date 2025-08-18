@@ -9,17 +9,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.OrderItemRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.response.projection.OrderProjection;
+import com.minh.shopee.domain.model.Cart;
 import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.domain.model.Product;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.domain.specification.OrderSpecification;
+import com.minh.shopee.repository.CartDetailRepository;
+import com.minh.shopee.repository.CartRepository;
 import com.minh.shopee.repository.GenericRepositoryCustom;
 import com.minh.shopee.repository.OrderDetailRepository;
 import com.minh.shopee.repository.OrderRepository;
@@ -42,8 +46,11 @@ public class OrderServiceImpl implements OrderService {
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
     private final GenericRepositoryCustom<Order> orderCustomRepo;
+    private final CartRepository cartRepository;
+    private final CartDetailRepository cartDetailRepository;
 
     @Override
+    @Transactional
     public void createOrder(CreateOrderRequest req, long userId) {
         log.info("Creating order for user: {}", userId);
         User currentUser = User.builder().id(userId).build();
@@ -108,6 +115,17 @@ public class OrderServiceImpl implements OrderService {
             this.orderDetailRepository.saveAll(orderItems);
 
             log.info("Order created successfully: {}", order.getId());
+
+            Cart cartUser = this.cartRepository.findByUserId(userId).orElse(null);
+            if (cartUser != null) {
+                List<Long> orderedProductIds = req.getItems()
+                        .stream()
+                        .map(OrderItemRequest::getProductId)
+                        .toList();
+
+                this.cartDetailRepository.deleteByCartIdAndProductIdIn(cartUser.getId(), orderedProductIds);
+
+            }
         }
 
     }

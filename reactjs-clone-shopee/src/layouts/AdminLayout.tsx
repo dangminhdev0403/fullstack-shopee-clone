@@ -34,7 +34,6 @@ export default function AdminLayout() {
 
   const handleNavigate = (path: string) => {
     navigate(`${path}`);
-    console.log(`Navigating to ${path}`);
 
     setShowCommandPalette(false);
   };

@@ -23,8 +23,14 @@ import {
 } from "@mui/material";
 import { useShippingFee } from "@react-query/callApi";
 import { AddressDTO, useGetAddressesQuery } from "@redux/api/addressApi";
+import {
+  useGetCartQuery,
+  useRemoveListFromCartMutation,
+} from "@redux/api/cartApi";
+import { CreateOrderRequest, useCheckOutMutation } from "@redux/api/orderApi";
 import { RootState } from "@redux/store";
 import { GHNShippingFeeRequest } from "@service/product.service";
+import { ROUTES } from "@utils/constants/route";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -53,6 +59,8 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 // Enhanced Interfaces
 
@@ -69,6 +77,16 @@ interface PaymentMethodDTO {
   benefits?: string[];
 }
 const mockPaymentMethods: PaymentMethodDTO[] = [
+  {
+    id: "cod",
+    name: "Thanh toán khi nhận hàng (COD)",
+    type: "cod",
+    icon: Truck,
+    description: "Kiểm tra hàng trước khi thanh toán",
+    fee: 15000,
+    processingTime: "Khi giao hàng",
+    benefits: ["Kiểm tra hàng", "An toàn 100%"],
+  },
   {
     id: "momo",
     name: "Ví MoMo",
@@ -90,16 +108,7 @@ const mockPaymentMethods: PaymentMethodDTO[] = [
     processingTime: "Tức thì",
     benefits: ["Giảm 20k cho đơn đầu", "Tích xu đổi quà"],
   },
-  {
-    id: "cod",
-    name: "Thanh toán khi nhận hàng (COD)",
-    type: "cod",
-    icon: Truck,
-    description: "Kiểm tra hàng trước khi thanh toán",
-    fee: 15000,
-    processingTime: "Khi giao hàng",
-    benefits: ["Kiểm tra hàng", "An toàn 100%"],
-  },
+
   {
     id: "bank",
     name: "Chuyển khoản ngân hàng",
@@ -169,19 +178,20 @@ const mockVouchers: VoucherDTO[] = [
 ];
 
 export default function CheckOutPage() {
-  // States
-  // api Redux
-
   const { data, isLoading: isLoadingAddresses } = useGetAddressesQuery();
+  const [checkOut] = useCheckOutMutation();
+  const [removeListFromCart] = useRemoveListFromCartMutation();
+
   const addresses: AddressDTO[] = useMemo(() => data ?? [], [data]);
+  const { refetch: refetchCart } = useGetCartQuery(); // ✅ gọi hook ở đầu component
 
   const checkoutCart = useSelector((state: RootState) => state.checkout.cart);
-
+  const navigate = useNavigate();
   const [selectedAddress, setSelectedAddress] = useState<AddressDTO | null>(
     null,
   );
 
-  const [selectedPayment, setSelectedPayment] = useState<string>("momo");
+  const [selectedPayment, setSelectedPayment] = useState<string>("cod");
   const [selectedShipping, setSelectedShipping] = useState<string>("express");
   const [showAddressDialog, setShowAddressDialog] = useState(false);
   const [showVoucherDialog, setShowVoucherDialog] = useState(false);
@@ -328,18 +338,35 @@ export default function CheckOutPage() {
     setNotification({ open: true, message: "Đã bỏ voucher", type: "info" });
   };
 
-  const handlePlaceOrder = () => {
-    setLoading(true);
-    // setTimeout(() => {
-    //   setLoading(false);
-
-    //   setNotification({
-    //     open: true,
-    //     message: "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.",
-    //     type: "success",
-    //   });
-    // }, 3000);
-    console.log(checkoutCart);
+  const handlePlaceOrder = async () => {
+    let data: CreateOrderRequest = {
+      receiverName: selectedAddress?.name || "",
+      receiverAddress: selectedAddress?.fullAddress || "",
+      receiverPhone: selectedAddress?.phone || "",
+      shippingFee,
+      paymentMethod: selectedPaymentMethod?.id.toUpperCase() as "COD" | "MOMO",
+      discount: paymentDiscount,
+      items: checkoutCart.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        shopId: item.shop,
+      })),
+    };
+    try {
+      await checkOut(data).unwrap(); // gọi mutation
+      setLoading(false);
+      toast.success("Đặt hàng thành công!");
+      refetchCart();
+      navigate(ROUTES.ACCOUNT.ORDER);
+    } catch (error) {
+      setLoading(false);
+      setNotification({
+        open: true,
+        message: "Đặt hàng thất bại. Vui lòng thử lại.",
+        type: "error",
+      });
+      console.error("Checkout error:", error);
+    }
   };
 
   if (pageLoading) {

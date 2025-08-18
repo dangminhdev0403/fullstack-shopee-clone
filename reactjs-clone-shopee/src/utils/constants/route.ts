@@ -1,3 +1,5 @@
+const PROFILE = "/profile";
+
 export const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
@@ -8,8 +10,13 @@ export const ROUTES = {
   CART: "/cart",
   CHECKOUT: "/checkout",
   ORDER_HISTORY: "/order-history",
-  PROFILE: "/profile",
-
+  PROFILE: PROFILE,
+  ACCOUNT: {
+    ADDRESS: `${PROFILE}/address`,
+    NOTIFICATION: `${PROFILE}/notification`,
+    ORDER: `${PROFILE}/order`,
+    PASSWORD: `${PROFILE}/password`,
+  },
   ADMIN: {
     BASE: "/admin",
     CHILDREN: {
