@@ -1,22 +1,74 @@
 "use client";
 
+import { LoadingSkeleton } from "@components/Loading";
+import { useGetOrderHistoryQuery } from "@redux/api/orderApi";
 import {
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Clock,
+  MapPin,
   Package,
+  Phone,
   RotateCcw,
   Star,
   Truck,
+  User,
   XCircle,
 } from "lucide-react";
 import { useState } from "react";
 
-type OrderStatus =
-  | "pending"
-  | "processing"
-  | "shipping"
-  | "delivered"
-  | "cancelled";
+// Thông tin một đơn hàng
+// Trạng thái đơn hàng
+export type OrderStatus = "PENDING" | "SHIPPING" | "CANCELED" | "COMPLETED";
+
+// Thông tin user trong đơn hàng
+export interface OrderDetail {
+  id: number;
+  quantity: number;
+  price: number;
+
+  product: {
+    name: string;
+    image: string;
+  };
+}
+
+// Thông tin một đơn hàng
+export interface Order {
+  id: number;
+  status: OrderStatus;
+  code: string;
+  tolalPrice: number;
+  createdAt: string;
+  receiverAddress: string;
+  receiverName: string;
+  receiverPhone: string;
+  orderDetail: OrderDetail[];
+}
+
+// Thông tin phân trang
+export interface PageInfo {
+  size: number;
+  number: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+// Data chính trong response
+export interface OrderHistoryData {
+  content: Order[];
+  page: PageInfo;
+}
+
+// Response tổng thể
+export interface OrderHistoryResponse {
+  status: number;
+  error: string | null;
+  message: string;
+  data: OrderHistoryData;
+}
+
 type OrderFilter =
   | "all"
   | "pending"
@@ -25,83 +77,16 @@ type OrderFilter =
   | "delivered"
   | "cancelled";
 
-interface Order {
-  id: string;
-  orderNumber: string;
-  date: string;
-  status: OrderStatus;
-  total: number;
-  items: {
-    id: string;
-    name: string;
-    image: string;
-    quantity: number;
-    price: number;
-    variant?: string;
-  }[];
-  trackingNumber?: string;
-  estimatedDelivery?: string;
-}
-
-const mockOrders: Order[] = [
+const statusConfig: Record<
+  string,
   {
-    id: "1",
-    orderNumber: "SP2024001",
-    date: "2024-01-15",
-    status: "delivered",
-    total: 299000,
-    items: [
-      {
-        id: "1",
-        name: "Áo thun nam basic cotton",
-        image: "/placeholder.svg?height=80&width=80",
-        quantity: 2,
-        price: 149500,
-        variant: "Màu đen, Size L",
-      },
-    ],
-    trackingNumber: "SPX123456789",
-    estimatedDelivery: "2024-01-18",
-  },
-  {
-    id: "2",
-    orderNumber: "SP2024002",
-    date: "2024-01-20",
-    status: "shipping",
-    total: 450000,
-    items: [
-      {
-        id: "2",
-        name: "Giày sneaker nữ",
-        image: "/placeholder.svg?height=80&width=80",
-        quantity: 1,
-        price: 450000,
-        variant: "Màu trắng, Size 37",
-      },
-    ],
-    trackingNumber: "SPX987654321",
-    estimatedDelivery: "2024-01-25",
-  },
-  {
-    id: "3",
-    orderNumber: "SP2024003",
-    date: "2024-01-22",
-    status: "processing",
-    total: 180000,
-    items: [
-      {
-        id: "3",
-        name: "Túi xách mini",
-        image: "/placeholder.svg?height=80&width=80",
-        quantity: 1,
-        price: 180000,
-        variant: "Màu hồng",
-      },
-    ],
-  },
-];
-
-const statusConfig = {
+    label: string;
+    icon: React.ComponentType<any>;
+    color: string;
+    bg: string;
+    border: string;
+  }
+> = {
   pending: {
     label: "Chờ xác nhận",
     icon: Clock,
@@ -140,16 +125,24 @@ const statusConfig = {
 };
 
 export default function OrderSection() {
-  const [activeFilter, setActiveFilter] = useState<OrderFilter>("all");
-  const [orders] = useState<Order[]>(mockOrders);
+  const { data: orderData, isLoading } = useGetOrderHistoryQuery();
+  const orderList = orderData?.data.content || [];
+  console.log("Order List:", orderList);
 
-  const filteredOrders = orders.filter(
-    (order) => activeFilter === "all" || order.status === activeFilter,
+  const [activeFilter, setActiveFilter] = useState<OrderFilter>("all");
+  const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
+
+  const filteredOrders = orderList.filter(
+    (order) =>
+      activeFilter === "all" ||
+      order.status.toLocaleLowerCase() === activeFilter,
   );
 
   const getStatusCount = (status: OrderFilter) => {
-    if (status === "all") return orders.length;
-    return orders.filter((order) => order.status === status).length;
+    if (status === "all") return orderList.length;
+    return orderList.filter(
+      (order) => order.status.toLocaleLowerCase() === status,
+    ).length;
   };
 
   const formatPrice = (price: number) => {
@@ -164,22 +157,46 @@ export default function OrderSection() {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
+  const toggleOrderExpansion = (orderId: number) => {
+    const newExpanded = new Set(expandedOrders);
+    if (newExpanded.has(orderId)) {
+      newExpanded.delete(orderId);
+    } else {
+      newExpanded.add(orderId);
+    }
+    setExpandedOrders(newExpanded);
+  };
+
+  if (isLoading) {
+    return <LoadingSkeleton />;
+  }
   return (
-    <div className="animate-slide-in p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-foreground text-2xl font-bold">Đơn mua của tôi</h2>
-        <div className="text-muted-foreground text-sm">
-          Tổng cộng:{" "}
-          <span className="text-foreground font-semibold">{orders.length}</span>{" "}
-          đơn hàng
+    <div className="animate-slide-in mx-auto max-w-6xl p-6">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="text-foreground mb-2 text-3xl font-bold">
+            Đơn mua của tôi
+          </h2>
+          <p className="text-muted-foreground">
+            Quản lý và theo dõi tất cả đơn hàng của bạn
+          </p>
+        </div>
+        <div className="bg-muted rounded-lg px-4 py-2">
+          <span className="text-muted-foreground text-sm">Tổng cộng: </span>
+          <span className="text-foreground text-lg font-bold">
+            {orderList.length}
+          </span>
+          <span className="text-muted-foreground text-sm"> đơn hàng</span>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="bg-muted mb-6 flex space-x-1 rounded-lg p-1">
+      <div className="bg-muted mb-8 flex flex-wrap gap-2 rounded-xl p-2">
         {[
           { key: "all" as const, label: "Tất cả" },
           { key: "pending" as const, label: "Chờ xác nhận" },
@@ -191,159 +208,241 @@ export default function OrderSection() {
           <button
             key={filter.key}
             onClick={() => setActiveFilter(filter.key)}
-            className={`rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
               activeFilter === filter.key
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-background"
+                ? "bg-primary text-primary-foreground scale-105 shadow-md"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
             }`}
           >
             {filter.label}
-            <span className="ml-2 text-xs opacity-75">
-              ({getStatusCount(filter.key)})
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs ${
+                activeFilter === filter.key
+                  ? "bg-primary-foreground/20"
+                  : "bg-muted-foreground/20"
+              }`}
+            >
+              {getStatusCount(filter.key)}
             </span>
           </button>
         ))}
       </div>
 
       {/* Orders List */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {filteredOrders.length === 0 ? (
-          <div className="py-12 text-center">
-            <Package className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
-            <h3 className="text-foreground mb-2 text-lg font-medium">
+          <div className="py-16 text-center">
+            <div className="bg-muted/50 mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full">
+              <Package className="text-muted-foreground h-12 w-12" />
+            </div>
+            <h3 className="text-foreground mb-2 text-xl font-semibold">
               Không có đơn hàng nào
             </h3>
-            <p className="text-muted-foreground">
-              Bạn chưa có đơn hàng nào trong danh mục này
+            <p className="text-muted-foreground mx-auto max-w-md">
+              Bạn chưa có đơn hàng nào trong danh mục này. Hãy khám phá các sản
+              phẩm và tạo đơn hàng đầu tiên!
             </p>
           </div>
         ) : (
           filteredOrders.map((order) => {
-            const statusInfo = statusConfig[order.status];
+            const statusInfo = statusConfig[order.status.toLocaleLowerCase()];
             const StatusIcon = statusInfo.icon;
+            const isExpanded = expandedOrders.has(order.id);
 
             return (
               <div
                 key={order.id}
-                className="bg-card hover-lift animate-fade-in rounded-lg border border-gray-500 p-6"
+                className="bg-card hover-lift animate-fade-in border-border overflow-hidden rounded-xl border shadow-sm"
               >
-                {/* Order Header */}
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-muted-foreground text-sm">
-                        Mã đơn hàng:
-                      </span>
-                      <span className="text-foreground font-semibold">
-                        {order.orderNumber}
-                      </span>
-                    </div>
-                    <div className="bg-muted-foreground h-1 w-1 rounded-full"></div>
-                    <span className="text-muted-foreground text-sm">
-                      {formatDate(order.date)}
-                    </span>
-                  </div>
-                  <div
-                    className={`flex items-center space-x-2 rounded-full px-3 py-1 ${statusInfo.bg} ${statusInfo.border} border`}
-                  >
-                    <StatusIcon className={`h-4 w-4 ${statusInfo.color}`} />
-                    <span className={`text-sm font-medium ${statusInfo.color}`}>
-                      {statusInfo.label}
-                    </span>
-                  </div>
-                </div>
+                <div className="bg-muted/30 border-border border-b px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 rounded-lg p-2">
+                          <Package className="text-primary h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground text-sm font-medium">
+                              Mã đơn hàng:
+                            </span>
+                            <span className="text-foreground text-lg font-bold">
+                              {order.code}
+                            </span>
+                          </div>
+                          <span className="text-muted-foreground text-sm">
+                            {formatDate(order.createdAt)}
+                          </span>
+                        </div>
+                      </div>
 
-                {/* Order Items */}
-                <div className="mb-4 space-y-3">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-4">
-                      <img
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.name}
-                        className="h-16 w-16 rounded-lg border border-gray-500 object-cover"
-                      />
-                      <div className="flex-1">
-                        <h4 className="text-foreground font-medium">
-                          {item.name}
-                        </h4>
-                        {item.variant && (
-                          <p className="text-muted-foreground text-sm">
-                            {item.variant}
-                          </p>
+                      <div className="hidden items-center gap-4 text-sm md:flex">
+                        <div className="flex items-center gap-2">
+                          <Package className="text-muted-foreground h-4 w-4" />
+                          <span className="text-muted-foreground">
+                            {order.orderDetail.length} sản phẩm
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`flex items-center gap-2 rounded-full px-4 py-2 ${statusInfo.bg} ${statusInfo.border} border`}
+                      >
+                        <StatusIcon className={`h-4 w-4 ${statusInfo.color}`} />
+                        <span
+                          className={`text-sm font-semibold ${statusInfo.color}`}
+                        >
+                          {statusInfo.label}
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => toggleOrderExpansion(order.id)}
+                        className="hover:bg-muted rounded-lg p-2 transition-colors"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="text-muted-foreground h-5 w-5" />
+                        ) : (
+                          <ChevronDown className="text-muted-foreground h-5 w-5" />
                         )}
-                        <div className="mt-1 flex items-center justify-between">
-                          <span className="text-muted-foreground text-sm">
-                            x{item.quantity}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {isExpanded && (
+                  <div className="p-6">
+                    {/* Delivery Information */}
+                    <div className="bg-muted/20 mb-6 rounded-lg p-4">
+                      <h4 className="text-foreground mb-3 flex items-center gap-2 font-semibold">
+                        <MapPin className="h-4 w-4" />
+                        Thông tin giao hàng
+                      </h4>
+                      <div className="grid gap-4 text-sm md:grid-cols-2">
+                        <div className="flex items-center gap-2">
+                          <User className="text-muted-foreground h-4 w-4" />
+                          <span className="text-muted-foreground">
+                            Người nhận:
                           </span>
-                          <span className="text-primary font-semibold">
-                            {formatPrice(item.price)}
+                          <span className="font-medium">
+                            {order.receiverName}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone className="text-muted-foreground h-4 w-4" />
+                          <span className="text-muted-foreground">
+                            Số điện thoại:
+                          </span>
+                          <span className="font-medium">
+                            {order.receiverPhone}
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2 md:col-span-2">
+                          <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
+                          <span className="text-muted-foreground">
+                            Địa chỉ:
+                          </span>
+                          <span className="font-medium">
+                            {order.receiverAddress}
                           </span>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
 
-                {/* Tracking Info */}
-                {order.trackingNumber && (
-                  <div className="bg-muted mb-4 rounded-lg p-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-muted-foreground text-sm">
-                          Mã vận đơn:
-                        </span>
-                        <span className="text-foreground ml-2 font-mono text-sm font-medium">
-                          {order.trackingNumber}
-                        </span>
+                    {/* Order Items with improved layout */}
+                    <div className="mb-6">
+                      <h4 className="text-foreground mb-4 flex items-center gap-2 font-semibold">
+                        <Package className="h-4 w-4" />
+                        Chi tiết đơn hàng ({order.orderDetail.length} sản phẩm)
+                      </h4>
+                      <div className="space-y-4">
+                        {order.orderDetail.map((item, index) => (
+                          <div
+                            key={item.id}
+                            className="bg-muted/20 flex items-center gap-4 rounded-lg p-4"
+                          >
+                            <div className="relative">
+                              <img
+                                src={item.product.image || "/placeholder.svg"}
+                                alt={item.product.name}
+                                className="border-border h-20 w-20 rounded-lg border object-cover"
+                              />
+                              <div className="bg-primary text-primary-foreground absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
+                                {index + 1}
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="text-foreground mb-1 font-semibold">
+                                {item.product.name}
+                              </h5>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                  <span className="text-muted-foreground bg-muted rounded px-2 py-1 text-sm">
+                                    Số lượng: {item.quantity}
+                                  </span>
+                                  <span className="text-primary font-bold">
+                                    {formatPrice(item.price)}
+                                  </span>
+                                </div>
+                                <div className="text-right">
+                                  <span className="text-muted-foreground text-sm">
+                                    Thành tiền:
+                                  </span>
+                                  <div className="text-primary text-lg font-bold">
+                                    {formatPrice(item.price * item.quantity)}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      {order.estimatedDelivery && (
-                        <div className="text-right">
-                          <span className="text-muted-foreground text-sm">
-                            Dự kiến giao:
-                          </span>
-                          <span className="text-foreground ml-2 text-sm font-medium">
-                            {formatDate(order.estimatedDelivery)}
-                          </span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
 
-                {/* Order Footer */}
-                <div className="flex items-center justify-between border-t border-gray-500 pt-4">
-                  <div className="text-right">
-                    <span className="text-muted-foreground">Tổng tiền: </span>
-                    <span className="text-primary text-xl font-bold">
-                      {formatPrice(order.total)}
-                    </span>
-                  </div>
-                  <div className="flex space-x-3">
-                    {order.status === "delivered" && (
-                      <>
-                        <button className="hover:bg-muted flex items-center space-x-2 rounded-lg border border-gray-500 px-4 py-2 transition-colors">
-                          <Star className="h-4 w-4" />
-                          <span className="text-sm font-medium">Đánh giá</span>
+                <div className="bg-muted/30 border-border border-t px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground text-lg">
+                        Tổng tiền:
+                      </span>
+                      <span className="text-primary text-2xl font-bold">
+                        {formatPrice(order.tolalPrice)}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-3">
+                      {order.status.toLocaleLowerCase() === "delivered" && (
+                        <>
+                          <button className="hover:bg-muted border-border flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors">
+                            <Star className="h-4 w-4" />
+                            <span className="text-sm font-medium">
+                              Đánh giá
+                            </span>
+                          </button>
+                          <button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 transition-colors">
+                            <RotateCcw className="h-4 w-4" />
+                            <span className="text-sm font-medium">Mua lại</span>
+                          </button>
+                        </>
+                      )}
+                      {order.status.toLocaleLowerCase() === "shipping" && (
+                        <button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 transition-colors">
+                          <Truck className="h-4 w-4" />
+                          <span className="text-sm font-medium">Theo dõi</span>
                         </button>
-                        <button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors">
-                          <RotateCcw className="h-4 w-4" />
-                          <span className="text-sm font-medium">Mua lại</span>
+                      )}
+                      {(order.status.toLocaleLowerCase() === "pending" ||
+                        order.status.toLocaleLowerCase() === "processing") && (
+                        <button className="border-destructive text-destructive hover:bg-destructive/10 flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors">
+                          <XCircle className="h-4 w-4" />
+                          <span className="text-sm font-medium">Hủy đơn</span>
                         </button>
-                      </>
-                    )}
-                    {order.status === "shipping" && (
-                      <button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors">
-                        <Truck className="h-4 w-4" />
-                        <span className="text-sm font-medium">Theo dõi</span>
-                      </button>
-                    )}
-                    {(order.status === "pending" ||
-                      order.status === "processing") && (
-                      <button className="border-destructive text-destructive hover:bg-destructive/10 flex items-center space-x-2 rounded-lg border px-4 py-2 transition-colors">
-                        <XCircle className="h-4 w-4" />
-                        <span className="text-sm font-medium">Hủy đơn</span>
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -470,7 +470,10 @@ export function Dashboard() {
                 <Award className="h-5 w-5 text-yellow-500" />
                 <span>Sản phẩm bán chạy</span>
               </h3>
-              <button className="rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100">
+              <button
+                className="rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100"
+                title="More info"
+              >
                 <MoreHorizontal className="h-4 w-4" />
               </button>
             </div>
@@ -516,7 +519,10 @@ export function Dashboard() {
                     <Star className="mr-1 h-4 w-4 fill-current" />
                     4.8
                   </div>
-                  <button className="rounded-lg p-2 transition-colors duration-200 hover:bg-orange-100 dark:hover:bg-orange-900/20">
+                  <button
+                    title="More info"
+                    className="rounded-lg p-2 transition-colors duration-200 hover:bg-orange-100 dark:hover:bg-orange-900/20"
+                  >
                     <Eye className="h-4 w-4 text-orange-600" />
                   </button>
                 </div>

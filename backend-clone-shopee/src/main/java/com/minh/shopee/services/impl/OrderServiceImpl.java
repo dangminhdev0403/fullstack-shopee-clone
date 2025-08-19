@@ -1,8 +1,10 @@
 package com.minh.shopee.services.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,7 +17,6 @@ import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.OrderItemRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
-import com.minh.shopee.domain.dto.response.projection.OrderProjection;
 import com.minh.shopee.domain.model.Cart;
 import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.OrderDetail;
@@ -55,6 +56,8 @@ public class OrderServiceImpl implements OrderService {
         log.info("Creating order for user: {}", userId);
         User currentUser = User.builder().id(userId).build();
         // Nhóm sản phẩm theo shopId
+        BigDecimal subtotal = BigDecimal.ZERO;
+
         Map<Long, List<OrderItemRequest>> groupedByShop = req.getItems()
                 .stream()
                 .collect(Collectors.groupingBy(OrderItemRequest::getShopId));
@@ -105,9 +108,17 @@ public class OrderServiceImpl implements OrderService {
 
                 // Giảm tồn kho
                 product.setStock(product.getStock() - itemReq.getQuantity());
+                subtotal = subtotal.add(product.getPrice().multiply(BigDecimal.valueOf(itemReq.getQuantity())));
                 productRepository.save(product);
             }
+            BigDecimal shippingFee = Optional.ofNullable(req.getShippingFee()).orElse(BigDecimal.ZERO);
+            BigDecimal discount = Optional.ofNullable(req.getDiscount()).orElse(BigDecimal.ZERO);
+            BigDecimal totalPrice = subtotal.add(shippingFee).subtract(discount);
+            if (totalPrice.compareTo(BigDecimal.ZERO) < 0) {
+                totalPrice = BigDecimal.ZERO;
+            }
 
+            order.setTolalPrice(totalPrice);
             order.setOrderDetail(orderItems);
             order.setOrderDetail(orderItems);
 
@@ -131,11 +142,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderProjection> getOrdersListByUser(Pageable pageable) {
+    public <T> Page<T> getOrdersListByUser(Pageable pageable, Class<T> projectionClass) {
         long userId = SecurityUtils.getCurrentUserId();
         return this.orderCustomRepo.findAll(OrderSpecification.hasUserId(
                 userId), pageable,
-                OrderProjection.class);
+                projectionClass);
     }
 
     @Override

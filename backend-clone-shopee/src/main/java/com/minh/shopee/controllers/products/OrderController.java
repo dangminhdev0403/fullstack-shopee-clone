@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.minh.shopee.domain.constant.ApiRoutes;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
+import com.minh.shopee.domain.dto.response.projection.OrderHistoryProjection;
 import com.minh.shopee.domain.dto.response.projection.OrderProjection;
 import com.minh.shopee.services.OrderService;
 import com.minh.shopee.services.utils.SecurityUtils;
@@ -37,9 +38,9 @@ public class OrderController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Page<OrderProjection>> getMethodName(
+    public ResponseEntity<Page<OrderHistoryProjection>> getOrdersList(
             @PageableDefault(page = 0, size = 20) Pageable pageable) {
-        Page<OrderProjection> orders = orderService.getOrdersListByUser(pageable);
+        Page<OrderHistoryProjection> orders = orderService.getOrdersListByUser(pageable, OrderHistoryProjection.class);
         return ResponseEntity.ok(orders);
     }
 

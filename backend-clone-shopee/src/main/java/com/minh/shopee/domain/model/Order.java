@@ -1,7 +1,11 @@
 package com.minh.shopee.domain.model;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,6 +44,10 @@ public class Order {
     private String receiverName;
     private String receiverAddress;
     private String receiverPhone;
+    BigDecimal tolalPrice; // Tổng giá trị đơn hàng
+    // Mã đơn nội bộ
+    @Column(unique = true, nullable = false)
+    private String code;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss: a", timezone = "GMT+7")
     @Column(updatable = false)
     private Instant createdAt;
@@ -71,6 +79,11 @@ public class Order {
         if (createdAt == null) {
             this.createdAt = Instant.now();
         }
+        if (code == null || code.isEmpty()) {
+            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String random = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
 
+            this.code = "SP" + date + "-" + random; // Tạo mã đơn hàng duy nhất
+        }
     }
 }

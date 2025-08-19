@@ -36,5 +36,6 @@ export const API_ROUTES = {
     GET: `${version}/orders/get-order`,
     CREATE: `${version}/orders/create-order`, // ✅ Lưu đơn hàng
     CHECKOUT: `${version}/orders/checkout`, // ✅ Lưu đơn hàng
+    HISTORY: `${version}/orders`, // ✅ Lưu đơn hàng
   },
 };

@@ -116,7 +116,7 @@ const ProductDetail = () => {
         // Handle success, e.g., navigate
         navigate(ROUTES.CART);
 
-        toast.success("Mua ngay thành công");
+        toast.success("Hãy tiến hành đặt hàng");
       })
       .catch((error) => {
         // Handle error, e.g., show an error message

@@ -1,10 +1,7 @@
 import App from "@App";
-import Login from "@components/Login";
-import Register from "@components/Register";
 import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import AdminLayout from "@layouts/AdminLayout";
-import AccountPage from "@pages/AccountPage";
 import {
   AddressSection,
   NotificationSection,
@@ -12,21 +9,25 @@ import {
   ProfileSection,
 } from "@pages/AccountPage/section";
 import OrderSection from "@pages/AccountPage/section/OrderSection/OrderSection";
-import Analytics from "@pages/admin/Analytics";
-import Dashboard from "@pages/admin/Dashboard";
-import Orders from "@pages/admin/Orders";
-import Products from "@pages/admin/Product";
-import UserManagement from "@pages/admin/UserManagement";
-import Auth from "@pages/Auth";
-import CheckOutPage from "@pages/CheckOut";
-import NotFound from "@pages/Errors/NotFound";
-import { ProductDetail } from "@pages/Product";
+
 import { ROUTES } from "@utils/constants/route";
 import { lazy } from "react";
 import { createBrowserRouter } from "react-router";
 
+const Login = lazy(() => import("@components/Login"));
+const Register = lazy(() => import("@components/Register"));
+const AccountPage = lazy(() => import("@pages/AccountPage"));
+const CheckOutPage = lazy(() => import("@pages/CheckOut"));
+const Dashboard = lazy(() => import("@pages/admin/Dashboard"));
+const Analytics = lazy(() => import("@pages/admin/Analytics"));
+const Orders = lazy(() => import("@pages/admin/Orders"));
+const Products = lazy(() => import("@pages/admin/Product"));
+const UserManagement = lazy(() => import("@pages/admin/UserManagement"));
+const Auth = lazy(() => import("@pages/Auth"));
 const ListProduct = lazy(() => import("@pages/Product/ListProduct"));
 const CartPage = lazy(() => import("@pages/Cart/CartPage"));
+const { ProductDetail } = await import("@pages/Product");
+const NotFound = lazy(() => import("@pages/Errors/NotFound"));
 
 // ...
 export const router = createBrowserRouter([
