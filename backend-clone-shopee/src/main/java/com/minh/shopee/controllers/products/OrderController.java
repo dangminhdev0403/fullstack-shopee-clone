@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.response.projection.OrderHistoryProjection;
-import com.minh.shopee.domain.dto.response.projection.OrderProjection;
 import com.minh.shopee.services.OrderService;
 import com.minh.shopee.services.utils.SecurityUtils;
 
@@ -29,6 +29,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping(ApiRoutes.CHECKOUT)
+    @ApiDescription("Checkout order")
     public ResponseEntity<CreateOrderRequest> checkout(@RequestBody @Valid CreateOrderRequest entity) {
 
         Long userId = SecurityUtils.getCurrentUserId();
@@ -38,6 +39,7 @@ public class OrderController {
     }
 
     @GetMapping("")
+    @ApiDescription("Get order history")
     public ResponseEntity<Page<OrderHistoryProjection>> getOrdersList(
             @PageableDefault(page = 0, size = 20) Pageable pageable) {
         Page<OrderHistoryProjection> orders = orderService.getOrdersListByUser(pageable, OrderHistoryProjection.class);
@@ -45,6 +47,7 @@ public class OrderController {
     }
 
     @PutMapping("")
+    @ApiDescription("Cancel order status")
     public ResponseEntity<String> cancelOrder(@Valid @RequestBody UpdateOrderDTO req) {
         this.orderService.cancelOrder(req);
         return ResponseEntity.ok("Huỷ đơn hàng thành công");

@@ -3,13 +3,14 @@ package com.minh.shopee.services.repocustom;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -30,6 +31,8 @@ import jakarta.persistence.TupleElement;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -63,9 +66,14 @@ public class GenericRepositoryImpl<T> implements GenericRepositoryCustom<T> {
      */
     @Override
     public <R> Optional<R> findOne(Specification<T> spec, Class<R> projection) {
-        List<R> result = projection.isInterface()
-                ? fetchInterfaceProjection(spec, Pageable.unpaged(), projection, true)
-                : fetchConstructorProjection(spec, Pageable.unpaged(), projection, true);
+        List<R> result;
+        try {
+            result = projection.isInterface()
+                    ? fetchInterfaceProjection(spec, Pageable.unpaged(), projection, true)
+                    : fetchConstructorProjection(spec, Pageable.unpaged(), projection, true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Failed to fetch interface projection", e);
+        }
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
@@ -74,15 +82,23 @@ public class GenericRepositoryImpl<T> implements GenericRepositoryCustom<T> {
      */
     @Override
     public <R> Page<R> findAll(Specification<T> spec, Pageable pageable, Class<R> projection) {
-        // Lấy danh sách content
-        List<R> content = projection.isInterface()
-                ? fetchInterfaceProjection(spec, pageable, projection, false)
-                : fetchConstructorProjection(spec, pageable, projection, false);
 
-        // Tính total count
-        long total = pageable.isUnpaged() || content.size() == pageable.getPageSize()
-                ? countTotal(spec) // Nếu unpaged hoặc full page size → đếm thật
-                : pageable.getOffset() + content.size(); // Ngược lại tính tạm
+        List<R> content;
+        long total;
+
+        // Lấy danh sách content
+        try {
+            content = projection.isInterface()
+                    ? fetchInterfaceProjection(spec, pageable, projection, false)
+                    : fetchConstructorProjection(spec, pageable, projection, false);
+
+            // Tính total count
+            total = pageable.isUnpaged() || content.size() == pageable.getPageSize()
+                    ? countTotal(spec) // Nếu unpaged hoặc full page size → đếm thật
+                    : pageable.getOffset() + content.size(); // Ngược lại tính tạm
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch interface projection", e);
+        }
 
         return new PageImpl<>(content, pageable, total);
     }
@@ -130,50 +146,76 @@ public class GenericRepositoryImpl<T> implements GenericRepositoryCustom<T> {
      * Lấy dữ liệu theo dạng Interface Projection
      * (Tức là projection là interface có getter tương ứng với field select)
      */
-    private <R> List<R> fetchInterfaceProjection(Specification<T> spec, Pageable pageable, Class<R> projection,
-            boolean singleResult) {
+    private <R> List<R> fetchInterfaceProjection(
+            Specification<T> spec,
+            Pageable pageable,
+            Class<R> projection,
+            boolean singleResult) throws NoSuchMethodException {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tuple> cq = cb.createTupleQuery(); // Trả về Tuple
+        CriteriaQuery<Tuple> cq = cb.createTupleQuery();
         Root<T> root = cq.from(domainClass);
 
-        applySpec(spec, cb, cq, root); // áp dụng Specification
+        applySpec(spec, cb, cq, root);
 
         List<Selection<?>> selections = new ArrayList<>();
         Set<String> aliases = new HashSet<>();
 
-        // Duyệt tất cả getter của projection interface
+        // Duyệt getter trong Projection
         for (Method method : projection.getMethods()) {
             if (!method.getName().startsWith("get") || method.getParameterCount() > 0)
                 continue;
 
-            // Lấy tên field từ getter (vd: getName → "name")
             String field = Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4);
-            // alias để tránh conflict dấu chấm
-            Selection<?> selection = resolvePath(root, field).alias(field.replace(".", "_"));
-            selections.add(selection);
-            aliases.add(field.replace(".", "_"));
+
+            if (Collection.class.isAssignableFrom(method.getReturnType())) {
+                // Join collection (ví dụ: orderDetail)
+                Join<Object, Object> join = root.join(field, JoinType.LEFT);
+                selections.add(join.alias(field));
+                aliases.add(field);
+            } else {
+                // Normal field
+                Selection<?> selection = resolvePath(root, field).alias(field.replace(".", "_"));
+                selections.add(selection);
+                aliases.add(field.replace(".", "_"));
+            }
         }
 
-        cq.multiselect(selections);
+        cq.multiselect(selections).distinct(true);
         applySort(pageable, cb, cq, root);
 
         TypedQuery<Tuple> query = entityManager.createQuery(cq);
         applyPaging(query, pageable, singleResult);
 
         List<Tuple> tuples = query.getResultList();
-        return tuples.stream()
-                .map(tuple -> {
-                    Map<String, Object> values = new HashMap<>();
-                    for (TupleElement<?> element : tuple.getElements()) {
-                        String alias = element.getAlias();
-                        if (aliases.contains(alias)) {
-                            // Đổi alias _ thành . để mapping đúng nested property
-                            values.put(alias.replace("_", "."), tuple.get(alias));
-                        }
-                    }
-                    // projectionFactory map values → projection interface
-                    return projectionFactory.createProjection(projection, values);
-                })
+
+        // ====== GOM LẠI DỮ LIỆU CHA - CON ======
+        Map<Object, Map<String, Object>> grouped = new LinkedHashMap<>();
+
+        for (Tuple tuple : tuples) {
+            Object id = tuple.get("id"); // alias id
+            Map<String, Object> values = grouped.computeIfAbsent(id, k -> new HashMap<>());
+
+            for (TupleElement<?> element : tuple.getElements()) {
+                String alias = element.getAlias();
+
+                if (alias == null)
+                    continue;
+
+                if (Collection.class.isAssignableFrom(
+                        projection.getMethod("get" + Character.toUpperCase(alias.charAt(0)) + alias.substring(1))
+                                .getReturnType())) {
+                    // Nếu là collection thì add vào list
+                    values.computeIfAbsent(alias, k -> new ArrayList<>());
+                    ((List<Object>) values.get(alias)).add(tuple.get(alias));
+                } else {
+                    values.putIfAbsent(alias.replace("_", "."), tuple.get(alias));
+                }
+            }
+        }
+
+        // Tạo projection từ map values
+        return grouped.values().stream()
+                .map(values -> projectionFactory.createProjection(projection, values))
                 .toList();
     }
 

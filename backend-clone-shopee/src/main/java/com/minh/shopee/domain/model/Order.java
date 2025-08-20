@@ -61,6 +61,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     List<OrderDetail> orderDetail;
+    
     @Transient // Không được lưu vào cơ sở dữ liệu
     private OrderStatus prevStatus;
 
