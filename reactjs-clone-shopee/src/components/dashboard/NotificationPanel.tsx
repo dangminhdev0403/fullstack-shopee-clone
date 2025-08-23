@@ -96,6 +96,7 @@ export function NotificationPanel({
             </h3>
             <div className="flex items-center space-x-2">
               <button
+                title="Đánh dấu tất cả đã đọc"
                 onClick={onClose}
                 className="rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
@@ -128,7 +129,10 @@ export function NotificationPanel({
                         <h4 className="text-sm font-medium">
                           {notification.title}
                         </h4>
-                        <button className="rounded p-1 transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/20">
+                        <button
+                          title="Xoa"
+                          className="rounded p-1 transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/20"
+                        >
                           <Trash2 className="h-3 w-3 text-red-500" />
                         </button>
                       </div>

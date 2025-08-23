@@ -1,49 +1,56 @@
 "use client";
 
+import { LoadingSkeleton } from "@components/Loading";
+import { useAlert } from "@hooks/useAlert";
+import {
+  AddressDTO,
+  useDeleteAddressMutation,
+  useGetAddressesQuery,
+  useUpdateAddressMutation,
+} from "@redux/api/addressApi";
 import { Edit, MapPin, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-
-interface Address {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  isDefault: boolean;
-}
+import { useMemo } from "react";
+import { toast } from "react-toastify";
 
 export default function AddressSection() {
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: 1,
-      name: "Nguyễn Văn A",
-      phone: "0123456789",
-      address: "123 Đường ABC, Phường XYZ, Quận 1, TP.HCM",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      name: "Nguyễn Văn A",
-      phone: "0987654321",
-      address: "456 Đường DEF, Phường UVW, Quận 2, TP.HCM",
-      isDefault: false,
-    },
-  ]);
+  const { data, isLoading } = useGetAddressesQuery();
+  const [deleteAddress] = useDeleteAddressMutation();
+  const [editAddress] = useUpdateAddressMutation();
+  const addresses: AddressDTO[] = useMemo(() => data ?? [], [data]);
+  const { confirm, success, error: errorAlert } = useAlert();
 
-  const handleSetDefault = (id: number) => {
-    setAddresses((prev) =>
-      prev.map((addr) => ({
-        ...addr,
-        isDefault: addr.id === id,
-      })),
-    );
-  };
-
-  const handleDelete = (id: number) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) {
-      setAddresses((prev) => prev.filter((addr) => addr.id !== id));
+  const handleSetDefault = async (id: number) => {
+    const addess = addresses.find((address) => address.id === id);
+    if (addess) {
+      try {
+        await editAddress({ ...addess, isDefault: true }).unwrap();
+        toast.success("Cập nhật địa chỉ thành công");
+      } catch (err) {
+        errorAlert("Cập nhật địa chỉ thất bại");
+        console.error(err);
+      }
     }
   };
 
+  const handleDelete = (id: number) => {
+    confirm(
+      "Xác nhận xoá địa chỉ",
+      "Bạn có chắc chắn muốn xoá địa chỉ này?",
+      async () => {
+        try {
+          await deleteAddress(id).unwrap();
+          toast.success("Xoá địa chỉ thành công");
+        } catch (error) {
+          errorAlert("Xoá địa chỉ thất bại", "Vui lòng thử lại sau.");
+          console.error(" error:", error);
+        }
+      },
+    );
+  };
+
+  if (isLoading) {
+    return <LoadingSkeleton />;
+  }
   return (
     <div className="p-6">
       <div className="mb-6 border-b border-gray-200 pb-4">
@@ -83,7 +90,7 @@ export default function AddressSection() {
                 </div>
                 <div className="flex items-start space-x-2 text-gray-600">
                   <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                  <span>{address.address}</span>
+                  <span>{address.fullAddress}</span>
                 </div>
               </div>
 
@@ -96,7 +103,9 @@ export default function AddressSection() {
                 </button>
                 <button
                   title="Xóa"
-                  onClick={() => handleDelete(address.id)}
+                  onClick={() =>
+                    address.id !== undefined && handleDelete(address.id)
+                  }
                   className="p-1 text-red-500 hover:text-red-600"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -107,7 +116,9 @@ export default function AddressSection() {
             <div className="mt-3 flex items-center space-x-4 border-t border-gray-100 pt-3">
               {!address.isDefault && (
                 <button
-                  onClick={() => handleSetDefault(address.id)}
+                  onClick={() =>
+                    address.id !== undefined && handleSetDefault(address.id)
+                  }
                   className="text-sm text-orange-500 hover:text-orange-600"
                 >
                   Thiết lập mặc định

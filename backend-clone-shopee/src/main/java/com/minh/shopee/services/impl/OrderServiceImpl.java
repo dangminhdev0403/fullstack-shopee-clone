@@ -142,14 +142,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public <T> Page<T> getOrdersListByUser(Pageable pageable, Class<T> projectionClass) {
-        long userId = SecurityUtils.getCurrentUserId();
-        // return this.orderCustomRepo.findAll(OrderSpecification.hasUserId(
-        // userId), pageable,
-        // projectionClass);
-        return this.orderRepository.findAllByUserId(userId, projectionClass,
-                pageable);
+    public <T> Page<T> getOrdersListByUser(Pageable pageable, Class<T> projectionClass, OrderStatus status) {
 
+        long userId = SecurityUtils.getCurrentUserId();
+
+        if (status != null) {
+            return orderRepository.findAllByUserIdAndStatus(userId, status, projectionClass, pageable);
+        }
+        return orderRepository.findAllByUserId(userId, projectionClass, pageable);
     }
 
     @Override

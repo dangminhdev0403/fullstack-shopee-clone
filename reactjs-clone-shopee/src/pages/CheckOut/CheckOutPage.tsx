@@ -205,7 +205,7 @@ export default function CheckOutPage() {
   });
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
-  const { confirm, success, error: errorAlert } = useAlert();
+  const { confirm, error: errorAlert } = useAlert();
 
   type NotificationType = "success" | "error" | "info" | "warning";
   const [notification, setNotification] = useState<{

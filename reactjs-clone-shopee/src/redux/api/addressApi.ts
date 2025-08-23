@@ -57,6 +57,13 @@ export const addressApi = rootApi.injectEndpoints({
       }),
       invalidatesTags: ["ADDRESS"],
     }),
+    deleteAddress: builder.mutation<void, number>({
+      query: (addressId) => ({
+        url: `${API_ROUTES.ADDRESS.ADDRESSES}/${addressId}`, // hoặc API_ROUTES.ADDRESS.DISTRICTS, v.v.
+        method: "DELETE",
+      }),
+      invalidatesTags: ["ADDRESS"],
+    }),
   }),
 });
 
@@ -64,4 +71,5 @@ export const {
   useGetAddressesQuery,
   useCreateAddressMutation,
   useUpdateAddressMutation,
+  useDeleteAddressMutation,
 } = addressApi;

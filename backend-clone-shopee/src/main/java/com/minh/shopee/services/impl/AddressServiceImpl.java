@@ -26,6 +26,10 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void addAddress(AddAddressDTO request, Long userId) {
+        Long count = this.addressRepository.countByUserId(userId);
+        if (count <= 0) {
+            request.setIsDefault(true);
+        }
         log.info("Adding new address for user with ID: {}", userId);
         User user = User.builder()
                 .id(userId)
@@ -57,8 +61,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void deleteAddress(Long addressId, Long userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteAddress'");
+        Address address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+        addressRepository.delete(address);
     }
 
     private String[] ShopUpdateStatusDTO(Object source) {

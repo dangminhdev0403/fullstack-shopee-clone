@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
+import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.response.projection.OrderHistoryProjection;
@@ -41,8 +43,9 @@ public class OrderController {
     @GetMapping("")
     @ApiDescription("Get order history")
     public ResponseEntity<Page<OrderHistoryProjection>> getOrdersList(
-            @PageableDefault(page = 0, size = 20) Pageable pageable) {
-        Page<OrderHistoryProjection> orders = orderService.getOrdersListByUser(pageable, OrderHistoryProjection.class);
+            @PageableDefault(page = 0, size = 20) Pageable pageable ,  @RequestParam(required = false) OrderStatus  status) {
+        Page<OrderHistoryProjection> orders = orderService.getOrdersListByUser(pageable, OrderHistoryProjection.class ,
+                status);
         return ResponseEntity.ok(orders);
     }
 

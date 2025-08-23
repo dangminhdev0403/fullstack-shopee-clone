@@ -1,5 +1,6 @@
 package com.minh.shopee.services.utils.error;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,11 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.response.ResponseData;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,6 +94,23 @@ public class GlobalExceptionHandler {
             error = e.getError();
             message = e.getMessage();
             log.error("❌ [APP EXCEPTION] URL: {} | Message: {}", request.getRequestURL(), ex.getMessage(), ex);
+        } else if (ex instanceof MethodArgumentTypeMismatchException e) {
+            statusCode = e.getErrorCode().equals("typeMismatch")
+                    ? HttpStatus.BAD_REQUEST.value()
+                    : HttpStatus.INTERNAL_SERVER_ERROR.value();
+
+            error = "Truyền tham số không hợp lệ";
+
+            if (e.getRequiredType() == OrderStatus.class) {
+                message = String.format(
+                        "Các giá trị hợp lệ: %s",
+
+                        Arrays.toString(OrderStatus.values()));
+            } else {
+                message = "Invalid parameter: " + e.getName();
+            }
+
+            log.error("❌ [APP EXCEPTION] URL: {} | Message: {}", request.getRequestURL(), message, ex);
         }
 
         else {

@@ -2,9 +2,10 @@
 
 import { LoadingSkeleton } from "@components/Loading";
 import { useAlert } from "@hooks/useAlert";
+import { Pagination } from "@mui/material";
 import {
   useCancelOrderMutation,
-  useGetOrderHistoryQuery,
+  useLazyGetOrderHistoryQuery,
 } from "@redux/api/orderApi";
 import {
   CheckCircle,
@@ -20,7 +21,7 @@ import {
   User,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Thông tin một đơn hàng
 // Trạng thái đơn hàng
@@ -129,8 +130,11 @@ const statusConfig: Record<
 };
 
 export default function OrderSection() {
-  const { data: orderData, isLoading } = useGetOrderHistoryQuery();
-  const [cancelOrder, { isLoading: isCanceling }] = useCancelOrderMutation();
+  const [page, setPage] = useState(1);
+
+  const [getOrderHistory, { data: orderData, isFetching, isLoading }] =
+    useLazyGetOrderHistoryQuery();
+  const [cancelOrder] = useCancelOrderMutation();
   const orderList = orderData?.data.content || [];
 
   const { confirm, success, error, info, warning } = useAlert();
@@ -138,11 +142,11 @@ export default function OrderSection() {
   const [activeFilter, setActiveFilter] = useState<OrderFilter>("all");
   const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
 
-  const filteredOrders = orderList.filter(
-    (order) =>
-      activeFilter === "all" ||
-      order.status.toLocaleLowerCase() === activeFilter,
-  );
+  useEffect(() => {
+    const status =
+      activeFilter === "all" ? undefined : activeFilter.toUpperCase();
+    getOrderHistory({ page: page, size: 5, status }); // API 0-based
+  }, [activeFilter, page, getOrderHistory]);
 
   const getStatusCount = (status: OrderFilter) => {
     if (status === "all") return orderList.length;
@@ -188,6 +192,13 @@ export default function OrderSection() {
     );
   };
 
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    setPage(value);
+    getOrderHistory({ page: value, size: 5 });
+  };
   if (isLoading || !orderData) {
     return <LoadingSkeleton />;
   }
@@ -246,7 +257,7 @@ export default function OrderSection() {
 
       {/* Orders List */}
       <div className="space-y-6">
-        {filteredOrders.length === 0 ? (
+        {orderList.length === 0 ? (
           <div className="py-16 text-center">
             <div className="bg-muted/50 mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full">
               <Package className="text-muted-foreground h-12 w-12" />
@@ -260,7 +271,7 @@ export default function OrderSection() {
             </p>
           </div>
         ) : (
-          filteredOrders.map((order) => {
+          orderList.map((order) => {
             const statusInfo = statusConfig[order.status.toLocaleLowerCase()];
             const StatusIcon = statusInfo.icon;
             const isExpanded = expandedOrders.has(order.id);
@@ -468,6 +479,14 @@ export default function OrderSection() {
             );
           })
         )}
+        <Pagination
+          className="flex justify-end pt-4"
+          size="large"
+          count={orderData?.data.page.totalPages ?? 0}
+          page={page}
+          onChange={handlePageChange}
+          color="standard"
+        />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { rootApi } from "@redux/api/rootApi";
 import { API_ROUTES } from "@service/apiRoutes";
+import Swal from "sweetalert2";
 
 export interface CreateOrderRequest {
   receiverName: string;
@@ -88,8 +89,8 @@ export const orderApi = rootApi.injectEndpoints({
       GetOrderHistoryParams | void
     >({
       query: (params) => {
-        const { page = 0, size = 10, status } = params ?? {};
-        let url = `${API_ROUTES.ORDER.BASE}?page=${page}&size=${size}`;
+        const { page = 0, size = 5, status } = params ?? {};
+        let url = `${API_ROUTES.ORDER.BASE}?page=${page}&size=${size}&sort=createdAt,desc`;
         if (status) url += `&status=${status}`;
         return { url, method: "GET" };
       },
@@ -112,6 +113,28 @@ export const orderApi = rootApi.injectEndpoints({
         body: { orderId: id },
       }),
       invalidatesTags: [{ type: "ORDER", id: "LIST" }],
+      async onQueryStarted(id, { queryFulfilled }) {
+        // Optimistic update
+
+        try {
+          await queryFulfilled;
+          Swal.fire({
+            icon: "success",
+            title: "Thành công",
+            text: "Hủy đơn hàng thành công",
+            timer: 2000,
+            showConfirmButton: true,
+          });
+        } catch {
+          Swal.fire({
+            icon: "error",
+            title: "Thất bại",
+            text: "Hủy đơn hàng thất bại, vui lòng thử lại sau",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        }
+      },
     }),
   }),
 
@@ -122,4 +145,5 @@ export const {
   useCheckOutMutation,
   useGetOrderHistoryQuery,
   useCancelOrderMutation,
+  useLazyGetOrderHistoryQuery,
 } = orderApi;
