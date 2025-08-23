@@ -1,4 +1,5 @@
 import { AddressDialog } from "@components/Dialog";
+import { useAlert } from "@hooks/useAlert";
 import {
   Alert,
   Badge,
@@ -23,10 +24,6 @@ import {
 } from "@mui/material";
 import { useShippingFee } from "@react-query/callApi";
 import { AddressDTO, useGetAddressesQuery } from "@redux/api/addressApi";
-import {
-  useGetCartQuery,
-  useRemoveListFromCartMutation,
-} from "@redux/api/cartApi";
 import { CreateOrderRequest, useCheckOutMutation } from "@redux/api/orderApi";
 import { RootState } from "@redux/store";
 import { GHNShippingFeeRequest } from "@service/product.service";
@@ -180,10 +177,8 @@ const mockVouchers: VoucherDTO[] = [
 export default function CheckOutPage() {
   const { data, isLoading: isLoadingAddresses } = useGetAddressesQuery();
   const [checkOut] = useCheckOutMutation();
-  const [removeListFromCart] = useRemoveListFromCartMutation();
 
   const addresses: AddressDTO[] = useMemo(() => data ?? [], [data]);
-  const { refetch: refetchCart } = useGetCartQuery(); // ✅ gọi hook ở đầu component
 
   const checkoutCart = useSelector((state: RootState) => state.checkout.cart);
   const navigate = useNavigate();
@@ -210,6 +205,8 @@ export default function CheckOutPage() {
   });
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
+  const { confirm, success, error: errorAlert } = useAlert();
+
   type NotificationType = "success" | "error" | "info" | "warning";
   const [notification, setNotification] = useState<{
     open: boolean;
@@ -352,21 +349,32 @@ export default function CheckOutPage() {
         shopId: item.shop,
       })),
     };
-    try {
-      await checkOut(data).unwrap(); // gọi mutation
-      setLoading(false);
-      toast.success("Đặt hàng thành công!");
-      refetchCart();
-      navigate(ROUTES.ACCOUNT.ORDER);
-    } catch (error) {
-      setLoading(false);
+    if (!selectedAddress) {
       setNotification({
         open: true,
-        message: "Đặt hàng thất bại. Vui lòng thử lại.",
+        message: "Vui lòng chọn địa chỉ giao hàng",
         type: "error",
       });
-      console.error("Checkout error:", error);
+      return;
     }
+
+    confirm(
+      "Xác nhận đặt hàng",
+      "Bạn có chắc chắn muốn đặt hàng?",
+      async () => {
+        try {
+          await checkOut(data).unwrap(); // gọi mutation
+          setLoading(false);
+
+          toast.success("Đặt hàng thành công!");
+          navigate(ROUTES.ACCOUNT.ORDER);
+        } catch (error) {
+          setLoading(false);
+          errorAlert("Đặt hàng thất bại", "Vui lòng thử lại sau.");
+          console.error("Checkout error:", error);
+        }
+      },
+    );
   };
 
   if (pageLoading) {

@@ -39,7 +39,7 @@ export interface Order {
   id: number;
   status: OrderStatus;
   code: string;
-  tolalPrice: number;
+  totalPrice: number;
   createdAt: string;
   receiverAddress: string;
   receiverName: string;
@@ -68,7 +68,6 @@ export interface OrderHistoryResponse {
   message: string;
   data: OrderHistoryData;
 }
-
 export const orderApi = rootApi.injectEndpoints({
   endpoints: (builder) => ({
     checkOut: builder.mutation<void, CreateOrderRequest>({
@@ -81,21 +80,46 @@ export const orderApi = rootApi.injectEndpoints({
           discount: body.discount ?? 0,
         },
       }),
+      invalidatesTags: [{ type: "ORDER", id: "LIST" }], // ✅ chuyển ra đây
     }),
+
     getOrderHistory: builder.query<
       OrderHistoryResponse,
       GetOrderHistoryParams | void
     >({
       query: (params) => {
         const { page = 0, size = 10, status } = params ?? {};
-        let url = `${API_ROUTES.ORDER.HISTORY}?page=${page}&size=${size}`;
+        let url = `${API_ROUTES.ORDER.BASE}?page=${page}&size=${size}`;
         if (status) url += `&status=${status}`;
         return { url, method: "GET" };
       },
+      providesTags: (result) =>
+        result?.data.content
+          ? [
+              ...result.data.content.map(({ id }) => ({
+                type: "ORDER" as const,
+                id,
+              })),
+              { type: "ORDER" as const, id: "LIST" },
+            ]
+          : [{ type: "ORDER" as const, id: "LIST" }],
+    }),
+
+    cancelOrder: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `${API_ROUTES.ORDER.BASE}/cancel`,
+        method: "PUT",
+        body: { orderId: id },
+      }),
+      invalidatesTags: [{ type: "ORDER", id: "LIST" }],
     }),
   }),
 
   overrideExisting: false,
 });
 
-export const { useCheckOutMutation, useGetOrderHistoryQuery } = orderApi;
+export const {
+  useCheckOutMutation,
+  useGetOrderHistoryQuery,
+  useCancelOrderMutation,
+} = orderApi;

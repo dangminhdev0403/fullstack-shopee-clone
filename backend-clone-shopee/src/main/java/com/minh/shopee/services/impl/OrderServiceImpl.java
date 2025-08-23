@@ -118,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
                 totalPrice = BigDecimal.ZERO;
             }
 
-            order.setTolalPrice(totalPrice);
+            order.setTotalPrice(totalPrice);
             order.setOrderDetail(orderItems);
             order.setOrderDetail(orderItems);
 
@@ -144,11 +144,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public <T> Page<T> getOrdersListByUser(Pageable pageable, Class<T> projectionClass) {
         long userId = SecurityUtils.getCurrentUserId();
-        return this.orderCustomRepo.findAll(OrderSpecification.hasUserId(
-                userId), pageable,
-                projectionClass);
-        // return this.orderRepository.findAllByUserId(userId, projectionClass,
-        // pageable);
+        // return this.orderCustomRepo.findAll(OrderSpecification.hasUserId(
+        // userId), pageable,
+        // projectionClass);
+        return this.orderRepository.findAllByUserId(userId, projectionClass,
+                pageable);
 
     }
 

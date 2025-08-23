@@ -1,7 +1,11 @@
 "use client";
 
 import { LoadingSkeleton } from "@components/Loading";
-import { useGetOrderHistoryQuery } from "@redux/api/orderApi";
+import { useAlert } from "@hooks/useAlert";
+import {
+  useCancelOrderMutation,
+  useGetOrderHistoryQuery,
+} from "@redux/api/orderApi";
 import {
   CheckCircle,
   ChevronDown,
@@ -39,7 +43,7 @@ export interface Order {
   id: number;
   status: OrderStatus;
   code: string;
-  tolalPrice: number;
+  totalPrice: number;
   createdAt: string;
   receiverAddress: string;
   receiverName: string;
@@ -75,7 +79,7 @@ type OrderFilter =
   | "processing"
   | "shipping"
   | "delivered"
-  | "cancelled";
+  | "canceled";
 
 const statusConfig: Record<
   string,
@@ -115,7 +119,7 @@ const statusConfig: Record<
     bg: "bg-green-50",
     border: "border-green-200",
   },
-  cancelled: {
+  canceled: {
     label: "Đã hủy",
     icon: XCircle,
     color: "text-red-600",
@@ -126,8 +130,10 @@ const statusConfig: Record<
 
 export default function OrderSection() {
   const { data: orderData, isLoading } = useGetOrderHistoryQuery();
+  const [cancelOrder, { isLoading: isCanceling }] = useCancelOrderMutation();
   const orderList = orderData?.data.content || [];
-  console.log("Order List:", orderList);
+
+  const { confirm, success, error, info, warning } = useAlert();
 
   const [activeFilter, setActiveFilter] = useState<OrderFilter>("all");
   const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
@@ -172,7 +178,17 @@ export default function OrderSection() {
     setExpandedOrders(newExpanded);
   };
 
-  if (isLoading) {
+  const handleCancelOrder = (orderId: number) => {
+    confirm(
+      "Xác nhận hủy đơn",
+      "Bạn có chắc chắn muốn hủy đơn hàng này?",
+      () => {
+        cancelOrder(orderId);
+      },
+    );
+  };
+
+  if (isLoading || !orderData) {
     return <LoadingSkeleton />;
   }
   return (
@@ -203,7 +219,7 @@ export default function OrderSection() {
           { key: "processing" as const, label: "Đang xử lý" },
           { key: "shipping" as const, label: "Đang giao" },
           { key: "delivered" as const, label: "Đã giao" },
-          { key: "cancelled" as const, label: "Đã hủy" },
+          { key: "canceled" as const, label: "Đã hủy" },
         ].map((filter) => (
           <button
             key={filter.key}
@@ -410,7 +426,7 @@ export default function OrderSection() {
                         Tổng tiền:
                       </span>
                       <span className="text-primary text-2xl font-bold">
-                        {formatPrice(order.tolalPrice)}
+                        {formatPrice(order.totalPrice)}
                       </span>
                     </div>
 
@@ -437,7 +453,10 @@ export default function OrderSection() {
                       )}
                       {(order.status.toLocaleLowerCase() === "pending" ||
                         order.status.toLocaleLowerCase() === "processing") && (
-                        <button className="border-destructive text-destructive hover:bg-destructive/10 flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors">
+                        <button
+                          onClick={() => handleCancelOrder(order.id)}
+                          className="border-destructive text-destructive hover:bg-destructive/10 flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors"
+                        >
                           <XCircle className="h-4 w-4" />
                           <span className="text-sm font-medium">Hủy đơn</span>
                         </button>

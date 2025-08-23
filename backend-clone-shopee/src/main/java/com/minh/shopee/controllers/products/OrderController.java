@@ -46,7 +46,7 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    @PutMapping("")
+    @PutMapping("/cancel")
     @ApiDescription("Cancel order status")
     public ResponseEntity<String> cancelOrder(@Valid @RequestBody UpdateOrderDTO req) {
         this.orderService.cancelOrder(req);

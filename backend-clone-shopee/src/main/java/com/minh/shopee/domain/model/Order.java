@@ -44,7 +44,7 @@ public class Order {
     private String receiverName;
     private String receiverAddress;
     private String receiverPhone;
-    BigDecimal tolalPrice; // Tổng giá trị đơn hàng
+    BigDecimal totalPrice; // Tổng giá trị đơn hàng
     // Mã đơn nội bộ
     @Column(unique = true, nullable = false)
     private String code;
@@ -61,7 +61,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     List<OrderDetail> orderDetail;
-    
+
     @Transient // Không được lưu vào cơ sở dữ liệu
     private OrderStatus prevStatus;
 

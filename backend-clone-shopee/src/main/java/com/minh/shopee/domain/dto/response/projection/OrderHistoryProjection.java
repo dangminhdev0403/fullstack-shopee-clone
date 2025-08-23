@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import com.minh.shopee.domain.model.OrderDetail;
-
 public interface OrderHistoryProjection {
     Long getId();
 
@@ -21,11 +19,11 @@ public interface OrderHistoryProjection {
 
     String getStatus();
 
-    BigDecimal getTolalPrice();
+    BigDecimal getTotalPrice();
 
     Instant getCreatedAt();
 
-    List<OrderDetail> getOrderDetail();
+    List<OrderDetailProjection> getOrderDetail();
 
     interface OrderDetailProjection {
         Long getId();
