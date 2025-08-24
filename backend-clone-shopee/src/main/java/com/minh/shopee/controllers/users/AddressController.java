@@ -65,7 +65,6 @@ public class AddressController {
         }
 
         this.addressService.updateAddress(request);
-
         return ResponseEntity.ok("Cập nhật địa chỉ thành công");
 
     }
@@ -74,7 +73,6 @@ public class AddressController {
     @ApiDescription("Xoá địa chỉ")
     public ResponseEntity<String> deleteAddress(@PathVariable Long id) {
         Long userId = SecurityUtils.getCurrentUserId();
-
         this.addressService.deleteAddress(id, userId);
         return ResponseEntity.ok("Xoá địa chỉ thành công");
     }

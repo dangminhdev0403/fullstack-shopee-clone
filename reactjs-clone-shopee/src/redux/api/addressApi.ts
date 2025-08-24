@@ -47,7 +47,7 @@ export const addressApi = rootApi.injectEndpoints({
         method: "POST",
         body: address,
       }),
-      invalidatesTags: ["ADDRESS"],
+      invalidatesTags: [{ type: "ADDRESS", id: "LIST" }],
     }),
     updateAddress: builder.mutation<void, AddressDTO>({
       query: (address) => ({
@@ -55,14 +55,14 @@ export const addressApi = rootApi.injectEndpoints({
         method: "PUT",
         body: address,
       }),
-      invalidatesTags: ["ADDRESS"],
+      invalidatesTags: [{ type: "ADDRESS", id: "LIST" }],
     }),
     deleteAddress: builder.mutation<void, number>({
       query: (addressId) => ({
         url: `${API_ROUTES.ADDRESS.ADDRESSES}/${addressId}`, // hoặc API_ROUTES.ADDRESS.DISTRICTS, v.v.
         method: "DELETE",
       }),
-      invalidatesTags: ["ADDRESS"],
+      invalidatesTags: [{ type: "ADDRESS", id: "LIST" }],
     }),
   }),
 });

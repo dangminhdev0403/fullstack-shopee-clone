@@ -21,7 +21,7 @@ export interface Province {
   UpdatedDate: string;
 }
 
-interface District {
+export interface District {
   DistrictID: number;
   DistrictName: string;
   ProvinceID: number;
@@ -38,7 +38,7 @@ interface District {
   Status: number;
 }
 
-interface Ward {
+export interface Ward {
   WardCode: number;
   WardName: string;
   DistrictID: number;

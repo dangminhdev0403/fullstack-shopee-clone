@@ -14,7 +14,9 @@ import com.minh.shopee.domain.model.Address;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.repository.AddressRepository;
 import com.minh.shopee.services.AddressService;
+import com.minh.shopee.services.utils.SecurityUtils;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,10 +53,15 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional
     public void updateAddress(EditAddressDTO dto) {
+        Long userId = SecurityUtils.getCurrentUserId();
+
         Address address = addressRepository.findById(dto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Address not found"));
-
+        if (Boolean.TRUE.equals(dto.getIsDefault())) {
+            addressRepository.updateAllDefaultFalse(userId);
+        }
         BeanUtils.copyProperties(dto, address, ShopUpdateStatusDTO(dto));
         addressRepository.save(address);
     }

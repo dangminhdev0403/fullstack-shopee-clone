@@ -183,8 +183,13 @@ export default function CheckOutPage() {
   const checkoutCart = useSelector((state: RootState) => state.checkout.cart);
   const navigate = useNavigate();
   const [selectedAddress, setSelectedAddress] = useState<AddressDTO | null>(
-    null,
+    () => {
+      // Lấy address mặc định đầu tiên (isDefault = true)
+      const defaultAddress = addresses.find((addr) => addr.isDefault);
+      return defaultAddress || null;
+    },
   );
+
 
   const [selectedPayment, setSelectedPayment] = useState<string>("cod");
   const [selectedShipping, setSelectedShipping] = useState<string>("express");
