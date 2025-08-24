@@ -3,8 +3,10 @@
 import AddressForm from "@components/Form/AddressForm/AddressForm";
 import { LoadingSkeleton } from "@components/Loading";
 import { useAlert } from "@hooks/useAlert";
+import { Button, CircularProgress, DialogActions } from "@mui/material";
 import {
   AddressDTO,
+  useCreateAddressMutation,
   useDeleteAddressMutation,
   useGetAddressesQuery,
   useUpdateAddressMutation,
@@ -30,7 +32,10 @@ export default function AddressSection() {
   });
   const { data, isLoading } = useGetAddressesQuery();
   const [deleteAddress] = useDeleteAddressMutation();
-  const [editAddress] = useUpdateAddressMutation();
+  const [editAddress, { isLoading: isUpdatingAddress }] =
+    useUpdateAddressMutation();
+  const [createAddress, { isLoading: isCreatingAddress }] =
+    useCreateAddressMutation();
   const addresses: AddressDTO[] = useMemo(() => data ?? [], [data]);
   const { confirm, error: errorAlert } = useAlert();
 
@@ -63,6 +68,33 @@ export default function AddressSection() {
     );
   };
 
+  const handleSaveAddress = async () => {
+    console.log("handleSaveAddress", newAddress);
+
+    if (action === "add") {
+      try {
+        await createAddress(newAddress).unwrap();
+        toast.success("Thêm địa chỉ thành công");
+        setIsOpen(false);
+      } catch (err) {
+        errorAlert(
+          typeof err === "object" && err !== null && "data" in err && typeof (err as any).data?.message === "string"
+            ? (err as any).data.message
+            : "Thêm địa chỉ thất bại"
+        );
+        console.error(err);
+      }
+    } else if (action === "edit") {
+      try {
+        await editAddress(newAddress).unwrap();
+        toast.success("Cập nhật địa chỉ thành công");
+        setIsOpen(false);
+      } catch (err) {
+        errorAlert("Cập nhật địa chỉ thất bại");
+        console.error(err);
+      }
+    }
+  };
   if (isLoading) {
     return <LoadingSkeleton />;
   }
@@ -81,6 +113,18 @@ export default function AddressSection() {
             onClick={() => {
               setAction("add");
               setIsOpen(true);
+              setNewAddress({
+                id: 0,
+                name: "",
+                phone: "",
+                addressDetail: "",
+                provinceId: 0,
+                districtId: 0,
+                wardId: "0",
+                fullAddress: "",
+                isDefault: false,
+                type: "home",
+              });
             }}
           >
             <Plus className="h-4 w-4" />
@@ -118,10 +162,15 @@ export default function AddressSection() {
 
                 <div className="ml-4 flex items-center space-x-2">
                   <button
-                    className="p-1 text-orange-500 hover:text-orange-600"
+                    onClick={() => {
+                      setAction("edit");
+                      setNewAddress(address);
+                      setIsOpen(true);
+                    }}
+                    className="p-2 text-orange-500 hover:text-orange-600"
                     title="Sửa"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-6 w-6" />
                   </button>
                   <button
                     title="Xóa"
@@ -130,7 +179,7 @@ export default function AddressSection() {
                     }
                     className="p-1 text-red-500 hover:text-red-600"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-6 w-6" />
                   </button>
                 </div>
               </div>
@@ -146,9 +195,6 @@ export default function AddressSection() {
                     Thiết lập mặc định
                   </button>
                 )}
-                <button className="text-sm text-gray-500 hover:text-gray-600">
-                  Chỉnh sửa
-                </button>
               </div>
             </div>
           ))}
@@ -162,6 +208,71 @@ export default function AddressSection() {
           isLoading={false}
         />
       )}
+      <DialogActions
+        sx={{
+          padding: "24px 32px",
+          backgroundColor: "#fafafa",
+          borderTop: "1px solid #e0e0e0",
+        }}
+      >
+        {isOpen && (
+          <>
+            <Button
+              onClick={() => setIsOpen(false)}
+              disabled={isCreatingAddress || isUpdatingAddress}
+              sx={{
+                borderRadius: "10px",
+                textTransform: "none",
+                fontWeight: 600,
+                px: 3,
+                py: 1.5,
+                color: "#666",
+                "&:hover": {
+                  backgroundColor: "#f5f5f5",
+                },
+              }}
+            >
+              Trở lại
+            </Button>
+            <Button
+              onClick={handleSaveAddress}
+              variant="contained"
+              disabled={isCreatingAddress || isUpdatingAddress}
+              sx={{
+                borderRadius: "10px",
+                textTransform: "none",
+                fontWeight: 600,
+                px: 4,
+                py: 1.5,
+                background: "linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)",
+                boxShadow: "0 4px 15px rgba(255, 107, 53, 0.3)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #f7931e 0%, #ff6b35 100%)",
+                  boxShadow: "0 6px 20px rgba(255, 107, 53, 0.4)",
+                },
+                "&:disabled": {
+                  background: "#ccc",
+                  boxShadow: "none",
+                },
+              }}
+            >
+              {isCreatingAddress || isUpdatingAddress ? (
+                <div className="flex items-center gap-2">
+                  <CircularProgress size={16} color="inherit" />
+                  <span>
+                    {action === "add" ? "Đang lưu..." : "Đang cập nhật..."}
+                  </span>
+                </div>
+              ) : action === "add" ? (
+                "Lưu địa chỉ"
+              ) : (
+                "Cập nhật địa chỉ"
+              )}
+            </Button>
+          </>
+        )}
+      </DialogActions>
     </div>
   );
 }

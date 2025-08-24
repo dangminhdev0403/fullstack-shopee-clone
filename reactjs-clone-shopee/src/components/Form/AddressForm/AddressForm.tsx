@@ -57,8 +57,8 @@ export default function AddressForm({
     const ward =
       wardArr.find((w) => String(w.WardCode) === String(partialAddress.wardId))
         ?.WardName || "";
-
-    return `${partialAddress.addressDetail}, ${ward}, ${district}, ${province}`;
+    const addressDetail = partialAddress.addressDetail || "";
+    return `${addressDetail}, ${ward}, ${district}, ${province}`;
   };
 
   const handleProvinceChange = (value: number) => {
@@ -201,9 +201,16 @@ export default function AddressForm({
           label="Địa chỉ cụ thể (số nhà, tên đường...)"
           fullWidth
           value={newAddress.addressDetail}
-          onChange={(e) =>
-            setNewAddress({ ...newAddress, addressDetail: e.target.value })
-          }
+          onChange={(e) => {
+            const updatedAddress = {
+              ...newAddress,
+              addressDetail: e.target.value,
+            };
+            setNewAddress({
+              ...updatedAddress,
+              fullAddress: updateFullAddress(updatedAddress),
+            });
+          }}
           variant="outlined"
           disabled={isLoading}
           sx={textFieldSx}
