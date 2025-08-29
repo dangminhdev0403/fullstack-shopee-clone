@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.minh.shopee.domain.dto.request.AddAddressDTO;
@@ -15,6 +16,7 @@ import com.minh.shopee.domain.model.User;
 import com.minh.shopee.repository.AddressRepository;
 import com.minh.shopee.services.AddressService;
 import com.minh.shopee.services.utils.SecurityUtils;
+import com.minh.shopee.services.utils.error.AppException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +33,17 @@ public class AddressServiceImpl implements AddressService {
         Long count = this.addressRepository.countByUserId(userId);
         if (count <= 0) {
             request.setIsDefault(true);
+        } else if (count > 5) {
+
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Address limit exceeded", "Address limit exceeded");
         }
         log.info("Adding new address for user with ID: {}", userId);
         User user = User.builder()
                 .id(userId)
                 .build(); // Assuming User is already fetched or created
+        if (Boolean.TRUE.equals(request.getIsDefault())) {
+            addressRepository.updateAllDefaultFalse(userId);
+        }
         Address address = Address.builder()
                 .name(request.getName())
                 .phone(request.getPhone())

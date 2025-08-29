@@ -1,44 +1,60 @@
-"use client";
-
-import type React from "react";
-
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useChangePasswordMutation } from "@redux/api/profileApi";
+import { changePasswordSchema } from "@utils/yup.shema";
 import { Eye, EyeOff, Save } from "lucide-react";
 import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { ClipLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
+type ChangePasswordFormValues = {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
 export default function PasswordSection() {
-  const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
     confirm: false,
   });
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+    reset,
+  } = useForm<ChangePasswordFormValues>({
+    resolver: yupResolver(changePasswordSchema as any),
+  });
 
   const togglePasswordVisibility = (field: keyof typeof showPasswords) => {
     setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
+  const onSubmit: SubmitHandler<ChangePasswordFormValues> = async (data) => {
+    try {
+      await changePassword({
+        oldPassword: data.oldPassword, // map sang backend DTO
+        newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword,
+      }).unwrap();
 
-  const handleSave = () => {
-    if (formData.newPassword !== formData.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp!");
-      return;
+      // ✅ Nếu success
+      reset();
+      toast.success("Đổi mật khẩu thành công");
+    } catch (error: any) {
+      if (error?.data?.message) {
+        // error.data.message là mảng [{ oldPassword: "Old password is required" }]
+        setError("oldPassword", {
+          type: "server",
+          message: error.data.message,
+        });
+      } else {
+        toast.error("Có lỗi xảy ra, vui lòng thử lại");
+      }
     }
-    if (formData.newPassword.length < 6) {
-      alert("Mật khẩu mới phải có ít nhất 6 ký tự!");
-      return;
-    }
-    console.log("Changing password");
-    alert("Đổi mật khẩu thành công!");
-    setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
   };
 
   return (
@@ -51,7 +67,7 @@ export default function PasswordSection() {
       </div>
 
       <div className="max-w-md">
-        <div className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Mật khẩu hiện tại
@@ -59,11 +75,9 @@ export default function PasswordSection() {
             <div className="relative">
               <input
                 type={showPasswords.current ? "text" : "password"}
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleInputChange}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
                 placeholder="Nhập mật khẩu hiện tại"
+                {...register("oldPassword")}
               />
               <button
                 type="button"
@@ -77,6 +91,11 @@ export default function PasswordSection() {
                 )}
               </button>
             </div>
+            {errors.oldPassword && (
+              <p className="text-medium mt-1 text-red-500">
+                {errors.oldPassword.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -86,9 +105,7 @@ export default function PasswordSection() {
             <div className="relative">
               <input
                 type={showPasswords.new ? "text" : "password"}
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleInputChange}
+                {...register("newPassword")}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
                 placeholder="Nhập mật khẩu mới"
               />
@@ -104,9 +121,12 @@ export default function PasswordSection() {
                 )}
               </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              Mật khẩu phải có ít nhất 6 ký tự
-            </p>
+
+            {errors.newPassword && (
+              <p className="text-medium mt-1 text-red-500">
+                {errors.newPassword.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -116,9 +136,7 @@ export default function PasswordSection() {
             <div className="relative">
               <input
                 type={showPasswords.confirm ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
+                {...register("confirmPassword")}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
                 placeholder="Nhập lại mật khẩu mới"
               />
@@ -134,16 +152,27 @@ export default function PasswordSection() {
                 )}
               </button>
             </div>
+            {errors.confirmPassword && (
+              <p className="text-medium mt-1 text-red-500">
+                {errors.confirmPassword.message}
+              </p>
+            )}
           </div>
 
           <button
-            onClick={handleSave}
+            disabled={isLoading}
+            type="submit"
             className="flex items-center space-x-2 rounded-md bg-orange-500 px-6 py-2 text-white transition-colors hover:bg-orange-600"
           >
-            <Save className="h-4 w-4" />
+            {isLoading ? (
+              <ClipLoader size={25} color="#fff" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
+
             <span>Xác nhận</span>
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

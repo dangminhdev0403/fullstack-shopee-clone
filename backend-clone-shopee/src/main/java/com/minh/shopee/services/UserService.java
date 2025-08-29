@@ -30,4 +30,6 @@ public interface UserService {
     boolean isExistEmail(String email);
 
     Page<UserDTO> searchUsers(String keyword, org.springframework.data.domain.Pageable pageable);
+
+    void changePassword(com.minh.shopee.domain.dto.request.ChangePassDTO req);
 }

@@ -27,7 +27,7 @@ const ItemProduct = ({
       <div className="group relative z-10 w-full rounded-sm border border-gray-200 bg-white transition hover:z-30 hover:-translate-y-0.5 hover:border-amber-500 hover:shadow-md">
         <div className="relative aspect-[1/1] w-full overflow-hidden">
           <img
-            className="absolute top-0 left-0 z-0 h-[180px] w-full object-cover"
+            className="absolute top-0 left-0 z-0 h-full w-full object-cover"
             src={imageUrl}
             alt={name}
           />

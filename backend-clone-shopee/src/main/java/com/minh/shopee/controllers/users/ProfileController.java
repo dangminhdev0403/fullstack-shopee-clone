@@ -7,15 +7,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.minh.shopee.domain.anotation.ApiDescription;
+import com.minh.shopee.domain.dto.request.ChangePassDTO;
 import com.minh.shopee.domain.dto.request.UserReqDTO;
 import com.minh.shopee.domain.dto.response.users.UpdateUserResDTO;
 import com.minh.shopee.services.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +42,14 @@ public class ProfileController {
         UpdateUserResDTO updatUser = this.userService.updateProfile(email, userRequest, avatarFile);
 
         return ResponseEntity.ok().body(updatUser);
+    }
+
+    @PutMapping("/change-password")
+    @ApiDescription("Thay đổi mật khẩu")
+    public ResponseEntity<String> putMethodName(@RequestBody @Valid ChangePassDTO entity) {
+       
+        this.userService.changePassword(entity);
+        return ResponseEntity.ok("Đổi mật khẩu thành công");
     }
 
 }

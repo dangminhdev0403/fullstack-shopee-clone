@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.minh.shopee.domain.dto.request.ChangePassDTO;
 import com.minh.shopee.domain.dto.request.UserReqDTO;
 import com.minh.shopee.domain.dto.request.UserResgisterDTO;
 import com.minh.shopee.domain.dto.response.users.UpdateUserResDTO;
@@ -25,6 +26,8 @@ import com.minh.shopee.repository.GenericRepositoryCustom;
 import com.minh.shopee.repository.RoleRepository;
 import com.minh.shopee.repository.UserRepository;
 import com.minh.shopee.services.UserService;
+import com.minh.shopee.services.utils.SecurityUtils;
+import com.minh.shopee.services.utils.error.AppException;
 import com.minh.shopee.services.utils.error.DuplicateException;
 import com.minh.shopee.services.utils.files.UploadCloud;
 
@@ -189,5 +192,24 @@ public class UserServiceImpl implements UserService {
     public Page<UserDTO> searchUsers(String keyword, Pageable pageable) {
 
         return this.userCustomRepo.findAll(UserSpecification.hasName(keyword), pageable, UserDTO.class);
+    }
+
+    @Override
+    public void changePassword(ChangePassDTO req) {
+
+        if (!req.getNewPassword().equals(req.getConfirmPassword())) {
+            throw new AppException(400, "Mật khẩu xác nhận không khớp",
+                    "Xác nhận mật khẩu không khớp với mật khẩu mới");
+
+        }
+        Long userId = SecurityUtils.getCurrentUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(404, "Người dùng không tồn tại", "Người dùng không tồn tại"));
+        if (!passwordEncoder.matches(req.getOldPassword(), user.getPassword())) {
+            throw new AppException(400, "Mật khẩu hiện tại không đúng", "Mật khẩu hiện tại không đúng");
+        }
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+        userRepository.save(user);
+
     }
 }

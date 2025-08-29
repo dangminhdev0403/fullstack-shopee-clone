@@ -61,7 +61,7 @@ const Register = () => {
         <FormInput
           className="mt-6"
           type="text"
-          placeholder="Name"
+          placeholder="Tên"
           register={register("name", rules.required("tên"))}
           error={errors.name}
         />

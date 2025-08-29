@@ -15,7 +15,6 @@ export const API_ROUTES = {
     BASE: `${version}/user`,
     INFO: `${version}/info`,
   },
-
   CATEGORY: {
     LIST: `${version}/categories`,
   },
@@ -37,6 +36,8 @@ export const API_ROUTES = {
     CREATE: `${version}/orders/create-order`, // ✅ Lưu đơn hàng
     CHECKOUT: `${version}/orders/checkout`, // ✅ Lưu đơn hàng
     BASE: `${version}/orders`, // ✅ Lưu đơn hàng
-   
+  },
+  PROFILE: {
+    CHANGE_PASSWORD: `${version}/profile/change-password`,
   },
 };
