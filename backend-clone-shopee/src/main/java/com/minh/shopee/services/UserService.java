@@ -25,11 +25,12 @@ public interface UserService {
 
     <T> T findByEmailAndRefreshToken(String email, String refreshToken, Class<T> type);
 
-    UpdateUserResDTO updateProfile(String email, UserReqDTO userReqDTO, MultipartFile avatarFile) throws IOException;
+    UpdateUserResDTO updateProfile( UserReqDTO userReqDTO, MultipartFile avatarFile) throws IOException;
 
     boolean isExistEmail(String email);
 
     Page<UserDTO> searchUsers(String keyword, org.springframework.data.domain.Pageable pageable);
 
     void changePassword(com.minh.shopee.domain.dto.request.ChangePassDTO req);
+   
 }

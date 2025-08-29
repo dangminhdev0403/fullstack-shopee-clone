@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAlert } from "@hooks/useAlert";
 import { useChangePasswordMutation } from "@redux/api/profileApi";
 import { changePasswordSchema } from "@utils/yup.shema";
 import { Eye, EyeOff, Save } from "lucide-react";
@@ -19,6 +20,7 @@ export default function PasswordSection() {
     confirm: false,
   });
   const [changePassword, { isLoading }] = useChangePasswordMutation();
+  const { confirm } = useAlert();
 
   const {
     register,
@@ -34,27 +36,33 @@ export default function PasswordSection() {
     setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
   const onSubmit: SubmitHandler<ChangePasswordFormValues> = async (data) => {
-    try {
-      await changePassword({
-        oldPassword: data.oldPassword, // map sang backend DTO
-        newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword,
-      }).unwrap();
+    confirm(
+      "Xác nhận thay đổi mật khẩu",
+      "Bạn có chắc chắn muốn đổi mật khẩu?",
+      async () => {
+        try {
+          await changePassword({
+            oldPassword: data.oldPassword, // map sang backend DTO
+            newPassword: data.newPassword,
+            confirmPassword: data.confirmPassword,
+          }).unwrap();
 
-      // ✅ Nếu success
-      reset();
-      toast.success("Đổi mật khẩu thành công");
-    } catch (error: any) {
-      if (error?.data?.message) {
-        // error.data.message là mảng [{ oldPassword: "Old password is required" }]
-        setError("oldPassword", {
-          type: "server",
-          message: error.data.message,
-        });
-      } else {
-        toast.error("Có lỗi xảy ra, vui lòng thử lại");
-      }
-    }
+          // ✅ Nếu success
+          reset();
+          toast.success("Đổi mật khẩu thành công");
+        } catch (error: any) {
+          if (error?.data?.message) {
+            // error.data.message là mảng [{ oldPassword: "Old password is required" }]
+            setError("oldPassword", {
+              type: "server",
+              message: error.data.message,
+            });
+          } else {
+            toast.error("Có lỗi xảy ra, vui lòng thử lại");
+          }
+        }
+      },
+    );
   };
 
   return (

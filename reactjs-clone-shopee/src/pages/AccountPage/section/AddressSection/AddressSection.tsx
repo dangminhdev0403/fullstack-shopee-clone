@@ -69,7 +69,6 @@ export default function AddressSection() {
   };
 
   const handleSaveAddress = async () => {
-    console.log("handleSaveAddress", newAddress);
 
     if (action === "add") {
       try {

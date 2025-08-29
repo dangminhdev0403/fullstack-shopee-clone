@@ -1,42 +1,92 @@
 "use client";
 
-import type React from "react";
+import { LoadingSkeleton } from "@components/Loading";
+import { useAlert } from "@hooks/useAlert";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "@redux/api/profileApi";
+import { Save, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { ClipLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
-import { Camera, Check, Edit3, Save, Upload } from "lucide-react";
-import { useState } from "react";
+interface ProfileFormValues {
+  name: string;
+  email: string;
+  avatarUrl: string;
+  avatarFile?: FileList;
+}
 
 export default function ProfileSection() {
-  const [formData, setFormData] = useState({
-    fullName: "Nguyễn Văn A",
-    email: "user@example.com",
-    phone: "0123456789",
-    gender: "male",
-    birthDate: "1990-01-01",
+  const { data, isLoading } = useGetProfileQuery();
+  const [updateProfile] = useUpdateProfileMutation();
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { confirm } = useAlert();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm<ProfileFormValues>({
+    defaultValues: {
+      name: "",
+      email: "",
+      avatarUrl: "",
+    },
   });
 
-  const [isEditing, setIsEditing] = useState({
-    email: false,
-    phone: false,
-  });
+  // khi có data từ API thì reset lại form
+  useEffect(() => {
+    if (data) {
+      reset({
+        name: data.name,
+        email: data.email,
+        avatarUrl: data.avatarUrl,
+      });
+    }
+  }, [data, reset]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const onSubmit = (values: ProfileFormValues) => {
+    console.log(values);
+    console.log(fileInputRef.current?.files);
+
+    confirm(
+      "Xác nhận cập nhật hồ sơ",
+      "Bạn có chắc chắn muốn lưu thay đổi?",
+      async () => {
+        try {
+          await updateProfile({
+            name: values.name,
+            email: values.email,
+            avatarFile: values.avatarFile ? values.avatarFile[0] : undefined,
+          }).unwrap();
+          setPreview(null);
+          toast.success("Cập nhật hồ sơ thành công");
+        } catch (error) {
+          console.log(error);
+          toast.error("Có lỗi xảy ra, vui lòng thử lại");
+        }
+      },
+    );
   };
 
-  const handleSave = () => {
-    console.log("Saving profile:", formData);
-    // Simulate API call
-    setTimeout(() => {
-      alert("Cập nhật thông tin thành công!");
-    }, 500);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && e.target.files) {
+      setPreview(URL.createObjectURL(file));
+      setValue("avatarFile", e.target.files as any, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
   };
 
-  const toggleEdit = (field: "email" | "phone") => {
-    setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
+  if (isLoading) return <LoadingSkeleton />;
 
   return (
     <div className="animate-slide-in p-8">
@@ -47,195 +97,102 @@ export default function ProfileSection() {
         </p>
       </div>
 
-      <div className="flex gap-12">
-        {/* Form */}
-        <div className="max-w-lg flex-1">
-          <div className="space-y-8">
-            <div className="space-y-2">
-              <label className="text-foreground block text-sm font-semibold">
-                Tên đăng nhập
-              </label>
-              <input
-                placeholder="Tên đăng nhập"
-                type="text"
-                value="user123"
-                disabled
-                className="bg-muted text-muted-foreground w-full cursor-not-allowed rounded-lg border border-gray-500 px-4 py-3"
-              />
-              <p className="text-muted-foreground text-xs">
-                Tên đăng nhập không thể thay đổi
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-foreground block text-sm font-semibold">
-                Họ & Tên
-              </label>
-              <input
-                placeholder="Họ & Tên"
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-foreground block text-sm font-semibold">
-                Email
-              </label>
-              <div className="flex">
-                <input
-                  placeholder="Email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={!isEditing.email}
-                  className={`flex-1 rounded-l-lg border border-gray-500 px-4 py-3 transition-all ${
-                    isEditing.email
-                      ? "focus:ring-primary focus:border-primary bg-input focus:ring-2"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                />
-                <button
-                  onClick={() => toggleEdit("email")}
-                  className={`rounded-r-lg border border-l-0 border-gray-500 px-4 py-3 text-sm font-medium transition-colors ${
-                    isEditing.email
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                  }`}
-                >
-                  {isEditing.email ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Edit3 className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-foreground block text-sm font-semibold">
-                Số điện thoại
-              </label>
-              <div className="flex">
-                <input
-                  placeholder="Số điện thoại"
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  disabled={!isEditing.phone}
-                  className={`flex-1 rounded-l-lg border border-gray-500 px-4 py-3 transition-all ${
-                    isEditing.phone
-                      ? "focus:ring-primary focus:border-primary bg-input focus:ring-2"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                />
-                <button
-                  onClick={() => toggleEdit("phone")}
-                  className={`rounded-r-lg border border-l-0 border-gray-500 px-4 py-3 text-sm font-medium transition-colors ${
-                    isEditing.phone
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                  }`}
-                >
-                  {isEditing.phone ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Edit3 className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <label className="text-foreground block text-sm font-semibold">
-                Giới tính
-              </label>
-              <div className="flex space-x-6">
-                {[
-                  { value: "male", label: "Nam" },
-                  { value: "female", label: "Nữ" },
-                  { value: "other", label: "Khác" },
-                ].map((option) => (
-                  <label
-                    key={option.value}
-                    className="group flex cursor-pointer items-center"
-                  >
-                    <input
-                      type="radio"
-                      name="gender"
-                      value={option.value}
-                      checked={formData.gender === option.value}
-                      onChange={handleInputChange}
-                      className="text-primary focus:ring-primary mr-3 h-4 w-4 border-gray-500 focus:ring-2"
-                    />
-                    <span className="text-foreground group-hover:text-primary transition-colors">
-                      {option.label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-foreground block text-sm font-semibold">
-                Ngày sinh
-              </label>
-              <input
-                placeholder="Ngày sinh"
-                type="date"
-                name="birthDate"
-                value={formData.birthDate}
-                onChange={handleInputChange}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
-              />
-            </div>
-
-            <button
-              onClick={handleSave}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 flex transform items-center space-x-3 rounded-lg px-8 py-3 shadow-md transition-all hover:scale-105 hover:shadow-lg"
-            >
-              <Save className="h-5 w-5" />
-              <span className="font-semibold">Lưu thay đổi</span>
-            </button>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex gap-12"
+        encType="multipart/form-data"
+      >
+        {/* Form bên trái */}
+        <div className="max-w-lg flex-1 space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-semibold">Họ & Tên</label>
+            <input
+              type="text"
+              placeholder="Họ & Tên"
+              {...register("name", { required: "Họ tên không được để trống" })}
+              className="w-full rounded-md border border-gray-300 px-3 py-2"
+            />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
           </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-semibold">Email</label>
+            <input
+              type="email"
+              placeholder="Email"
+              {...register("email", {
+                required: "Email không được để trống",
+                pattern: {
+                  value:
+                    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                  message: "Email không hợp lệ",
+                },
+              })}
+              className="w-full rounded-md border border-gray-300 px-3 py-2"
+            />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center space-x-2 rounded-lg px-6 py-3 shadow-md transition-all"
+          >
+            <Save className="h-5 w-5" />
+            {isLoading ? (
+              <ClipLoader size={25} color="#fff" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
+            <span>Lưu thay đổi</span>
+          </button>
         </div>
 
-        {/* Avatar Section */}
+        {/* Avatar bên phải */}
         <div className="flex-shrink-0">
           <div className="rounded-xl border border-gray-500 p-8 text-center">
             <div className="relative mb-6 inline-block">
-              <div className="from-primary to-secondary flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br shadow-xl">
-                <span className="text-primary-foreground text-4xl font-bold">
-                  U
-                </span>
-              </div>
-              <button
-                title="Change avatar"
-                className="bg-card hover:bg-muted absolute right-2 bottom-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-gray-500 shadow-md transition-all hover:shadow-lg"
-              >
-                <Camera className="text-muted-foreground h-5 w-5" />
-              </button>
+              {preview || data?.avatarUrl ? (
+                <div className="h-32 w-32">
+                  <img
+                    src={preview || data?.avatarUrl}
+                    alt="Avatar"
+                    className="h-32 w-32 justify-center rounded-full bg-gradient-to-br object-cover shadow-xl"
+                  />
+                </div>
+              ) : (
+                <div className="from-primary to-secondary flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br shadow-xl">
+                  <span className="text-4xl font-bold text-white">
+                    {data?.name[0]}
+                  </span>
+                </div>
+              )}
             </div>
 
-            <button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 mx-auto flex items-center space-x-2 rounded-lg px-6 py-3 shadow-md transition-all hover:shadow-lg">
+            <input
+              type="file"
+              accept="image/*"
+              {...register("avatarFile")}
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+
+            <button
+              type="button"
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/90 mx-auto flex items-center space-x-2 rounded-lg px-6 py-3 shadow-md"
+              onClick={() => fileInputRef.current?.click()}
+            >
               <Upload className="h-4 w-4" />
-              <span className="font-medium">Chọn ảnh</span>
+              <span>Chọn ảnh</span>
             </button>
-
-            <div className="text-muted-foreground bg-muted mt-4 rounded-lg p-4 text-xs">
-              <p className="mb-1 font-medium">Yêu cầu ảnh:</p>
-              <p>• Dung lượng tối đa: 1 MB</p>
-              <p>• Định dạng: JPEG, PNG</p>
-              <p>• Kích thước: 300x300px</p>
-            </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

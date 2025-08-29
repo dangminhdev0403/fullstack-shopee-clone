@@ -38,6 +38,7 @@ export const API_ROUTES = {
     BASE: `${version}/orders`, // ✅ Lưu đơn hàng
   },
   PROFILE: {
+    BASE: `${version}/profile`,
     CHANGE_PASSWORD: `${version}/profile/change-password`,
   },
 };

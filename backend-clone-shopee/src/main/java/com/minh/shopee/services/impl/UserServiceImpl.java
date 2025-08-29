@@ -122,10 +122,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UpdateUserResDTO updateProfile(String email, UserReqDTO userReqDTO, MultipartFile avatarFile)
+    public UpdateUserResDTO updateProfile(UserReqDTO userReqDTO, MultipartFile avatarFile)
             throws IOException {
-        log.info("Update user request for email: {}", email);
-        User userDb = findByUsername(email);
+        log.info("Update user : {}");
+        Long userId = SecurityUtils.getCurrentUserId();
+        User userDb = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(404, "Người dùng không tồn tại", "Người dùng không tồn tại"));
 
         applyUserUpdates(userDb, userReqDTO, avatarFile);
 
@@ -212,4 +214,5 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
     }
+
 }
