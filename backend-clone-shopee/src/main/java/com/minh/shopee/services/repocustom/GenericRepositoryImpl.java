@@ -92,10 +92,8 @@ public class GenericRepositoryImpl<T> implements GenericRepositoryCustom<T> {
                     ? fetchInterfaceProjection(spec, pageable, projection, false)
                     : fetchConstructorProjection(spec, pageable, projection, false);
 
-            // Tính total count
-            total = pageable.isUnpaged() || content.size() == pageable.getPageSize()
-                    ? countTotal(spec) // Nếu unpaged hoặc full page size → đếm thật
-                    : pageable.getOffset() + content.size(); // Ngược lại tính tạm
+            // Luôn đếm thật
+            total = countTotal(spec);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch interface projection", e);
         }

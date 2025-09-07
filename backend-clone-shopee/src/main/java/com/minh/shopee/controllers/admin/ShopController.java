@@ -25,6 +25,7 @@ import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.request.UpdateShopDTO;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
 import com.minh.shopee.domain.dto.response.projection.OrderProjection;
+import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.services.ProductSerivce;
 import com.minh.shopee.services.ShopService;
@@ -48,6 +49,14 @@ public class ShopController {
         URI location = URI.create(ApiRoutes.API_BASE_V1 + ApiRoutes.PRODUCTS);
         return ResponseEntity.created(location)
                 .body(productCreate);
+    }
+
+    @GetMapping(ApiRoutes.PRODUCTS)
+    @ApiDescription("Lấy danh sách sản phẩm")
+    public ResponseEntity<Page<ProductShopProjection>> getlistProduct(
+            @PageableDefault(page = 0, size = 20) Pageable pageable) {
+        Page<ProductShopProjection> products = productSerivce.getAllProductsByShop(pageable);
+        return ResponseEntity.ok(products);
     }
 
     @PostMapping(ApiRoutes.PRODUCTS + "/import")

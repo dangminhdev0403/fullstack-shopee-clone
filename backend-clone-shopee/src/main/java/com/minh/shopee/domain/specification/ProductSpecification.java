@@ -32,4 +32,7 @@ public class ProductSpecification {
     public static Specification<Product> hasStock(Integer stock) {
         return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("stock"), stock);
     }
+    public static Specification<Product> hasShopId(Long shopId) {
+        return (root, query, cb) -> cb.equal(root.get("shop").get("id"), shopId);
+    }
 }

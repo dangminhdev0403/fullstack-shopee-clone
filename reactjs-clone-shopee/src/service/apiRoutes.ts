@@ -2,6 +2,13 @@ const version = `/api/v1`;
 const apiLocation = "https://online-gateway.ghn.vn/shiip/public-api";
 
 export const API_ROUTES = {
+  ADMIN: {
+    SHOP: {
+      BASE: `${version}/admin/shops`,
+      PRODUCTS: `${version}/admin/shops/products`,
+      ORDERS: `${version}/admin/shops/orders`,
+    },
+  },
   AUTH: {
     LOGIN: `${version}/auth/login`,
     REGISTER: `${version}/auth/register`,

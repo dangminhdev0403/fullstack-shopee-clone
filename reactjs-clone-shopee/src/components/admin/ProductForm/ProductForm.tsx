@@ -2,7 +2,8 @@
 
 import type React from "react";
 
-import { Product, ProductFormData } from "@utils/constants/types/product-admin";
+import { Product } from "@redux/api/admin/productApi";
+import { ProductFormData } from "@utils/constants/types/product-admin";
 import { Save, X } from "lucide-react";
 import { useState } from "react";
 
@@ -20,28 +21,35 @@ export function ProductForm({
   isLoading,
 }: ProductFormProps) {
   const [formData, setFormData] = useState<ProductFormData>({
+    id: product?.id || 0,
     name: product?.name || "",
-    category: product?.category || "Điện thoại",
+    category: product?.category?.name || "Không xác định",
     price: product?.price || 0,
-    originalPrice: product?.originalPrice || 0,
     stock: product?.stock || 0,
     description: product?.description || "",
-    featured: product?.featured || false,
   });
 
-  const [errors, setErrors] = useState<Partial<ProductFormData>>({});
+  console.log(product);
+
+  type ProductFormErrors = {
+    name?: string;
+    price?: string;
+    stock?: string;
+    description?: string;
+    category?: string;
+    images?: string;
+  };
+
+  const [errors, setErrors] = useState<ProductFormErrors>({});
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<ProductFormData> = {};
+    const newErrors: ProductFormErrors = {};
 
     if (!formData.name.trim()) {
       newErrors.name = "Tên sản phẩm là bắt buộc";
     }
     if (formData.price <= 0) {
       newErrors.price = "Giá phải lớn hơn 0";
-    }
-    if (formData.originalPrice < formData.price) {
-      newErrors.originalPrice = "Giá gốc phải lớn hơn hoặc bằng giá bán";
     }
     if (formData.stock < 0) {
       newErrors.stock = "Số lượng không được âm";
@@ -58,7 +66,10 @@ export function ProductForm({
     }
   };
 
-  const handleChange = (field: keyof ProductFormData, value: any) => {
+  const handleChange = (
+    field: keyof ProductFormErrors & keyof ProductFormData,
+    value: any,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -104,7 +115,7 @@ export function ProductForm({
             </label>
             <select
               title="category"
-              value={formData.category}
+              value={formData.category || ""}
               onChange={(e) => handleChange("category", e.target.value)}
               className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
             >
@@ -113,6 +124,7 @@ export function ProductForm({
               <option value="Phụ kiện">Phụ kiện</option>
               <option value="Tablet">Tablet</option>
               <option value="Đồng hồ">Đồng hồ</option>
+              <option value="Quần áo">Quần áo</option>
             </select>
           </div>
 
@@ -132,29 +144,6 @@ export function ProductForm({
               />
               {errors.price && (
                 <p className="mt-1 text-sm text-red-600">{errors.price}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Giá gốc *
-              </label>
-              <input
-                type="number"
-                value={formData.originalPrice}
-                onChange={(e) =>
-                  handleChange(
-                    "originalPrice",
-                    Number.parseInt(e.target.value) || 0,
-                  )
-                }
-                className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
-                placeholder="0"
-              />
-              {errors.originalPrice && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.originalPrice}
-                </p>
               )}
             </div>
           </div>
@@ -188,22 +177,6 @@ export function ProductForm({
               className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
               placeholder="Nhập mô tả sản phẩm"
             />
-          </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="featured"
-              checked={formData.featured}
-              onChange={(e) => handleChange("featured", e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-            />
-            <label
-              htmlFor="featured"
-              className="ml-2 text-sm text-gray-700 dark:text-gray-300"
-            >
-              Sản phẩm nổi bật
-            </label>
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">

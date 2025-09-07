@@ -5,12 +5,16 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.minh.shopee.domain.base.BaseEntity;
+import com.minh.shopee.domain.constant.ProductStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,5 +56,15 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST) // Chỉ giữ lại PERSIST
     @JsonIgnore
     List<OrderDetail> orderDetails;
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
+    @PrePersist
+    public void prePersist() {
+        if (status == null) {
+            status = ProductStatus.ACTIVE; // Gán mặc định trước khi lưu
+        }
+    }
 
 }

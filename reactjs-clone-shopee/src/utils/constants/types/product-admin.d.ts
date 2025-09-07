@@ -16,13 +16,12 @@ export interface Product {
 }
 
 export interface ProductFormData {
+  id: number;
   name: string;
   category: string;
   price: number;
-  originalPrice: number;
   stock: number;
   description?: string;
-  featured: boolean;
 }
 
 export interface ProductStats {

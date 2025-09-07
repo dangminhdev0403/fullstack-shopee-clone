@@ -3,10 +3,9 @@
 import ProductForm from "@components/admin/ProductForm";
 import { Column, DataTable } from "@components/DataTable/DataTable";
 import { useProducts } from "@hooks/useProdcutAdmin";
-import { Product } from "@utils/constants/types/product-admin";
+import { Product, useGetAllProductsQuery } from "@redux/api/admin/productApi";
 import {
   AlertCircle,
-  CheckCircle,
   Edit,
   Package,
   Plus,
@@ -17,21 +16,18 @@ import {
 import { useState } from "react";
 
 export default function Products() {
-  const {
-    products,
-    isLoading,
-    addProduct,
-    updateProduct,
-    deleteProduct,
-    getStats,
-  } = useProducts();
+  const { isLoading, addProduct, updateProduct, deleteProduct, getStats } =
+    useProducts();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(
     null,
   );
+  const { data: productsData, isLoading: isLoadingProducts } =
+    useGetAllProductsQuery();
 
   const stats = getStats();
 
@@ -42,37 +38,11 @@ export default function Products() {
     }).format(price);
   };
 
-  const getStatusBadge = (status: string, stock: number) => {
-    if (status === "out_of_stock" || stock === 0) {
-      return (
-        <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">
-          <AlertCircle className="mr-1 h-3 w-3" />
-          Hết hàng
-        </span>
-      );
-    }
-    if (stock < 20) {
-      return (
-        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
-          <AlertCircle className="mr-1 h-3 w-3" />
-          Sắp hết
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
-        <CheckCircle className="mr-1 h-3 w-3" />
-        Còn hàng
-      </span>
-    );
-  };
-
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = (productsData?.products || []).filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || product.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all";
     return matchesSearch && matchesCategory;
   });
 
@@ -96,38 +66,49 @@ export default function Products() {
     setEditingProduct(undefined);
   };
 
-  const handleDeleteProduct = (id: string) => {
+  const handleDeleteProduct = (id: number) => {
     deleteProduct(id);
     setShowDeleteConfirm(null);
   };
 
   const columns: Column<Product>[] = [
     {
-      key: "name",
-      header: "Sản phẩm",
+      key: "image",
+      header: "Ảnh",
       render: (product) => (
         <div className="flex items-center space-x-4">
           <div className="relative">
-            <div className="h-16 w-16 rounded-2xl bg-gradient-to-r from-orange-400 to-red-400 shadow-lg" />
-            {product.featured && (
-              <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-red-500">
-                <Star className="h-3 w-3 fill-current text-white" />
+            {product?.images.imageUrl && (
+              <div>
+                <img
+                  src={product?.images?.imageUrl}
+                  className="h-16 w-16 rounded-2xl object-cover shadow-md"
+                  alt=""
+                />
               </div>
             )}
-          </div>
-          <div>
-            <div className="font-semibold">{product.name}</div>
-            <div className="text-sm text-gray-500">{product.id}</div>
           </div>
         </div>
       ),
     },
     {
+      key: "name",
+      header: "Sản phẩm",
+      render: (product) => (
+        <div className="flex items-center space-x-4">
+          <div>
+            <div className="font-semibold">{product.name}</div>
+          </div>
+        </div>
+      ),
+    },
+
+    {
       key: "category",
       header: "Danh mục",
       render: (product) => (
         <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-          {product.category}
+          {product.category?.name ?? "Không có danh mục"}
         </span>
       ),
     },
@@ -137,11 +118,11 @@ export default function Products() {
       render: (product) => (
         <div>
           <div className="font-semibold">{formatPrice(product.price)}</div>
-          {product.originalPrice > product.price && (
+          {/* {product.originalPrice > product.price && (
             <div className="text-sm text-gray-500 line-through">
               {formatPrice(product.originalPrice)}
             </div>
-          )}
+          )} */}
         </div>
       ),
     },
@@ -156,26 +137,12 @@ export default function Products() {
         </span>
       ),
     },
-    {
-      key: "sold",
-      header: "Đã bán",
-      render: (product) => <span className="font-medium">{product.sold}</span>,
-    },
-    {
-      key: "rating",
-      header: "Đánh giá",
-      render: (product) => (
-        <div className="flex items-center space-x-1">
-          <Star className="h-4 w-4 fill-current text-yellow-500" />
-          <span className="font-medium">{product.rating}</span>
-        </div>
-      ),
-    },
-    {
-      key: "status",
-      header: "Trạng thái",
-      render: (product) => getStatusBadge(product.status, product.stock),
-    },
+
+    // {
+    //   key: "status",
+    //   header: "Trạng thái",
+    //   render: (product) => getStatusBadge(product.status, product.stock),
+    // },
   ];
 
   const filterOptions = [
@@ -296,10 +263,10 @@ export default function Products() {
         filterOptions={filterOptions}
         onFilterChange={handleFilterChange}
         actions={renderActions}
-        loading={isLoading}
+        loading={isLoadingProducts}
         emptyMessage="Không tìm thấy sản phẩm nào"
         paginated={true}
-        itemsPerPage={10}
+        itemsPerPage={productsData?.page.size || 10}
         showPaginationInfo={true}
       />
 

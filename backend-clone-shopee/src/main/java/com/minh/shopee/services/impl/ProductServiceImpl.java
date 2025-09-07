@@ -17,6 +17,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.minh.shopee.domain.constant.ProductStatus;
 import com.minh.shopee.domain.constant.QuantityAction;
 import com.minh.shopee.domain.dto.mappers.CartMapper;
 import com.minh.shopee.domain.dto.request.AddProductDTO;
@@ -26,7 +27,8 @@ import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductImageDTO;
-import com.minh.shopee.domain.dto.response.products.ProductProjection;
+import com.minh.shopee.domain.dto.response.projection.ProductProjection;
+import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
 import com.minh.shopee.domain.dto.response.projection.CartProjection;
 import com.minh.shopee.domain.model.Cart;
@@ -77,7 +79,8 @@ public class ProductServiceImpl implements ProductSerivce {
 
     @Override
     public Page<ProductResDTO> getAllProducts(Pageable pageable) {
-        Page<ProductProjection> products = this.productRepository.findAllBy(pageable, ProductProjection.class);
+Page<ProductProjection> products =
+    productRepository.findAllByStatus(ProductStatus.ACTIVE, pageable, ProductProjection.class);
         List<ProductProjection> productList = products.getContent();
 
         List<ProductResDTO> dtoList = productList.stream()
@@ -365,6 +368,17 @@ public class ProductServiceImpl implements ProductSerivce {
             throw new AccessDeniedException("Bạn không có quyền xóa một hoặc nhiều sản phẩm.");
         }
         cartDetailRepository.deleteAll(cartDetails);
+    }
+
+    @Override
+    public Page<ProductShopProjection> getAllProductsByShop(Pageable pageable) {
+        long userId = SecurityUtils.getCurrentUserId();
+        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
+                        "Không tìm thấy shop của User này"));
+        Specification<Product> spec = Specification.where(null);
+        spec = spec.and(ProductSpecification.hasShopId(shop.getId()));
+        return this.productCustomRepo.findAll(spec, pageable, ProductShopProjection.class);
     }
 
 }

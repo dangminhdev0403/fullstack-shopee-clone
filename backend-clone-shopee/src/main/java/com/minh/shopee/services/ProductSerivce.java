@@ -14,6 +14,7 @@ import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
+import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 
 public interface ProductSerivce {
 
@@ -36,5 +37,7 @@ public interface ProductSerivce {
   void removeFromCart(long productId, Long userId);
 
   void removeListFromCart(ListIdCartDetailDTO req, Long userId);
+
+  Page<ProductShopProjection> getAllProductsByShop(Pageable pageable);
 
 }
