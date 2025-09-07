@@ -216,6 +216,32 @@ public class GenericRepositoryImpl<T> implements GenericRepositoryCustom<T> {
                 .map(values -> projectionFactory.createProjection(projection, values))
                 .toList();
     }
+    
+    // 1) Lấy danh sách id theo spec + pageable (chỉ select id)
+    public List<Long> findIds(Specification<T> spec, Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<T> root = cq.from(domainClass);
+        cq.select(root.get("id").as(Long.class));
+        applySpec(spec, cb, cq, root);
+        applySort(pageable, cb, cq, root); // nếu FE truyền sort
+        TypedQuery<Long> q = entityManager.createQuery(cq);
+        applyPaging(q, pageable, false);
+        return q.getResultList();
+    }
+
+    // 2) Lấy projection theo danh sách id (unpaged) — tái sử dụng
+    // fetchInterface/Constructor
+    public <R> List<R> findAllByIds(List<Long> ids, Class<R> projection) throws NoSuchMethodException {
+        if (ids == null || ids.isEmpty())
+            return new ArrayList<>();
+        Specification<T> idSpec = (root, query, cb) -> root.get("id").in(ids);
+        // Lấy full projections (unpaged) — fetchInterfaceProjection đã xử lý grouping
+        // cho collection
+        return projection.isInterface()
+                ? fetchInterfaceProjection(idSpec, Pageable.unpaged(), projection, false)
+                : fetchConstructorProjection(idSpec, Pageable.unpaged(), projection, false);
+    }
 
     /**
      * Chuyển "category.name" thành root.get("category").get("name")

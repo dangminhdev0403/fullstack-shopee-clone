@@ -2,9 +2,14 @@ package com.minh.shopee.services.impl;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,10 +32,10 @@ import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductImageDTO;
-import com.minh.shopee.domain.dto.response.projection.ProductProjection;
-import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
 import com.minh.shopee.domain.dto.response.projection.CartProjection;
+import com.minh.shopee.domain.dto.response.projection.ProductProjection;
+import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 import com.minh.shopee.domain.model.Cart;
 import com.minh.shopee.domain.model.CartDetail;
 import com.minh.shopee.domain.model.Category;
@@ -79,8 +84,8 @@ public class ProductServiceImpl implements ProductSerivce {
 
     @Override
     public Page<ProductResDTO> getAllProducts(Pageable pageable) {
-Page<ProductProjection> products =
-    productRepository.findAllByStatus(ProductStatus.ACTIVE, pageable, ProductProjection.class);
+        Page<ProductProjection> products = productRepository.findAllByStatus(ProductStatus.ACTIVE, pageable,
+                ProductProjection.class);
         List<ProductProjection> productList = products.getContent();
 
         List<ProductResDTO> dtoList = productList.stream()
@@ -376,9 +381,37 @@ Page<ProductProjection> products =
         Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
                 () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
                         "Không tìm thấy shop của User này"));
+
         Specification<Product> spec = Specification.where(null);
         spec = spec.and(ProductSpecification.hasShopId(shop.getId()));
-        return this.productCustomRepo.findAll(spec, pageable, ProductShopProjection.class);
+
+        // 1) Lấy ids theo pageable (chỉ select id, không join)
+        List<Long> ids = this.productCustomRepo.findIds(spec, pageable);
+        // 2) Lấy tổng số để trả trong Page (dùng productRepository.count(spec) nếu bạn
+        // có JpaSpecificationExecutor)
+        long total = this.productRepository.count(spec);
+
+        // nếu không có id nào -> trả page rỗng
+        if (ids.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, total);
+        }
+        // 3) Lấy projection cho các ids (unpaged) — an toàn với join images
+        List<ProductShopProjection> list;
+        try {
+            list = this.productCustomRepo.findAllByIds(ids, ProductShopProjection.class);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 4) Sắp lại theo thứ tự ids (để giữ thứ tự paging)
+        Map<Long, ProductShopProjection> map = list.stream()
+                .collect(Collectors.toMap(ProductShopProjection::getId, Function.identity()));
+        List<ProductShopProjection> ordered = ids.stream()
+                .map(map::get)
+                .filter(Objects::nonNull)
+                .toList();
+        // 5) Trả Page
+        return new PageImpl<>(ordered, pageable, total);
     }
 
 }
