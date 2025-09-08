@@ -28,6 +28,10 @@ export interface DataTableProps<T> {
   paginated?: boolean;
   itemsPerPage?: number;
   showPaginationInfo?: boolean;
+  currentPage: number;
+  totalPages: number;
+  totalElements: number;
+  onPageChange: (page: number) => void;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -45,10 +49,13 @@ export function DataTable<T extends Record<string, any>>({
   paginated = false,
   itemsPerPage = 10,
   showPaginationInfo = true,
-}: DataTableProps<T>) {
+  currentPage = 1,
+  totalPages = 1,
+  totalElements = 0,
+  onPageChange,
+}: Readonly<DataTableProps<T>>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Filter data based on search term
   const filteredData = data.filter((item) => {
@@ -61,27 +68,24 @@ export function DataTable<T extends Record<string, any>>({
   });
 
   const totalItems = filteredData.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedData = paginated
-    ? filteredData.slice(startIndex, endIndex)
-    : filteredData;
-  const displayData = paginatedData;
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    setCurrentPage(1);
   };
 
   const handleFilterChange = (value: string) => {
     setSelectedFilter(value);
-    setCurrentPage(1);
+
     onFilterChange?.(value);
   };
 
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    console.log("Go to page:", page);
+    console.log("Loading state:", loading);
+
+    if (page < 1 || page > totalPages) return;
+    onPageChange(page - 1);
   };
 
   const goToPreviousPage = () => {
@@ -178,8 +182,9 @@ export function DataTable<T extends Record<string, any>>({
               )}
             </tr>
           </thead>
+
           <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-            {displayData.length === 0 ? (
+            {data.length === 0 && !loading ? (
               <tr>
                 <td
                   colSpan={columns.length + (actions ? 1 : 0)}
@@ -189,7 +194,7 @@ export function DataTable<T extends Record<string, any>>({
                 </td>
               </tr>
             ) : (
-              displayData.map((item, index) => (
+              data.map((item, index) => (
                 <tr
                   key={index}
                   className="transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
@@ -220,13 +225,9 @@ export function DataTable<T extends Record<string, any>>({
             {/* Pagination info */}
             {showPaginationInfo && (
               <div className="text-sm text-gray-700 dark:text-gray-300">
-                Hiển thị <span className="font-medium">{startIndex + 1}</span>{" "}
-                đến{" "}
-                <span className="font-medium">
-                  {Math.min(endIndex, totalItems)}
-                </span>{" "}
-                trong tổng số <span className="font-medium">{totalItems}</span>{" "}
-                kết quả
+                Hiển thị <span className="font-medium">{data.length}</span> dữ
+                liệu trong tổng số{" "}
+                <span className="font-medium">{totalElements}</span> kết quả
               </div>
             )}
 

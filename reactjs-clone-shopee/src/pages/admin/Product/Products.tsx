@@ -13,7 +13,7 @@ import {
   Trash2,
   TrendingUp,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Products() {
   const { isLoading, addProduct, updateProduct, deleteProduct, getStats } =
@@ -26,8 +26,27 @@ export default function Products() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(
     null,
   );
-  const { data: productsData, isLoading: isLoadingProducts } =
-    useGetAllProductsQuery();
+  const [page, setPage] = useState(0);
+
+  const {
+    data: productsData,
+    isLoading: isLoadingProducts,
+    isFetching,
+  } = useGetAllProductsQuery(
+    { page, size: 10 },
+    { refetchOnMountOrArgChange: true },
+  );
+
+  useEffect(() => {
+    console.log(
+      "isLoading:",
+      isLoading,
+      "isFetching:",
+      isFetching,
+      "page:",
+      page,
+    );
+  }, [isLoading, isFetching, page]);
 
   const stats = getStats();
 
@@ -37,14 +56,6 @@ export default function Products() {
       currency: "VND",
     }).format(price);
   };
-
-  const filteredProducts = (productsData?.products || []).filter((product) => {
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all";
-    return matchesSearch && matchesCategory;
-  });
 
   const handleAddProduct = () => {
     setEditingProduct(undefined);
@@ -255,7 +266,7 @@ export default function Products() {
       </div>
 
       <DataTable
-        data={filteredProducts}
+        data={productsData?.products || []}
         columns={columns}
         searchable={true}
         searchPlaceholder="Tìm kiếm sản phẩm..."
@@ -263,11 +274,15 @@ export default function Products() {
         filterOptions={filterOptions}
         onFilterChange={handleFilterChange}
         actions={renderActions}
-        loading={isLoadingProducts}
+        loading={isFetching || isLoadingProducts}
         emptyMessage="Không tìm thấy sản phẩm nào"
         paginated={true}
         itemsPerPage={productsData?.page.size || 10}
+        currentPage={page + 1}
         showPaginationInfo={true}
+        totalPages={productsData?.page?.totalPages || 0}
+        totalElements={productsData?.page?.totalElements || 0}
+        onPageChange={(newPage) => setPage(newPage)}
       />
 
       {/* Product Form Modal */}

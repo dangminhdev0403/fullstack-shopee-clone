@@ -15,11 +15,10 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.minh.shopee.domain.constant.OrderStatus;
+import com.minh.shopee.domain.constant.ProductStatus;
 import com.minh.shopee.domain.dto.response.ResponseData;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -94,23 +93,33 @@ public class GlobalExceptionHandler {
             error = e.getError();
             message = e.getMessage();
             log.error("❌ [APP EXCEPTION] URL: {} | Message: {}", request.getRequestURL(), ex.getMessage(), ex);
-        } else if (ex instanceof MethodArgumentTypeMismatchException e) {
-            statusCode = e.getErrorCode().equals("typeMismatch")
-                    ? HttpStatus.BAD_REQUEST.value()
-                    : HttpStatus.INTERNAL_SERVER_ERROR.value();
+        } else if (ex instanceof MethodArgumentNotValidException e) {
+            statusCode = HttpStatus.BAD_REQUEST.value();
+            error = "Lỗi validation";
 
-            error = "Truyền tham số không hợp lệ";
+            message = e.getBindingResult().getFieldErrors().stream()
+                    .map(fieldError -> {
+                        Map<String, String> errorMap = new HashMap<>();
+                        String field = fieldError.getField();
 
-            if (e.getRequiredType() == OrderStatus.class) {
-                message = String.format(
-                        "Các giá trị hợp lệ: %s",
+                        // Nếu field là Enum (ví dụ ProductStatus)
+                        if (fieldError.getRejectedValue() != null
+                                && fieldError.getRejectedValue() instanceof String
+                                && fieldError.getCode() != null
+                                && fieldError.getCode().startsWith("typeMismatch")
+                                && field.equals("status")) {
 
-                        Arrays.toString(OrderStatus.values()));
-            } else {
-                message = "Invalid parameter: " + e.getName();
-            }
+                            errorMap.put(field, "Giá trị '" + fieldError.getRejectedValue()
+                                    + "' không hợp lệ. Chỉ chấp nhận: "
+                                    + Arrays.toString(ProductStatus.values()));
+                        } else {
+                            errorMap.put(field, fieldError.getDefaultMessage());
+                        }
+                        return errorMap;
+                    })
+                    .toList();
 
-            log.error("❌ [APP EXCEPTION] URL: {} | Message: {}", request.getRequestURL(), message, ex);
+            log.error("⚠️ [400 VALIDATION ERROR]   Message: {}", message);
         }
 
         else {
@@ -135,13 +144,32 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(fieldError -> {
                     Map<String, String> errorMap = new HashMap<>();
-
                     String field = fieldError.getField();
-                    String message = fieldError.getDefaultMessage();
+                    Object rejected = fieldError.getRejectedValue();
 
+                    // Nếu là lỗi typeMismatch và rejected là String
+                    if (fieldError.getCode() != null
+                            && fieldError.getCode().startsWith("typeMismatch")
+                            && rejected instanceof String) {
+
+                        try {
+                            Class<?> fieldType = new org.springframework.beans.BeanWrapperImpl(result.getTarget())
+                                    .getPropertyType(field);
+
+                            if (fieldType != null && fieldType.isEnum()) {
+                                errorMap.put(field, "Giá trị enum không hợp lệ");
+                                return errorMap;
+                            }
+                        } catch (Exception ignored) {
+                        }
+                    }
+
+                    // fallback mặc định
                     errorMap.put(
                             field != null ? field : "unknownField",
-                            message != null ? message : "Lỗi không xác định");
+                            fieldError.getDefaultMessage() != null
+                                    ? fieldError.getDefaultMessage()
+                                    : "Lỗi không xác định");
 
                     return errorMap;
                 })

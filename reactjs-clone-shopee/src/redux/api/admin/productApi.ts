@@ -29,9 +29,12 @@ export interface ProductListResponse {
 
 export const adminProductApi = rootApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllProducts: builder.query<ProductListResponse, void>({
-      query: () => ({
-        url: API_ROUTES.ADMIN.SHOP.PRODUCTS,
+    getAllProducts: builder.query<
+      ProductListResponse,
+      { page: number; size: number }
+    >({
+      query: ({ page, size }) => ({
+        url: `${API_ROUTES.ADMIN.SHOP.PRODUCTS}?page=${page}&size=${size}`,
         method: "GET",
       }),
       transformResponse: (

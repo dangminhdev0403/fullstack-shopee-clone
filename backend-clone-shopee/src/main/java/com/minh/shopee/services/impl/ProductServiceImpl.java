@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +29,7 @@ import com.minh.shopee.domain.dto.mappers.CartMapper;
 import com.minh.shopee.domain.dto.request.AddProductDTO;
 import com.minh.shopee.domain.dto.request.ListIdCartDetailDTO;
 import com.minh.shopee.domain.dto.request.ProductReqDTO;
+import com.minh.shopee.domain.dto.request.ProductUpdateDTO;
 import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
@@ -52,6 +54,7 @@ import com.minh.shopee.repository.ProductImageRepository;
 import com.minh.shopee.repository.ProductRepository;
 import com.minh.shopee.repository.ShopRepository;
 import com.minh.shopee.services.ProductSerivce;
+import com.minh.shopee.services.utils.CommonUtils;
 import com.minh.shopee.services.utils.SecurityUtils;
 import com.minh.shopee.services.utils.error.AppException;
 import com.minh.shopee.services.utils.files.ExcelHelper;
@@ -412,6 +415,25 @@ public class ProductServiceImpl implements ProductSerivce {
                 .toList();
         // 5) Trả Page
         return new PageImpl<>(ordered, pageable, total);
+    }
+
+    @Override
+    public ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO) {
+
+        long userId = SecurityUtils.getCurrentUserId();
+        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
+                        "Không tìm thấy shop của User này"));
+        Product product = this.productRepository.findByIdAndShopId(productDTO.getId(), shop.getId())
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Product not found",
+                        "Không tìm thấy sản phẩm cho shop này"));
+        if (shop.getId() != product.getShop().getId()) {
+            throw new AccessDeniedException("Bạn không có quyền cập nhật sản phẩm này.");
+        }
+        BeanUtils.copyProperties(productDTO, product, CommonUtils.getNullPropertyNames(productDTO));
+        log.info("Updating product: {}", product);
+        this.productRepository.save(product);
+        return productDTO;
     }
 
 }

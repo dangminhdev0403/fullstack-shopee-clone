@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.minh.shopee.domain.dto.request.AddProductDTO;
 import com.minh.shopee.domain.dto.request.ListIdCartDetailDTO;
 import com.minh.shopee.domain.dto.request.ProductReqDTO;
+import com.minh.shopee.domain.dto.request.ProductUpdateDTO;
 import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
@@ -25,6 +26,8 @@ public interface ProductSerivce {
   Page<ProductResDTO> searchProducts(String keyword, FiltersProduct filter, SortFilter sortFilte, Pageable pageable);
 
   ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imageProduct);
+
+  ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO);
 
   <T> T getProductById(long id, Class<T> type);
 

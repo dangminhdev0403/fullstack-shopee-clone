@@ -37,38 +37,10 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(ApiRoutes.SHOPS)
 @RequiredArgsConstructor
 public class ShopController {
-    private final ProductSerivce productSerivce;
     private final ShopService shopService;
 
-    @PostMapping(ApiRoutes.PRODUCTS)
-    @ApiDescription("Tạo mới sản phẩm")
-    public ResponseEntity<ProductResDTO> createAProduct(@ModelAttribute @Valid ProductReqDTO productDTO,
-            @RequestParam(value = "imageProduct", required = false) List<MultipartFile> imagesProduct) {
-        ProductResDTO productCreate = productSerivce.createAProduct(productDTO, imagesProduct);
-
-        URI location = URI.create(ApiRoutes.API_BASE_V1 + ApiRoutes.PRODUCTS);
-        return ResponseEntity.created(location)
-                .body(productCreate);
-    }
-
-    @GetMapping(ApiRoutes.PRODUCTS)
-    @ApiDescription("Lấy danh sách sản phẩm")
-    public ResponseEntity<Page<ProductShopProjection>> getlistProduct(
-            @PageableDefault(page = 0, size = 20) Pageable pageable) {
-        Page<ProductShopProjection> products = productSerivce.getAllProductsByShop(pageable);
-        return ResponseEntity.ok(products);
-    }
-
-    @PostMapping(ApiRoutes.PRODUCTS + "/import")
-    @ApiDescription("Tạo danh sách sản phẩm từ file Excel")
-    public ResponseEntity<String> createListProduct(
-            @RequestParam(value = "fileProductExcel", required = false) MultipartFile file) {
-        if (file != null) {
-            this.productSerivce.createListProduct(file);
-            return ResponseEntity.ok("Tạo danh sách sản phẩm thành công: ");
-        }
-        return ResponseEntity.ok("Tạo danh sách sản phẩm không thành công: ");
-    }
+  
+   
 
     @PutMapping("/update-status")
     @ApiDescription("Cập nhật trạng thái cửa hàng")
