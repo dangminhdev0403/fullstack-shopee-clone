@@ -10,7 +10,7 @@ export interface BaseResponse<T> {
   error: string | null;
   message: string;
   data: {
-    content: T[];
+    content: T[] ;
     page: PageInfo;
   };
 }

@@ -1,11 +1,13 @@
+import { Category } from "@redux/api/admin/categoryApi";
 import { rootApi } from "@redux/api/rootApi";
 import { API_ROUTES } from "@service/apiRoutes";
-import { BaseResponse, PageInfo } from "@utils/constants/types/response";
+import {
+  ApiResponse,
+  BaseResponse,
+  PageInfo,
+} from "@utils/constants/types/response";
 
-// Product category
-export interface Category {
-  name: string;
-}
+//
 
 // Product images
 export interface ProductImage {
@@ -20,8 +22,19 @@ export interface Product {
   price: number;
   stock: number;
   description: string;
+  status: "ACTIVE" | "INACTIVE";
 }
 
+export interface UpdateProductPayload {
+  id: number;
+  name?: string;
+  categoryId?: number;
+  imageUrl?: string;
+  price?: number;
+  stock?: number;
+  description?: string;
+  status?: "ACTIVE" | "INACTIVE";
+}
 export interface ProductListResponse {
   products: Product[];
   page: PageInfo;
@@ -34,7 +47,7 @@ export const adminProductApi = rootApi.injectEndpoints({
       { page: number; size: number }
     >({
       query: ({ page, size }) => ({
-        url: `${API_ROUTES.ADMIN.SHOP.PRODUCTS}?page=${page}&size=${size}`,
+        url: `${API_ROUTES.ADMIN.PRODUCTS}?page=${page}&size=${size}`,
         method: "GET",
       }),
       transformResponse: (
@@ -56,14 +69,28 @@ export const adminProductApi = rootApi.injectEndpoints({
             ]
           : [{ type: "PRODUCT" as const, id: "LIST" }],
     }),
-    deleteProduct: builder.mutation<void, number>({
-      query: (id) => ({
-        url: `${API_ROUTES.ADMIN.SHOP.PRODUCTS}/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: [{ type: "PRODUCT", id: "LIST" }],
+    updateProduct: builder.mutation<ApiResponse<Product>, Partial<Product>>({
+      query: (product) => {
+        const formData = new FormData();
+        Object.entries(product).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+          }
+        });
+
+        return {
+          url: `${API_ROUTES.ADMIN.PRODUCTS}`,
+          method: "PUT",
+          body: formData,
+        };
+      },
+      invalidatesTags: (result, error, { id }) => [
+        { type: "PRODUCT", id },
+        { type: "PRODUCT", id: "LIST" },
+      ],
     }),
   }),
   overrideExisting: false,
 });
-export const { useGetAllProductsQuery } = adminProductApi;
+export const { useGetAllProductsQuery, useUpdateProductMutation } =
+  adminProductApi;

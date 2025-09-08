@@ -430,9 +430,16 @@ public class ProductServiceImpl implements ProductSerivce {
         if (shop.getId() != product.getShop().getId()) {
             throw new AccessDeniedException("Bạn không có quyền cập nhật sản phẩm này.");
         }
+        if(productDTO.getCategoryId() != null){
+            Category category = new Category();
+            category.setId(productDTO.getCategoryId());
+            product.setCategory(category);
+        }
         BeanUtils.copyProperties(productDTO, product, CommonUtils.getNullPropertyNames(productDTO));
         log.info("Updating product: {}", product);
-        this.productRepository.save(product);
+        Product updatedProduct = this.productRepository.save(product);
+        BeanUtils.copyProperties(updatedProduct, productDTO);
+        productDTO.setCategoryId(updatedProduct.getCategory().getId());
         return productDTO;
     }
 

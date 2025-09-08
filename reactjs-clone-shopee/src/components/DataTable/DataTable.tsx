@@ -19,7 +19,7 @@ export interface DataTableProps<T> {
   searchable?: boolean;
   searchPlaceholder?: string;
   filterable?: boolean;
-  filterOptions?: { value: string; label: string }[];
+  filterOptions?: { id: number; name: string }[];
   onFilterChange?: (value: string) => void;
   actions?: (item: T) => React.ReactNode;
   className?: string;
@@ -47,7 +47,6 @@ export function DataTable<T extends Record<string, any>>({
   emptyMessage = "Không có dữ liệu",
   loading = false,
   paginated = false,
-  itemsPerPage = 10,
   showPaginationInfo = true,
   currentPage = 1,
   totalPages = 1,
@@ -56,19 +55,6 @@ export function DataTable<T extends Record<string, any>>({
 }: Readonly<DataTableProps<T>>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
-
-  // Filter data based on search term
-  const filteredData = data.filter((item) => {
-    if (!searchable || !searchTerm) return true;
-
-    return columns.some((column) => {
-      const value = item[column.key as keyof T];
-      return value?.toString().toLowerCase().includes(searchTerm.toLowerCase());
-    });
-  });
-
-  const totalItems = filteredData.length;
-  const startIndex = (currentPage - 1) * itemsPerPage;
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -146,8 +132,8 @@ export function DataTable<T extends Record<string, any>>({
                   className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
                 >
                   {filterOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
+                    <option key={option.id} id={option.id.toString()}>
+                      {option.name}
                     </option>
                   ))}
                 </select>

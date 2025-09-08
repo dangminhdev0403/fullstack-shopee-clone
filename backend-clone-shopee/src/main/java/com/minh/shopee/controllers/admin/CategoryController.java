@@ -23,6 +23,7 @@ import com.minh.shopee.domain.dto.request.CategoryDTO;
 import com.minh.shopee.domain.model.Category;
 import com.minh.shopee.services.CategoryService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +46,7 @@ public class CategoryController {
     @ApiDescription("Tạo danh sách danh mục")
     public ResponseEntity<String> createCategory(
             @RequestParam(value = "fileCategoryExcel", required = false) MultipartFile file,
-            @ModelAttribute Category category) throws IOException {
+            @ModelAttribute @Valid Category category) throws IOException {
         if (file != null) {
             this.categoryService.createListCategory(file);
             return ResponseEntity.ok("Tạo danh mục thành công: ");

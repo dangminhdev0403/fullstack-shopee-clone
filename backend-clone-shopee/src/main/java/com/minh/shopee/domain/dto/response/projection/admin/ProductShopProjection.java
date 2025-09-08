@@ -17,7 +17,11 @@ public interface ProductShopProjection {
 
     ProductImageProjection getImages();
 
+    String getStatus();
+
     interface CategoryProjection {
+        Long getId();
+
         String getName();
     }
 

@@ -1,32 +1,34 @@
-"use client";
-
 import ProductForm from "@components/admin/ProductForm";
 import { Column, DataTable } from "@components/DataTable/DataTable";
+import { useAlert } from "@hooks/useAlert";
 import { useProducts } from "@hooks/useProdcutAdmin";
-import { Product, useGetAllProductsQuery } from "@redux/api/admin/productApi";
+import { useGetAllCategoriesQuery } from "@redux/api/admin/categoryApi";
+import {
+  Product,
+  useGetAllProductsQuery,
+  useUpdateProductMutation,
+} from "@redux/api/admin/productApi";
 import {
   AlertCircle,
+  Ban,
+  CheckCircle,
   Edit,
   Package,
   Plus,
   Star,
-  Trash2,
   TrendingUp,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Products() {
-  const { isLoading, addProduct, updateProduct, deleteProduct, getStats } =
-    useProducts();
-
-  const [searchTerm, setSearchTerm] = useState("");
+  const { isLoading, getStats } = useProducts();
+  const { confirm, success, error } = useAlert();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(
-    null,
-  );
+
   const [page, setPage] = useState(0);
+  const [updateProduct] = useUpdateProductMutation();
 
   const {
     data: productsData,
@@ -37,17 +39,8 @@ export default function Products() {
     { refetchOnMountOrArgChange: true },
   );
 
-  useEffect(() => {
-    console.log(
-      "isLoading:",
-      isLoading,
-      "isFetching:",
-      isFetching,
-      "page:",
-      page,
-    );
-  }, [isLoading, isFetching, page]);
-
+  const { data: categories } = useGetAllCategoriesQuery();
+  const categoriesList = categories?.categories || [];
   const stats = getStats();
 
   const formatPrice = (price: number) => {
@@ -64,22 +57,58 @@ export default function Products() {
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
+
     setShowForm(true);
   };
 
   const handleFormSubmit = (formData: any) => {
     if (editingProduct) {
-      updateProduct(editingProduct.id, formData);
+      updateProduct(formData);
     } else {
-      addProduct(formData);
+      // addProduct(formData);
     }
     setShowForm(false);
     setEditingProduct(undefined);
   };
 
-  const handleDeleteProduct = (id: number) => {
-    deleteProduct(id);
-    setShowDeleteConfirm(null);
+  const handleChangeStatus = async (
+    id: number,
+    status: "ACTIVE" | "INACTIVE",
+  ) => {
+    const statusUpdate = status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    const message = status === "ACTIVE" ? "tạm ngừng bán" : "kích hoạt bán";
+
+    confirm(
+      "Xác nhận thay đổi",
+      `Bạn có chắc chắn muốn ${message} sản phẩm này?`,
+      async () => {
+        try {
+          await updateProduct({ id, status: statusUpdate }).unwrap();
+          // ✅ Có thể show toast success
+          success("Cập nhật thành công!");
+        } catch (err) {
+          // ❌ Có thể show toast error
+          error("Lỗi khi cập nhật:");
+        }
+      },
+    );
+  };
+
+  const getStatusBadge = (status: "ACTIVE" | "INACTIVE") => {
+    if (status === "INACTIVE") {
+      return (
+        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
+          <AlertCircle className="mr-1 h-3 w-3" />
+          Tạm khoá
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
+        <CheckCircle className="mr-1 h-3 w-3" />
+        Hoạt động
+      </span>
+    );
   };
 
   const columns: Column<Product>[] = [
@@ -93,7 +122,7 @@ export default function Products() {
               <div>
                 <img
                   src={product?.images?.imageUrl}
-                  className="h-16 w-16 rounded-2xl object-cover shadow-md"
+                  className="h-16 w-16 rounded object-cover shadow-md"
                   alt=""
                 />
               </div>
@@ -128,7 +157,9 @@ export default function Products() {
       header: "Giá",
       render: (product) => (
         <div>
-          <div className="font-semibold">{formatPrice(product.price)}</div>
+          <div className="inline-flex items-center !justify-center !text-center font-semibold">
+            {formatPrice(product.price)}
+          </div>
           {/* {product.originalPrice > product.price && (
             <div className="text-sm text-gray-500 line-through">
               {formatPrice(product.originalPrice)}
@@ -142,27 +173,18 @@ export default function Products() {
       header: "Tồn kho",
       render: (product) => (
         <span
-          className={`font-medium ${product.stock < 20 ? "text-red-600" : "text-green-600"}`}
+          className={`inline-flex font-medium ${product.stock < 20 ? "text-red-600" : "text-green-600"} !justify-center !text-center`}
         >
           {product.stock}
         </span>
       ),
     },
 
-    // {
-    //   key: "status",
-    //   header: "Trạng thái",
-    //   render: (product) => getStatusBadge(product.status, product.stock),
-    // },
-  ];
-
-  const filterOptions = [
-    { value: "all", label: "Tất cả danh mục" },
-    { value: "Điện thoại", label: "Điện thoại" },
-    { value: "Laptop", label: "Laptop" },
-    { value: "Phụ kiện", label: "Phụ kiện" },
-    { value: "Tablet", label: "Tablet" },
-    { value: "Đồng hồ", label: "Đồng hồ" },
+    {
+      key: "status",
+      header: "Trạng thái",
+      render: (product) => getStatusBadge(product.status),
+    },
   ];
 
   const handleFilterChange = (value: string) => {
@@ -172,18 +194,22 @@ export default function Products() {
   const renderActions = (product: Product) => (
     <div className="flex items-center space-x-2">
       <button
-        title="Edit"
+        title="Chỉnh sửa"
         onClick={() => handleEditProduct(product)}
         className="rounded-lg p-2 transition-colors duration-200 hover:bg-green-100 dark:hover:bg-green-900/20"
       >
-        <Edit className="h-4 w-4 text-green-600" />
+        <Edit className="h-4 w-4 text-blue-600" />
       </button>
       <button
-        title="Delete"
-        onClick={() => setShowDeleteConfirm(product.id)}
-        className="rounded-lg p-2 transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/20"
+        title={product.status === "ACTIVE" ? "Tạm ngừng bán" : "Kích hoạt bán"}
+        onClick={() => handleChangeStatus(product.id, product.status)}
+        className="rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-900/20"
       >
-        <Trash2 className="h-4 w-4 text-red-600" />
+        {product.status === "ACTIVE" ? (
+          <Ban className="h-4 w-4 text-red-600" />
+        ) : (
+          <CheckCircle className="h-4 w-4 text-green-600" />
+        )}
       </button>
     </div>
   );
@@ -271,7 +297,7 @@ export default function Products() {
         searchable={true}
         searchPlaceholder="Tìm kiếm sản phẩm..."
         filterable={true}
-        filterOptions={filterOptions}
+        filterOptions={categoriesList}
         onFilterChange={handleFilterChange}
         actions={renderActions}
         loading={isFetching || isLoadingProducts}
@@ -294,34 +320,9 @@ export default function Products() {
             setShowForm(false);
             setEditingProduct(undefined);
           }}
+          categories={categoriesList}
           isLoading={isLoading}
         />
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="bg-opacity-100 fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-          <div className="rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
-            <h3 className="mb-4 text-lg font-semibold">Xác nhận xóa</h3>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">
-              Bạn có chắc chắn muốn xóa ? Hành động này không thể hoàn tác.
-            </p>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowDeleteConfirm(null)}
-                className="rounded-xl border border-gray-200 px-4 py-2 transition-colors duration-200 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={() => handleDeleteProduct(showDeleteConfirm)}
-                className="rounded-xl bg-red-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-red-700"
-              >
-                Xóa
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

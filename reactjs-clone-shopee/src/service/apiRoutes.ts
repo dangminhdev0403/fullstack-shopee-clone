@@ -5,9 +5,10 @@ export const API_ROUTES = {
   ADMIN: {
     SHOP: {
       BASE: `${version}/admin/shops`,
-      PRODUCTS: `${version}/admin/shops/products`,
       ORDERS: `${version}/admin/shops/orders`,
     },
+    PRODUCTS: `${version}/admin/products`,
+    CATEGORIES: `${version}/admin/categories`,
   },
   AUTH: {
     LOGIN: `${version}/auth/login`,

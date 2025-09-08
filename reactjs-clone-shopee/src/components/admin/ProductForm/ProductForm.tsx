@@ -2,6 +2,7 @@
 
 import type React from "react";
 
+import { Category } from "@redux/api/admin/categoryApi";
 import { Product } from "@redux/api/admin/productApi";
 import { ProductFormData } from "@utils/constants/types/product-admin";
 import { Save, X } from "lucide-react";
@@ -12,6 +13,7 @@ interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  categories?: Category[];
 }
 
 export function ProductForm({
@@ -19,17 +21,16 @@ export function ProductForm({
   onSubmit,
   onCancel,
   isLoading,
+  categories,
 }: ProductFormProps) {
   const [formData, setFormData] = useState<ProductFormData>({
     id: product?.id || 0,
     name: product?.name || "",
-    category: product?.category?.name || "Không xác định",
+    categoryId: product?.category?.id as number,
     price: product?.price || 0,
     stock: product?.stock || 0,
     description: product?.description || "",
   });
-
-  console.log(product);
 
   type ProductFormErrors = {
     name?: string;
@@ -115,16 +116,15 @@ export function ProductForm({
             </label>
             <select
               title="category"
-              value={formData.category || ""}
-              onChange={(e) => handleChange("category", e.target.value)}
+              value={formData.categoryId || ""}
+              onChange={(e) => handleChange("categoryId", e.target.value)}
               className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
             >
-              <option value="Điện thoại">Điện thoại</option>
-              <option value="Laptop">Laptop</option>
-              <option value="Phụ kiện">Phụ kiện</option>
-              <option value="Tablet">Tablet</option>
-              <option value="Đồng hồ">Đồng hồ</option>
-              <option value="Quần áo">Quần áo</option>
+              {categories?.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              )) || <option value="Không xác định">Không xác định</option>}
             </select>
           </div>
 
