@@ -22,6 +22,7 @@ export interface ProductFormData {
   price: number;
   stock: number;
   description?: string;
+  images: File[]; // ✅ luôn là mảng
 }
 
 export interface ProductStats {

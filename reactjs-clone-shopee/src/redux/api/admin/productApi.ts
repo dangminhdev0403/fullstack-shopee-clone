@@ -24,20 +24,40 @@ export interface Product {
   description: string;
   status: "ACTIVE" | "INACTIVE";
 }
+export interface ProductImage {
+  id: number;
+  imageUrl: string;
+}
+// Payload cho tạo sản phẩm
+export interface CreateProductPayload {
+  name: string;
+  categoryId: number;
+  price: number;
+  stock: number;
+  description?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  images?: File[]; // nhiều ảnh
+}
 
+// Payload cho update sản phẩm
 export interface UpdateProductPayload {
   id: number;
   name?: string;
   categoryId?: number;
-  imageUrl?: string;
   price?: number;
   stock?: number;
   description?: string;
   status?: "ACTIVE" | "INACTIVE";
+  images?: File[]; // nhiều ảnh
 }
+
 export interface ProductListResponse {
   products: Product[];
   page: PageInfo;
+}
+
+export interface ProductImagesResponse {
+  images: ProductImage[];
 }
 
 export const adminProductApi = rootApi.injectEndpoints({
@@ -47,7 +67,7 @@ export const adminProductApi = rootApi.injectEndpoints({
       { page: number; size: number }
     >({
       query: ({ page, size }) => ({
-        url: `${API_ROUTES.ADMIN.PRODUCTS}?page=${page}&size=${size}`,
+        url: `${API_ROUTES.ADMIN.PRODUCTS}?page=${page}&size=${size}&sort=createdAt,desc`,
         method: "GET",
       }),
       transformResponse: (
@@ -69,28 +89,77 @@ export const adminProductApi = rootApi.injectEndpoints({
             ]
           : [{ type: "PRODUCT" as const, id: "LIST" }],
     }),
-    updateProduct: builder.mutation<ApiResponse<Product>, Partial<Product>>({
+    getProductImages: builder.query<ApiResponse<ProductImagesResponse>, number>(
+      {
+        query: (id) => ({
+          url: `${API_ROUTES.ADMIN.PRODUCTS}/images/${id}`,
+          method: "GET",
+        }),
+      },
+    ),
+    updateProduct: builder.mutation<ApiResponse<Product>, UpdateProductPayload>(
+      {
+        query: (product) => {
+          const formData = new FormData();
+
+          Object.entries(product).forEach(([key, value]) => {
+            if (value === undefined || value === null) return;
+
+            if (value instanceof File) {
+              formData.append("images", value);
+            } else if (Array.isArray(value) && value[0] instanceof File) {
+              value.forEach((file) => formData.append("images", file));
+            } else {
+              formData.append(key, value.toString());
+            }
+          });
+
+          return {
+            url: `${API_ROUTES.ADMIN.PRODUCTS}`,
+            method: "PUT",
+            body: formData,
+          };
+        },
+        invalidatesTags: (result, error, { id }) => [
+          { type: "PRODUCT", id },
+          { type: "PRODUCT", id: "LIST" },
+        ],
+      },
+    ),
+
+    createdProduct: builder.mutation<
+      ApiResponse<Product>,
+      CreateProductPayload
+    >({
       query: (product) => {
         const formData = new FormData();
+
         Object.entries(product).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
+          if (value === undefined || value === null) return;
+
+          if (value instanceof File) {
+            formData.append("images", value);
+          } else if (Array.isArray(value) && value[0] instanceof File) {
+            value.forEach((file) => formData.append("images", file));
+          } else {
             formData.append(key, value.toString());
           }
         });
 
         return {
           url: `${API_ROUTES.ADMIN.PRODUCTS}`,
-          method: "PUT",
+          method: "POST",
           body: formData,
         };
       },
-      invalidatesTags: (result, error, { id }) => [
-        { type: "PRODUCT", id },
-        { type: "PRODUCT", id: "LIST" },
-      ],
+      invalidatesTags: [{ type: "PRODUCT", id: "LIST" }],
     }),
   }),
   overrideExisting: false,
 });
-export const { useGetAllProductsQuery, useUpdateProductMutation } =
-  adminProductApi;
+export const {
+  useGetProductImagesQuery,
+  useGetAllProductsQuery,
+  useUpdateProductMutation,
+  useCreatedProductMutation,
+} = adminProductApi;

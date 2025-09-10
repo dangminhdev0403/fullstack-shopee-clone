@@ -8,6 +8,7 @@ import com.minh.shopee.domain.model.ProductImage;
 
 @Repository
 public interface ProductImageRepository
-        extends JpaRepository<ProductImage, Long>, JpaSpecificationExecutor<ProductImage> {
+                extends JpaRepository<ProductImage, Long>, JpaSpecificationExecutor<ProductImage> {
 
+                void deleteAllByProductId(Long productId);
 }

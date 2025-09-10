@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { Category } from "@redux/api/admin/categoryApi";
-import { Product } from "@redux/api/admin/productApi";
+import { Product, useGetProductImagesQuery } from "@redux/api/admin/productApi";
 import { ProductFormData } from "@utils/constants/types/product-admin";
 import { Save, X } from "lucide-react";
 import { useState } from "react";
@@ -14,6 +14,7 @@ interface ProductFormProps {
   onCancel: () => void;
   isLoading?: boolean;
   categories?: Category[];
+  getImages: boolean;
 }
 
 export function ProductForm({
@@ -22,14 +23,16 @@ export function ProductForm({
   onCancel,
   isLoading,
   categories,
+  getImages,
 }: ProductFormProps) {
   const [formData, setFormData] = useState<ProductFormData>({
     id: product?.id || 0,
     name: product?.name || "",
-    categoryId: product?.category?.id as number,
+    categoryId: product?.category?.id ?? (categories?.[0]?.id as number),
     price: product?.price || 0,
     stock: product?.stock || 0,
     description: product?.description || "",
+    images: [],
   });
 
   type ProductFormErrors = {
@@ -37,11 +40,17 @@ export function ProductForm({
     price?: string;
     stock?: string;
     description?: string;
-    category?: string;
+    categoryId?: string;
     images?: string;
   };
 
+
+  const { data: dataImages } = useGetProductImagesQuery(formData.id, {
+    skip: !getImages, // 👈 chỉ gọi khi getImages = true
+  });
+
   const [errors, setErrors] = useState<ProductFormErrors>({});
+  const [previews, setPreviews] = useState<string[]>([]);
 
   const validateForm = (): boolean => {
     const newErrors: ProductFormErrors = {};
@@ -52,14 +61,31 @@ export function ProductForm({
     if (formData.price <= 0) {
       newErrors.price = "Giá phải lớn hơn 0";
     }
-    if (formData.stock < 0) {
-      newErrors.stock = "Số lượng không được âm";
+    if (formData.stock <= 0) {
+      newErrors.stock = "Số lượng tồn kho phải lớn hơn 0";
     }
 
+    if (!getImages && formData?.images?.length <= 0) {
+      newErrors.images = "Phải có ít nhât 1 hình ảnh";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length > 0) {
+      handleChange("images", files);
+      setPreviews(files.map((file) => URL.createObjectURL(file)));
+    }
+  };
+
+  const handleDeleteImage = (index: number) => {
+    const newImages = [...formData.images];
+    newImages.splice(index, 1);
+    handleChange("images", newImages);
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  }
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
@@ -116,7 +142,7 @@ export function ProductForm({
             </label>
             <select
               title="category"
-              value={formData.categoryId || ""}
+              value={formData.categoryId || 1}
               onChange={(e) => handleChange("categoryId", e.target.value)}
               className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
             >
@@ -135,6 +161,7 @@ export function ProductForm({
               </label>
               <input
                 type="number"
+                min={0}
                 value={formData.price}
                 onChange={(e) =>
                   handleChange("price", Number.parseInt(e.target.value) || 0)
@@ -154,6 +181,7 @@ export function ProductForm({
             </label>
             <input
               type="number"
+              min={0}
               value={formData.stock}
               onChange={(e) =>
                 handleChange("stock", Number.parseInt(e.target.value) || 0)
@@ -177,6 +205,72 @@ export function ProductForm({
               className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
               placeholder="Nhập mô tả sản phẩm"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Ảnh sản phẩm
+            </label>
+
+            {/* Input upload ảnh */}
+            <input
+              title="images"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-xl file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-orange-700 hover:file:bg-orange-100"
+            />
+
+            {/* Ảnh cũ từ API */}
+            {(dataImages?.data?.images?.length ?? 0) > 0 && (
+              <div className="mt-4">
+                <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Ảnh hiện tại
+                </p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {dataImages?.data.images?.map((img) => (
+                    <div key={img.id} className="relative">
+                      <img
+                        src={img.imageUrl}
+                        alt="old"
+                        className="h-24 w-full rounded-lg object-cover shadow"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Ảnh mới upload */}
+            {previews.length > 0 && (
+              <div className="mt-4">
+                <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Ảnh mới tải lên
+                </p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {previews.map((src, idx) => (
+                    <div key={idx} className="relative">
+                      <img
+                        src={src}
+                        alt={`Preview ${idx}`}
+                        className="h-24 w-full rounded-lg object-cover shadow"
+                      />
+                      <button
+                        onClick={() => handleDeleteImage(idx)}
+                        type="button"
+                        className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white shadow"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {errors.images && (
+              <p className="mt-1 text-sm text-red-600">{errors.images}</p>
+            )}
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">

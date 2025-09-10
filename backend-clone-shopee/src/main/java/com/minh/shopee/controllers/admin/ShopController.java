@@ -1,33 +1,22 @@
 package com.minh.shopee.controllers.admin;
 
-import java.net.URI;
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
-import com.minh.shopee.domain.dto.request.ProductReqDTO;
 import com.minh.shopee.domain.dto.request.ShopUpdateStatusDTO;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.request.UpdateShopDTO;
-import com.minh.shopee.domain.dto.response.products.ProductResDTO;
 import com.minh.shopee.domain.dto.response.projection.OrderProjection;
-import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 import com.minh.shopee.domain.model.Order;
-import com.minh.shopee.services.ProductSerivce;
 import com.minh.shopee.services.ShopService;
 
 import jakarta.validation.Valid;
@@ -38,9 +27,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ShopController {
     private final ShopService shopService;
-
-  
-   
 
     @PutMapping("/update-status")
     @ApiDescription("Cập nhật trạng thái cửa hàng")

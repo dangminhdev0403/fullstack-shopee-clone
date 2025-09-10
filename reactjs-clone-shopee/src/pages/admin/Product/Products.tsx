@@ -5,6 +5,7 @@ import { useProducts } from "@hooks/useProdcutAdmin";
 import { useGetAllCategoriesQuery } from "@redux/api/admin/categoryApi";
 import {
   Product,
+  useCreatedProductMutation,
   useGetAllProductsQuery,
   useUpdateProductMutation,
 } from "@redux/api/admin/productApi";
@@ -25,9 +26,11 @@ export default function Products() {
   const { confirm, success, error } = useAlert();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showForm, setShowForm] = useState(false);
+  const [getImages, setGetImages] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
   const [page, setPage] = useState(0);
+  const [createProduct] = useCreatedProductMutation();
   const [updateProduct] = useUpdateProductMutation();
 
   const {
@@ -51,24 +54,33 @@ export default function Products() {
   };
 
   const handleAddProduct = () => {
+    setGetImages(false);
     setEditingProduct(undefined);
     setShowForm(true);
   };
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
-
+    setGetImages(true);
     setShowForm(true);
   };
 
-  const handleFormSubmit = (formData: any) => {
-    if (editingProduct) {
-      updateProduct(formData);
-    } else {
-      // addProduct(formData);
+  const handleFormSubmit = async (formData: any) => {
+    try {
+      if (editingProduct != undefined) {
+        await updateProduct(formData).unwrap();
+        success("Cập nhật sản phẩm thành công!");
+      } else {
+        await createProduct(formData).unwrap();
+        success("Thêm sản phẩm mới thành công!");
+      }
+    } catch (err) {
+      error("Có lỗi xảy ra khi lưu sản phẩm!");
+    } finally {
+      setGetImages(false);
+      setShowForm(false);
+      setEditingProduct(undefined);
     }
-    setShowForm(false);
-    setEditingProduct(undefined);
   };
 
   const handleChangeStatus = async (
@@ -319,9 +331,11 @@ export default function Products() {
           onCancel={() => {
             setShowForm(false);
             setEditingProduct(undefined);
+            setGetImages(false);
           }}
           categories={categoriesList}
           isLoading={isLoading}
+          getImages={getImages}
         />
       )}
     </div>

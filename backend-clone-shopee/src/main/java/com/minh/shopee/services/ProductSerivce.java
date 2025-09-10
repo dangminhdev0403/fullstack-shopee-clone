@@ -1,5 +1,6 @@
 package com.minh.shopee.services;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -25,9 +26,9 @@ public interface ProductSerivce {
 
   Page<ProductResDTO> searchProducts(String keyword, FiltersProduct filter, SortFilter sortFilte, Pageable pageable);
 
-  ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imageProduct);
+  ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imageProduct) ;
 
-  ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO);
+  ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO, List<MultipartFile> imageProduct) ;
 
   <T> T getProductById(long id, Class<T> type);
 

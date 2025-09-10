@@ -2,6 +2,7 @@ package com.minh.shopee.services.impl;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.minh.shopee.domain.constant.ProductStatus;
@@ -151,6 +153,7 @@ public class ProductServiceImpl implements ProductSerivce {
     }
 
     @Override
+    @Transactional
     public ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imagesProduct) {
         long userId = SecurityUtils.getCurrentUserId();
         Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
@@ -190,15 +193,71 @@ public class ProductServiceImpl implements ProductSerivce {
 
     }
 
-    private ProductImage mapToProductImage(MultipartFile image, Product product) {
+    @Override
+    @Transactional
+    public ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO, List<MultipartFile> imagesProduct) {
+
+        long userId = SecurityUtils.getCurrentUserId();
+        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
+                        "Không tìm thấy shop của User này"));
+        Product product = this.productRepository.findByIdAndShopId(productDTO.getId(), shop.getId())
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Product not found",
+                        "Không tìm thấy sản phẩm cho shop này"));
+        if (shop.getId() != product.getShop().getId()) {
+            throw new AccessDeniedException("Bạn không có quyền cập nhật sản phẩm này.");
+        }
+        if (productDTO.getCategoryId() != null) {
+            Category category = new Category();
+            category.setId(productDTO.getCategoryId());
+            product.setCategory(category);
+        }
+        // Cập nhật ảnh
+        if (imagesProduct != null && !imagesProduct.isEmpty()) {
+            List<ProductImage> productImages = imagesProduct.stream()
+                    .map(image -> mapToProductImage(image, product)) // dùng trực tiếp, không build lại
+                    .toList();
+
+            product.getImages().clear(); // xoá ảnh cũ trong entity
+            product.getImages().addAll(productImages); // thêm ảnh mới
+        }
+
+        BeanUtils.copyProperties(productDTO, product, CommonUtils.getNullPropertyNames(productDTO));
+        log.info("Updating product: {}", product);
+        Product updatedProduct = this.productRepository.save(product);
+        BeanUtils.copyProperties(updatedProduct, productDTO);
+        productDTO.setCategoryId(updatedProduct.getCategory().getId());
+        return productDTO;
+    }
+
+    @Transactional
+    public ProductImage mapToProductImage(MultipartFile image, Product product) {
         try {
+            if (image != null && product.getImages() != null && !product.getImages().isEmpty()) {
+                // Xóa ảnh cũ trên Cloudinary
+                for (ProductImage productImage : new ArrayList<>(product.getImages())) {
+                    uploadCloud.deleteFile(productImage.getImageUrl());
+                }
+
+                // Xóa khỏi entity -> Hibernate sẽ tự xử lý orphanRemoval
+                product.getImages().clear();
+            }
+
+            // Upload ảnh mới
             String imageUrl = uploadCloud.handleSaveUploadFile(image, "products");
-            return ProductImage.builder()
+
+            ProductImage newImage = ProductImage.builder()
                     .imageUrl(imageUrl)
                     .product(product)
                     .build();
+
+            // Thêm vào entity để Hibernate persist
+            product.getImages().add(newImage);
+
+            return newImage;
+
         } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("Lỗi upload ảnh", e);
         }
     }
 
@@ -415,32 +474,6 @@ public class ProductServiceImpl implements ProductSerivce {
                 .toList();
         // 5) Trả Page
         return new PageImpl<>(ordered, pageable, total);
-    }
-
-    @Override
-    public ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO) {
-
-        long userId = SecurityUtils.getCurrentUserId();
-        Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
-                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
-                        "Không tìm thấy shop của User này"));
-        Product product = this.productRepository.findByIdAndShopId(productDTO.getId(), shop.getId())
-                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Product not found",
-                        "Không tìm thấy sản phẩm cho shop này"));
-        if (shop.getId() != product.getShop().getId()) {
-            throw new AccessDeniedException("Bạn không có quyền cập nhật sản phẩm này.");
-        }
-        if(productDTO.getCategoryId() != null){
-            Category category = new Category();
-            category.setId(productDTO.getCategoryId());
-            product.setCategory(category);
-        }
-        BeanUtils.copyProperties(productDTO, product, CommonUtils.getNullPropertyNames(productDTO));
-        log.info("Updating product: {}", product);
-        Product updatedProduct = this.productRepository.save(product);
-        BeanUtils.copyProperties(updatedProduct, productDTO);
-        productDTO.setCategoryId(updatedProduct.getCategory().getId());
-        return productDTO;
     }
 
 }
