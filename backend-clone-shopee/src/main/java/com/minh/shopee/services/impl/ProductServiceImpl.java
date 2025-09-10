@@ -33,6 +33,7 @@ import com.minh.shopee.domain.dto.request.ListIdCartDetailDTO;
 import com.minh.shopee.domain.dto.request.ProductReqDTO;
 import com.minh.shopee.domain.dto.request.ProductUpdateDTO;
 import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
+import com.minh.shopee.domain.dto.request.filters.FiltersProductAdmin;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductImageDTO;
@@ -321,8 +322,7 @@ public class ProductServiceImpl implements ProductSerivce {
                 spec = spec.and(ProductSpecification.hasStock(stock));
             }
             if (filter.getCategoryId().isPresent()) {
-                Long categoryId = Long.parseLong(filter.getCategoryId().get());
-                spec = spec.and(ProductSpecification.hasCategoryId(categoryId));
+                spec = spec.and(ProductSpecification.hasCategoryId(filter.getCategoryId().get()));
             }
         }
         return spec;
@@ -438,7 +438,7 @@ public class ProductServiceImpl implements ProductSerivce {
     }
 
     @Override
-    public Page<ProductShopProjection> getAllProductsByShop(Pageable pageable) {
+    public Page<ProductShopProjection> getAllProductsByShop(Pageable pageable, FiltersProductAdmin filtersProduct) {
         long userId = SecurityUtils.getCurrentUserId();
         Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
                 () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
@@ -446,7 +446,12 @@ public class ProductServiceImpl implements ProductSerivce {
 
         Specification<Product> spec = Specification.where(null);
         spec = spec.and(ProductSpecification.hasShopId(shop.getId()));
-
+        if (filtersProduct.getCategoryId() != null) {
+            spec = spec.and(ProductSpecification.hasCategoryId(filtersProduct.getCategoryId()));
+        }
+        if (filtersProduct.getKeyword() != null) {
+            spec = spec.and(ProductSpecification.hasKeyword(filtersProduct.getKeyword()));
+        }
         // 1) Lấy ids theo pageable (chỉ select id, không join)
         List<Long> ids = this.productCustomRepo.findIds(spec, pageable);
         // 2) Lấy tổng số để trả trong Page (dùng productRepository.count(spec) nếu bạn

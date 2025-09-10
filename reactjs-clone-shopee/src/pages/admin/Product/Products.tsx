@@ -24,10 +24,12 @@ import { useState } from "react";
 export default function Products() {
   const { isLoading, getStats } = useProducts();
   const { confirm, success, error } = useAlert();
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>();
   const [showForm, setShowForm] = useState(false);
   const [getImages, setGetImages] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [page, setPage] = useState(0);
   const [createProduct, { isLoading: isLoadingCreate }] =
@@ -40,7 +42,7 @@ export default function Products() {
     isLoading: isLoadingProducts,
     isFetching,
   } = useGetAllProductsQuery(
-    { page, size: 10 },
+    { page, size: 10, categoryId: selectedCategory, keyword: searchTerm },
     { refetchOnMountOrArgChange: true },
   );
 
@@ -257,7 +259,9 @@ export default function Products() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Tổng sản phẩm
               </p>
-              <p className="text-3xl font-bold">{stats.totalProducts}</p>
+              <p className="text-3xl font-bold">
+                {productsData?.page.totalElements}
+              </p>
             </div>
             <div className="rounded-2xl bg-blue-100 p-3 dark:bg-blue-900/20">
               <Package className="h-6 w-6 text-blue-600" />
@@ -306,6 +310,8 @@ export default function Products() {
       </div>
 
       <DataTable
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
         data={productsData?.products || []}
         columns={columns}
         searchable={true}

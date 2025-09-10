@@ -21,8 +21,22 @@ public class ProductSpecification {
         };
     }
 
-    public static Specification<Product> hasCategoryId(Long categoryId) {
-        return (root, query, cb) -> cb.equal(root.get("category").get("id"), categoryId);
+    public static Specification<Product> hasCategoryId(String categoryId) {
+        return (root, query, cb) -> {
+            if (categoryId == null || categoryId.isBlank()) {
+                return cb.conjunction();
+            }
+            return cb.equal(root.get("category").get("id"), Long.parseLong(categoryId));
+        };
+    }
+
+    public static Specification<Product> hasKeyword(String keyword) {
+        return (root, query, cb) -> {
+            if (keyword == null || keyword.isBlank()) {
+                return cb.conjunction(); // luôn true, không ảnh hưởng filter khác
+            }
+            return cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%");
+        };
     }
 
     public static Specification<Product> hasPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
@@ -32,6 +46,7 @@ public class ProductSpecification {
     public static Specification<Product> hasStock(Integer stock) {
         return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("stock"), stock);
     }
+
     public static Specification<Product> hasShopId(Long shopId) {
         return (root, query, cb) -> cb.equal(root.get("shop").get("id"), shopId);
     }

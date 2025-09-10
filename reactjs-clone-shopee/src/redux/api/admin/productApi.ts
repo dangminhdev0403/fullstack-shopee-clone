@@ -64,12 +64,34 @@ export const adminProductApi = rootApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllProducts: builder.query<
       ProductListResponse,
-      { page: number; size: number }
+      {
+        page: number;
+        size: number;
+        keyword?: string;
+        categoryId?: string;
+        sortBy?: string;
+        direction?: string;
+      }
     >({
-      query: ({ page, size }) => ({
-        url: `${API_ROUTES.ADMIN.PRODUCTS}?page=${page}&size=${size}&sort=createdAt,desc`,
-        method: "GET",
-      }),
+      query: ({
+        page,
+        size,
+        keyword,
+        categoryId,
+        sortBy = "id",
+        direction = "asc",
+      }) => {
+        const params = new URLSearchParams();
+        params.set("page", page.toString());
+        params.set("size", size.toString());
+        params.set("sort", `${sortBy},${direction}`);
+        if (keyword) params.set("keyword", keyword);
+        if (categoryId) params.set("categoryId", categoryId.toString());
+        return {
+          url: `${API_ROUTES.ADMIN.PRODUCTS}?${params.toString()}`,
+          method: "GET",
+        };
+      },
       transformResponse: (
         response: BaseResponse<Product>,
       ): ProductListResponse => {

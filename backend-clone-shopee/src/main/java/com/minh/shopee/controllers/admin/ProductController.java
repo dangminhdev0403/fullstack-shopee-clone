@@ -21,6 +21,7 @@ import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
 import com.minh.shopee.domain.dto.request.ProductReqDTO;
 import com.minh.shopee.domain.dto.request.ProductUpdateDTO;
+import com.minh.shopee.domain.dto.request.filters.FiltersProductAdmin;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
 import com.minh.shopee.domain.dto.response.projection.admin.ProductImageProjection;
 import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
@@ -40,8 +41,9 @@ public class ProductController {
     @GetMapping("")
     @ApiDescription("Lấy danh sách sản phẩm")
     public ResponseEntity<Page<ProductShopProjection>> getlistProduct(
-            @PageableDefault(page = 0, size = 20) Pageable pageable) {
-        Page<ProductShopProjection> products = productSerivce.getAllProductsByShop(pageable);
+            @PageableDefault(page = 0, size = 20) Pageable pageable,
+            @ModelAttribute FiltersProductAdmin filtersProduct) {
+        Page<ProductShopProjection> products = productSerivce.getAllProductsByShop(pageable, filtersProduct);
         return ResponseEntity.ok(products);
     }
 
@@ -80,9 +82,9 @@ public class ProductController {
 
     @PutMapping("")
     @ApiDescription("Cập nhật sản phẩm")
-    public ResponseEntity<ProductUpdateDTO> updateAProduct(@ModelAttribute @Valid ProductUpdateDTO productDTO , 
+    public ResponseEntity<ProductUpdateDTO> updateAProduct(@ModelAttribute @Valid ProductUpdateDTO productDTO,
             @RequestParam(value = "images", required = false) List<MultipartFile> imagesProduct) {
-        this.productSerivce.updateAProduct(productDTO , imagesProduct);
+        this.productSerivce.updateAProduct(productDTO, imagesProduct);
         return ResponseEntity.ok(productDTO);
     }
 

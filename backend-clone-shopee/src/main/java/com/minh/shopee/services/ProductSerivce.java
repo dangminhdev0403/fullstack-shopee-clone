@@ -1,6 +1,5 @@
 package com.minh.shopee.services;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import com.minh.shopee.domain.dto.request.ListIdCartDetailDTO;
 import com.minh.shopee.domain.dto.request.ProductReqDTO;
 import com.minh.shopee.domain.dto.request.ProductUpdateDTO;
 import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
+import com.minh.shopee.domain.dto.request.filters.FiltersProductAdmin;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
@@ -26,9 +26,9 @@ public interface ProductSerivce {
 
   Page<ProductResDTO> searchProducts(String keyword, FiltersProduct filter, SortFilter sortFilte, Pageable pageable);
 
-  ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imageProduct) ;
+  ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imageProduct);
 
-  ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO, List<MultipartFile> imageProduct) ;
+  ProductUpdateDTO updateAProduct(ProductUpdateDTO productDTO, List<MultipartFile> imageProduct);
 
   <T> T getProductById(long id, Class<T> type);
 
@@ -42,6 +42,6 @@ public interface ProductSerivce {
 
   void removeListFromCart(ListIdCartDetailDTO req, Long userId);
 
-  Page<ProductShopProjection> getAllProductsByShop(Pageable pageable);
+  Page<ProductShopProjection> getAllProductsByShop(Pageable pageable, FiltersProductAdmin filtersProduct);
 
 }

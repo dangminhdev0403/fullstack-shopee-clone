@@ -13,6 +13,7 @@ public class FiltersProduct {
 
     private Optional<String> minPrice;
     private Optional<String> maxPrice;
+    private Optional<String> keyword;
     
     private Optional<String> stock;
     private Optional<String> categoryId;
