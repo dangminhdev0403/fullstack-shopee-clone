@@ -95,6 +95,7 @@ export const adminProductApi = rootApi.injectEndpoints({
           url: `${API_ROUTES.ADMIN.PRODUCTS}/images/${id}`,
           method: "GET",
         }),
+        providesTags: (result, error, id) => [{ type: "PRODUCT", id }],
       },
     ),
     updateProduct: builder.mutation<ApiResponse<Product>, UpdateProductPayload>(
