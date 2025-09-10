@@ -30,8 +30,10 @@ export default function Products() {
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
   const [page, setPage] = useState(0);
-  const [createProduct] = useCreatedProductMutation();
-  const [updateProduct] = useUpdateProductMutation();
+  const [createProduct, { isLoading: isLoadingCreate }] =
+    useCreatedProductMutation();
+  const [updateProduct, { isLoading: isLoadingUpdate }] =
+    useUpdateProductMutation();
 
   const {
     data: productsData,
@@ -334,7 +336,9 @@ export default function Products() {
             setGetImages(false);
           }}
           categories={categoriesList}
-          isLoading={isLoading}
+          isLoading={
+            isLoading || isLoadingProducts || isLoadingUpdate || isLoadingCreate
+          }
           getImages={getImages}
         />
       )}

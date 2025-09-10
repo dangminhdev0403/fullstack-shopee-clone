@@ -159,8 +159,10 @@ public class ProductServiceImpl implements ProductSerivce {
         Shop shop = this.shopRepository.findByOwnerId(userId).orElseThrow(
                 () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found",
                         "Không tìm thấy shop của User này"));
+
         Category category = new Category();
         category.setId(productDTO.getCategoryId());
+
         Product product = Product.builder()
                 .name(productDTO.getName())
                 .description(productDTO.getDescription())
@@ -168,12 +170,13 @@ public class ProductServiceImpl implements ProductSerivce {
                 .shop(shop)
                 .stock(productDTO.getStock())
                 .category(category)
+                .images(new ArrayList<>()) // ép luôn list rỗng
                 .build();
 
+        // Lưu trước để có productId (nếu bạn cần ID ngay cho ảnh)
         productRepository.save(product);
 
         if (imagesProduct != null && !imagesProduct.isEmpty()) {
-
             List<ProductImage> productImages = imagesProduct.stream()
                     .map(image -> {
                         String imageUrl = this.mapToProductImage(image, product).getImageUrl();
@@ -182,15 +185,12 @@ public class ProductServiceImpl implements ProductSerivce {
                                 .product(product)
                                 .build();
                     })
-                    .toList();
+                    .collect(Collectors.toList()); // mutable list
 
-            product.setImages(productImages);
-            productImageRepository.saveAll(productImages);
-
+            product.getImages().addAll(productImages); // giữ nguyên collection Hibernate quản lý
         }
 
         return ProductMapper.toProductResDTO(product);
-
     }
 
     @Override

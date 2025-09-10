@@ -2,6 +2,8 @@
 
 import type React from "react";
 
+import Loading from "@components/Icon/LoadingIcon";
+import { LoadingSpinner } from "@components/Loading";
 import { Category } from "@redux/api/admin/categoryApi";
 import { Product, useGetProductImagesQuery } from "@redux/api/admin/productApi";
 import { ProductFormData } from "@utils/constants/types/product-admin";
@@ -44,10 +46,10 @@ export function ProductForm({
     images?: string;
   };
 
-
-  const { data: dataImages } = useGetProductImagesQuery(formData.id, {
-    skip: !getImages, // 👈 chỉ gọi khi getImages = true
-  });
+  const { data: dataImages, isLoading: isLoadingImages } =
+    useGetProductImagesQuery(formData.id, {
+      skip: !getImages, // 👈 chỉ gọi khi getImages = true
+    });
 
   const [errors, setErrors] = useState<ProductFormErrors>({});
   const [previews, setPreviews] = useState<string[]>([]);
@@ -85,7 +87,7 @@ export function ProductForm({
     newImages.splice(index, 1);
     handleChange("images", newImages);
     setPreviews((prev) => prev.filter((_, i) => i !== index));
-  }
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
@@ -182,7 +184,7 @@ export function ProductForm({
             <input
               type="number"
               min={0}
-              value={formData.stock}
+              value={formData.stock ?? ""} // cho phép hiển thị rỗng
               onChange={(e) =>
                 handleChange("stock", Number.parseInt(e.target.value) || 0)
               }
@@ -222,23 +224,27 @@ export function ProductForm({
             />
 
             {/* Ảnh cũ từ API */}
-            {(dataImages?.data?.images?.length ?? 0) > 0 && (
-              <div className="mt-4">
-                <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Ảnh hiện tại
-                </p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {dataImages?.data.images?.map((img) => (
-                    <div key={img.id} className="relative">
-                      <img
-                        src={img.imageUrl}
-                        alt="old"
-                        className="h-24 w-full rounded-lg object-cover shadow"
-                      />
-                    </div>
-                  ))}
+            {isLoadingImages ? (
+              <LoadingSpinner />
+            ) : (
+              (dataImages?.data?.images?.length ?? 0) > 0 && (
+                <div className="mt-4">
+                  <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Ảnh hiện tại
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {dataImages?.data.images?.map((img) => (
+                      <div key={img.id} className="relative">
+                        <img
+                          src={img.imageUrl}
+                          alt="old"
+                          className="h-24 w-full rounded-lg object-cover shadow"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )
             )}
 
             {/* Ảnh mới upload */}
@@ -286,7 +292,7 @@ export function ProductForm({
               disabled={isLoading}
               className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-2 text-white transition-all duration-300 hover:from-orange-600 hover:to-red-600 disabled:opacity-50"
             >
-              <Save className="h-4 w-4" />
+              {isLoading ? <Loading /> : <Save className="h-4 w-4" />}
               <span>{isLoading ? "Đang lưu..." : "Lưu"}</span>
             </button>
           </div>
