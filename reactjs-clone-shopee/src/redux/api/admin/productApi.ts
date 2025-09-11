@@ -56,6 +56,10 @@ export interface ProductListResponse {
   page: PageInfo;
 }
 
+export interface ProductOverview {
+  sold: number;
+  outOfStock: number;
+}
 export interface ProductImagesResponse {
   images: ProductImage[];
 }
@@ -120,6 +124,16 @@ export const adminProductApi = rootApi.injectEndpoints({
         providesTags: (result, error, id) => [{ type: "PRODUCT", id }],
       },
     ),
+    getOverViewProduct: builder.query<ProductOverview, void>({
+      query: () => ({
+        url: `${API_ROUTES.ADMIN.ANALYTICS.PRODUCT_OVERVIEW}`,
+        method: "GET",
+      }),
+      transformResponse: (response: ApiResponse<ProductOverview>) => {
+        return response.data;
+      },
+      providesTags: [{ type: "PRODUCT", id: "OVERVIEW" }],
+    }),
     updateProduct: builder.mutation<ApiResponse<Product>, UpdateProductPayload>(
       {
         query: (product) => {
@@ -185,4 +199,5 @@ export const {
   useGetAllProductsQuery,
   useUpdateProductMutation,
   useCreatedProductMutation,
+  useGetOverViewProductQuery,
 } = adminProductApi;

@@ -9,6 +9,9 @@ export const API_ROUTES = {
     },
     PRODUCTS: `${version}/admin/products`,
     CATEGORIES: `${version}/admin/categories`,
+    ANALYTICS: {
+      PRODUCT_OVERVIEW: `${version}/admin/analytics/product-overview`,
+    }
   },
   AUTH: {
     LOGIN: `${version}/auth/login`,

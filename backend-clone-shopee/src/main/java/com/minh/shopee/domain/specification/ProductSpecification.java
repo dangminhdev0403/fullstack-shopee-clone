@@ -4,7 +4,13 @@ import java.math.BigDecimal;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.minh.shopee.domain.constant.OrderStatus;
+import com.minh.shopee.domain.model.Order;
+import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.domain.model.Product;
+
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 
 public class ProductSpecification {
 
@@ -49,5 +55,18 @@ public class ProductSpecification {
 
     public static Specification<Product> hasShopId(Long shopId) {
         return (root, query, cb) -> cb.equal(root.get("shop").get("id"), shopId);
+    }
+
+    public static Specification<Product> hasBeenSold() {
+        return (root, query, cb) -> {
+            Join<Product, OrderDetail> orderDetailJoin = root.join("orderDetails", JoinType.INNER);
+            Join<OrderDetail, Order> orderJoin = orderDetailJoin.join("order", JoinType.INNER);
+
+            return cb.equal(orderJoin.get("status"), OrderStatus.DELIVERED);
+        };
+    }
+
+    public static Specification<Product> isZeroStock() {
+        return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("stock"), 0);
     }
 }

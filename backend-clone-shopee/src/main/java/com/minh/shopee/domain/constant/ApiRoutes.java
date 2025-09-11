@@ -16,6 +16,7 @@ public class ApiRoutes {
         public static final String USERS = "/users";
         public static final String ORDERS = "/orders";
         public static final String ADMIN = "/admin";
+        public static final String ANALYTICS = "/analytics";
         public static final String API_BASE = "/api";
         public static final String API_BASE_V1 = "/api/v1";
         public static final List<String> API_VERSIONS = List.of("v1", "v2", "v3");

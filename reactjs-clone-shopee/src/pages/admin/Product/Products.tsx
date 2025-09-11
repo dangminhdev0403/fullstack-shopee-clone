@@ -7,6 +7,7 @@ import {
   Product,
   useCreatedProductMutation,
   useGetAllProductsQuery,
+  useGetOverViewProductQuery,
   useUpdateProductMutation,
 } from "@redux/api/admin/productApi";
 import {
@@ -20,6 +21,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
+import { BeatLoader } from "react-spinners";
 
 export default function Products() {
   const { isLoading, getStats } = useProducts();
@@ -45,6 +47,10 @@ export default function Products() {
     { page, size: 10, categoryId: selectedCategory, keyword: searchTerm },
     { refetchOnMountOrArgChange: true },
   );
+
+  const { data: overview, isLoading: isLoadingOverview } =
+    useGetOverViewProductQuery();
+  console.log(overview);
 
   const { data: categories } = useGetAllCategoriesQuery();
   const categoriesList = categories?.categories || [];
@@ -259,9 +265,13 @@ export default function Products() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Tổng sản phẩm
               </p>
-              <p className="text-3xl font-bold">
-                {productsData?.page.totalElements}
-              </p>
+              {isLoadingProducts ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">
+                  {productsData?.page.totalElements}
+                </p>
+              )}
             </div>
             <div className="rounded-2xl bg-blue-100 p-3 dark:bg-blue-900/20">
               <Package className="h-6 w-6 text-blue-600" />
@@ -272,7 +282,11 @@ export default function Products() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Đã bán</p>
-              <p className="text-3xl font-bold">{stats.totalSold}</p>
+              {isLoadingOverview ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">{overview?.sold}</p>
+              )}
             </div>
             <div className="rounded-2xl bg-green-100 p-3 dark:bg-green-900/20">
               <TrendingUp className="h-6 w-6 text-green-600" />
@@ -285,7 +299,11 @@ export default function Products() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Hết hàng
               </p>
-              <p className="text-3xl font-bold">{stats.outOfStock}</p>
+              {isLoadingOverview ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">{overview?.outOfStock}</p>
+              )}
             </div>
             <div className="rounded-2xl bg-red-100 p-3 dark:bg-red-900/20">
               <AlertCircle className="h-6 w-6 text-red-600" />
