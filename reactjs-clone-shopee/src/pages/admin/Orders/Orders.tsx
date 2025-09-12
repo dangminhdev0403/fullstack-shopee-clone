@@ -2,38 +2,65 @@
 
 import ProductForm from "@components/admin/ProductForm";
 import { Column, DataTable } from "@components/DataTable/DataTable";
-import { useProducts } from "@hooks/useProdcutAdmin";
-import { Product } from "@utils/constants/types/product-admin";
 import {
-  AlertCircle,
+  OrderDetail,
+  useGetOrdersQuery,
+  useGetOrderStatusQuery,
+} from "@redux/api/admin/orderApi";
+import {
   CheckCircle,
   Edit,
   Hourglass,
   LucideClipboardList,
   Plus,
-  Trash2,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { BeatLoader } from "react-spinners";
+type StatusType =
+  | "DELIVERED"
+  | "PENDING"
+  | "PROCESSING"
+  | "SHIPPING"
+  | "RETURNED"
+  | "CANCELED";
 
 export default function Orders() {
-  const {
-    products,
-    isLoading,
-    addProduct,
-    updateProduct,
-    deleteProduct,
-    getStats,
-  } = useProducts();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [showForm, setShowForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | undefined>();
+  const [editingOrderDetail, setEditingOrderDetail] = useState<
+    OrderDetail | undefined
+  >();
+  const [status, setStatus] = useState<
+    | "DELIVERED"
+    | "PENDING"
+    | "PROCESSING"
+    | "SHIPPING"
+    | "RETURNED"
+    | "CANCELED"
+    | undefined
+  >(undefined);
+  const statusMap: Record<number, StatusType> = {
+    0: "PENDING", // Đang chờ
+    1: "PROCESSING", // Đang xử lý
+    2: "SHIPPING", // Đang giao
+    3: "DELIVERED", // Đã giao
+    4: "CANCELED", // Đã hủy
+    5: "RETURNED", // Đã trả
+  };
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
     null,
   );
-
-  const stats = getStats();
+  const [page, setPage] = useState(1);
+  const { data: ordersData, isLoading: isLoadingOrders } = useGetOrdersQuery({
+    keyword: searchTerm,
+    page,
+    status,
+    size: 10,
+  });
+  const { data: orderStatus, isLoading: isLoadingOrderStatus } =
+    useGetOrderStatusQuery();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -42,75 +69,96 @@ export default function Orders() {
     }).format(price);
   };
 
-  const getStatusBadge = (status: string, stock: number) => {
-    if (status === "out_of_stock" || stock === 0) {
-      return (
-        <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">
-          <AlertCircle className="mr-1 h-3 w-3" />
-          Hết hàng
-        </span>
-      );
+  const getStatusBadge = (
+    status:
+      | "DELIVERED"
+      | "PENDING"
+      | "PROCESSING"
+      | "SHIPPING"
+      | "RETURNED"
+      | "CANCELED",
+  ) => {
+    switch (status) {
+      case "DELIVERED":
+        return (
+          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
+            <CheckCircle className="mr-1 h-3 w-3" />
+            Đã giao
+          </span>
+        );
+      case "PENDING":
+        return (
+          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
+            <Hourglass className="mr-1 h-3 w-3" />
+            Chờ duyệt
+          </span>
+        );
+      case "PROCESSING":
+        return (
+          <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800 dark:bg-purple-900/20 dark:text-purple-300">
+            <Hourglass className="mr-1 h-3 w-3" />
+            Đang xử lý
+          </span>
+        );
+      case "SHIPPING":
+        return (
+          <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+            <LucideClipboardList className="mr-1 h-3 w-3" />
+            Đang giao
+          </span>
+        );
+      case "RETURNED":
+        return (
+          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">
+            <XCircle className="mr-1 h-3 w-3" />
+            Trả hàng
+          </span>
+        );
+      case "CANCELED":
+        return (
+          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">
+            <XCircle className="mr-1 h-3 w-3" />
+            Đã huỷ
+          </span>
+        );
+      default:
+        return null;
     }
-    if (stock < 20) {
-      return (
-        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
-          <AlertCircle className="mr-1 h-3 w-3" />
-          Sắp hết
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
-        <CheckCircle className="mr-1 h-3 w-3" />
-        Còn hàng
-      </span>
-    );
   };
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const handleAddProduct = () => {
-    setEditingProduct(undefined);
+  const handleAddOrderDetail = () => {
+    setEditingOrderDetail(undefined);
     setShowForm(true);
   };
 
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
+  const handleEditOrderDetail = (OrderDetail: OrderDetail) => {
+    setEditingOrderDetail(OrderDetail);
     setShowForm(true);
   };
 
   const handleFormSubmit = (formData: any) => {
-    if (editingProduct) {
-      updateProduct(editingProduct.id, formData);
+    if (editingOrderDetail) {
+      updateOrderDetail(editingOrderDetail.id, formData);
     } else {
-      addProduct(formData);
+      addOrderDetail(formData);
     }
     setShowForm(false);
-    setEditingProduct(undefined);
+    setEditingOrderDetail(undefined);
   };
 
-  const handleDeleteProduct = (id: string) => {
-    deleteProduct(id);
+  const handleDeleteOrderDetail = (id: string) => {
+    deleteOrderDetail(id);
     setShowDeleteConfirm(null);
   };
 
-  const columns: Column<Product>[] = [
+  const columns: Column<OrderDetail>[] = [
     {
       key: "name",
       header: "Mã đơn hàng",
-      render: (product) => (
-        <div className="flex items-center space-x-4">
-         
+      render: (orderDetail) => (
+        <div className="space-x-4">
           <div>
-            <div className="font-semibold">{product.name}</div>
-            <div className="text-sm text-gray-500">{product.id}</div>
+            <div className="font-semibold">{orderDetail.order.code || "-"}</div>
           </div>
         </div>
       ),
@@ -118,52 +166,56 @@ export default function Orders() {
     {
       key: "price",
       header: "Tổng tiền",
-      render: (product) => (
+      render: (orderDetail) => (
         <div>
-          <div className="font-semibold">{formatPrice(product.price)}</div>
+          <div className="font-semibold">
+            {formatPrice(orderDetail.order.totalPrice || 0)}
+          </div>
         </div>
       ),
     },
     {
-      key: "sold",
-      header: "Đã bán",
-      render: (product) => <span className="font-medium">{product.sold}</span>,
+      key: "quantity",
+      header: "Số lượng mua",
+      render: (orderDetail) => (
+        <span className="text-center font-medium">
+          {orderDetail.quantity || 0}
+        </span>
+      ),
     },
     {
       key: "status",
       header: "Trạng thái",
-      render: (product) => getStatusBadge(product.status, product.stock),
+      render: (orderDetail) =>
+        getStatusBadge(
+          (orderDetail.order?.status || undefined) as
+            | "DELIVERED"
+            | "PENDING"
+            | "PROCESSING"
+            | "SHIPPING"
+            | "RETURNED",
+        ),
     },
   ];
 
-  const filterOptions = [
-    { value: "all", label: "Tất cả đơn hàng" },
-    { value: "Điện thoại", label: "Điện thoại" },
-    { value: "Laptop", label: "Laptop" },
-    { value: "Phụ kiện", label: "Phụ kiện" },
-    { value: "Tablet", label: "Tablet" },
-    { value: "Đồng hồ", label: "Đồng hồ" },
-  ];
-
   const handleFilterChange = (value: string) => {
-    setSelectedCategory(value);
+    const id = Number(value); // chuyển string -> number
+    const mappedStatus = statusMap[id]; // lấy status từ map
+    if (mappedStatus) {
+      setStatus(mappedStatus);
+    } else {
+      setStatus(undefined); // nếu không tìm thấy thì set undefined
+    }
   };
 
-  const renderActions = (product: Product) => (
-    <div className="flex items-center space-x-2">
+  const renderActions = (order: OrderDetail) => (
+    <div className="space-x-2">
       <button
         title="Edit"
-        onClick={() => handleEditProduct(product)}
+        onClick={() => handleEditOrderDetail(order)}
         className="rounded-lg p-2 transition-colors duration-200 hover:bg-green-100 dark:hover:bg-green-900/20"
       >
         <Edit className="h-4 w-4 text-green-600" />
-      </button>
-      <button
-        title="Delete"
-        onClick={() => setShowDeleteConfirm(product.id)}
-        className="rounded-lg p-2 transition-colors duration-200 hover:bg-red-100 dark:hover:bg-red-900/20"
-      >
-        <Trash2 className="h-4 w-4 text-red-600" />
       </button>
     </div>
   );
@@ -181,7 +233,7 @@ export default function Orders() {
           </p>
         </div>
         <button
-          onClick={handleAddProduct}
+          onClick={handleAddOrderDetail}
           className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-orange-600 hover:to-red-600 hover:shadow-xl"
         >
           <Plus className="h-5 w-5" />
@@ -197,7 +249,13 @@ export default function Orders() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Tổng đơn hàng
               </p>
-              <p className="text-3xl font-bold">{stats.totalProducts}</p>
+              {isLoadingOrders ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">
+                  {ordersData?.page.totalElements}
+                </p>
+              )}
             </div>
             <div className="rounded-2xl bg-blue-100 p-3 dark:bg-blue-900/20">
               <LucideClipboardList className="h-6 w-6 text-blue-600" />
@@ -210,7 +268,6 @@ export default function Orders() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Thành công
               </p>
-              <p className="text-3xl font-bold">{stats.totalSold}</p>
             </div>
             <div className="rounded-2xl bg-green-100 p-3 dark:bg-green-900/20">
               <CheckCircle className="h-6 w-6 text-green-600" />
@@ -221,7 +278,6 @@ export default function Orders() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Đã huỷ</p>
-              <p className="text-3xl font-bold">{stats.outOfStock}</p>
             </div>
             <div className="rounded-2xl bg-red-100 p-3 dark:bg-red-900/20">
               <XCircle className="h-6 w-6 text-red-600" />
@@ -234,9 +290,7 @@ export default function Orders() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Chờ duyệt
               </p>
-              <p className="text-3xl font-bold">
-                {stats.averageRating.toFixed(1)}
-              </p>
+              <p className="text-3xl font-bold"></p>
             </div>
             <div className="rounded-2xl bg-yellow-100 p-3 dark:bg-yellow-900/20">
               <Hourglass className="h-6 w-6 text-yellow-600" />
@@ -246,31 +300,35 @@ export default function Orders() {
       </div>
 
       <DataTable
-        data={filteredProducts}
+        setSearchTerm={setSearchTerm}
+        data={ordersData?.orderDetail || []}
         columns={columns}
         searchable={true}
-        searchPlaceholder="Tìm kiếm đơn hàng..."
+        searchPlaceholder="Tìm kiếm với mã đơn hàng ..."
         filterable={true}
-        filterOptions={filterOptions}
         onFilterChange={handleFilterChange}
-        actions={renderActions}
-        loading={isLoading}
+        loading={isLoadingOrderStatus || isLoadingOrders}
         emptyMessage="Không tìm thấy đơn hàng nào"
         paginated={true}
-        itemsPerPage={10}
+        itemsPerPage={ordersData?.page.size || 0}
+        currentPage={page}
         showPaginationInfo={true}
+        totalElements={ordersData?.page.totalElements || 0}
+        totalPages={ordersData?.page.totalPages || 0}
+        actions={renderActions}
+        onPageChange={setPage}
+        filterOptions={orderStatus || []}
       />
 
-      {/* Product Form Modal */}
+      {/* OrderDetail Form Modal */}
       {showForm && (
         <ProductForm
-          product={editingProduct}
           onSubmit={handleFormSubmit}
           onCancel={() => {
             setShowForm(false);
-            setEditingProduct(undefined);
+            setEditingOrderDetail(undefined);
           }}
-          isLoading={isLoading}
+          isLoading={isLoadingOrderStatus}
         />
       )}
 
@@ -290,7 +348,7 @@ export default function Orders() {
                 Hủy
               </button>
               <button
-                onClick={() => handleDeleteProduct(showDeleteConfirm)}
+                onClick={() => handleDeleteOrderDetail(showDeleteConfirm)}
                 className="rounded-xl bg-red-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-red-700"
               >
                 Xóa

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.minh.shopee.domain.constant.ApiRoutes;
-import com.minh.shopee.domain.dto.response.analytics.ProductOverviewDTO;
+import com.minh.shopee.domain.dto.response.projection.admin.analytics.ProductOverviewDTO;
 import com.minh.shopee.services.AnalyticsService;
 
 import lombok.RequiredArgsConstructor;

@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +19,14 @@ import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.OrderItemRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
+import com.minh.shopee.domain.dto.request.filters.FilterOrderAdmin;
 import com.minh.shopee.domain.model.Cart;
 import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.domain.model.Product;
+import com.minh.shopee.domain.model.Shop;
 import com.minh.shopee.domain.model.User;
+import com.minh.shopee.domain.specification.OrderDetailSpecification;
 import com.minh.shopee.domain.specification.OrderSpecification;
 import com.minh.shopee.repository.CartDetailRepository;
 import com.minh.shopee.repository.CartRepository;
@@ -46,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
-    private final GenericRepositoryCustom<Order> orderCustomRepo;
+    private final GenericRepositoryCustom<OrderDetail> orderDetailCustomRepo;
     private final CartRepository cartRepository;
     private final CartDetailRepository cartDetailRepository;
 
@@ -166,6 +171,31 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setStatus(OrderStatus.CANCELED);
         this.orderRepository.save(order);
+    }
+
+    @Override
+    public <T> Page<T> getOrderDetailsListByShop(Pageable pageable, Class<T> projectionClass, FilterOrderAdmin filter)
+            throws NoSuchMethodException {
+        long userId = SecurityUtils.getCurrentUserId();
+        Shop shop = shopRepository.findByOwnerId(userId)
+                .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST.value(),
+                        "Shop not found", "Không tìm thấy shop của User này"));
+
+        Specification<OrderDetail> spec = OrderDetailSpecification.filterByShopStatusKeyword(
+                shop.getId(),
+                filter.getStatus(),
+                filter.getKeyword());
+
+        List<Long> ids = orderDetailCustomRepo.findIds(spec, pageable);
+
+        if (ids.isEmpty())
+            return new PageImpl<>(List.of(), pageable, 0);
+
+        List<T> details = orderDetailCustomRepo.findAllByIds(ids, projectionClass);
+        long total = orderDetailRepository.count(spec);
+
+        return new PageImpl<>(details, pageable, total);
+
     }
 
 }

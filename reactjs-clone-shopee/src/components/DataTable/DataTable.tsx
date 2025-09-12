@@ -32,7 +32,6 @@ export interface DataTableProps<T> {
   totalPages: number;
   totalElements: number;
   onPageChange: (page: number) => void;
-  searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -54,7 +53,6 @@ export function DataTable<T extends Record<string, any>>({
   totalPages = 1,
   totalElements = 0,
   onPageChange,
-  searchTerm,
   setSearchTerm,
 }: Readonly<DataTableProps<T>>) {
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -78,7 +76,7 @@ export function DataTable<T extends Record<string, any>>({
     console.log("Loading state:", loading);
 
     if (page < 1 || page > totalPages) return;
-    onPageChange(page - 1);
+    onPageChange(page);
   };
 
   const goToPreviousPage = () => {
@@ -125,6 +123,7 @@ export function DataTable<T extends Record<string, any>>({
                   onChange={(e) => handleFilterChange(e.target.value)}
                   className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
                 >
+                  <option value="all">Tất cả</option>
                   {filterOptions.map((option) => (
                     <option
                       key={option.id}
@@ -165,13 +164,13 @@ export function DataTable<T extends Record<string, any>>({
                   {columns.map((column, index) => (
                     <th
                       key={index}
-                      className={`px-6 py-4 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400 ${column.className || ""}`}
+                      className={`px-6 py-4 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400 ${column.className || ""}`}
                     >
                       {column.header}
                     </th>
                   ))}
                   {actions && (
-                    <th className="px-6 py-4 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    <th className="px-6 py-4 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       Thao tác
                     </th>
                   )}
@@ -197,13 +196,13 @@ export function DataTable<T extends Record<string, any>>({
                       {columns.map((column, colIndex) => (
                         <td
                           key={colIndex}
-                          className={`px-6 py-4 whitespace-nowrap ${column.className || ""}`}
+                          className={`px-6 py-4 text-center align-middle whitespace-nowrap ${column.className || ""}`}
                         >
                           {renderCellContent(item, column)}
                         </td>
                       ))}
                       {actions && (
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 text-center align-middle whitespace-nowrap">
                           {actions(item)}
                         </td>
                       )}

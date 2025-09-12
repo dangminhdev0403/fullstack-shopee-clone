@@ -33,7 +33,7 @@ export default function Products() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [createProduct, { isLoading: isLoadingCreate }] =
     useCreatedProductMutation();
   const [updateProduct, { isLoading: isLoadingUpdate }] =
@@ -50,7 +50,6 @@ export default function Products() {
 
   const { data: overview, isLoading: isLoadingOverview } =
     useGetOverViewProductQuery();
-  console.log(overview);
 
   const { data: categories } = useGetAllCategoriesQuery();
   const categoriesList = categories?.categories || [];
@@ -157,7 +156,7 @@ export default function Products() {
       key: "name",
       header: "Sản phẩm",
       render: (product) => (
-        <div className="flex items-center space-x-4">
+        <div className=" space-x-4">
           <div>
             <div className="font-semibold">{product.name}</div>
           </div>
@@ -169,7 +168,7 @@ export default function Products() {
       key: "category",
       header: "Danh mục",
       render: (product) => (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+        <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-200">
           {product.category?.name ?? "Không có danh mục"}
         </span>
       ),
@@ -210,6 +209,7 @@ export default function Products() {
   ];
 
   const handleFilterChange = (value: string) => {
+    if (value === "all") value = "";
     setSelectedCategory(value);
   };
 
@@ -328,7 +328,6 @@ export default function Products() {
       </div>
 
       <DataTable
-        searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         data={productsData?.products || []}
         columns={columns}
@@ -342,7 +341,7 @@ export default function Products() {
         emptyMessage="Không tìm thấy sản phẩm nào"
         paginated={true}
         itemsPerPage={productsData?.page.size || 10}
-        currentPage={page + 1}
+        currentPage={page}
         showPaginationInfo={true}
         totalPages={productsData?.page?.totalPages || 0}
         totalElements={productsData?.page?.totalElements || 0}

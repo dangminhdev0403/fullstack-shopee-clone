@@ -12,7 +12,7 @@ const FormInput = ({ ...props }: FormInputProps) => {
   return (
     <div className={props.className ?? "mt-2"}>
       <input
-        type="text"
+        type={props.type ?? "text"}
         placeholder={props.placeholder}
         className="h-10 w-full rounded border border-gray-400"
         {...props.register}

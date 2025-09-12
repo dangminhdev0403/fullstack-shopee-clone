@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.minh.shopee.domain.model.Order;
+import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.domain.model.Product;
 import com.minh.shopee.domain.model.ProductImage;
 import com.minh.shopee.domain.model.User;
@@ -31,6 +32,11 @@ public class RepositoryConfig {
     @Bean
     public GenericRepositoryCustom<Order> orderRepositoryCustom() {
         return new GenericRepositoryImpl<>(Order.class);
+    }
+
+    @Bean
+    public GenericRepositoryCustom<OrderDetail> orderDetailCustomRepo() {
+        return new GenericRepositoryImpl<>(OrderDetail.class);
     }
 
 }

@@ -6,11 +6,15 @@ import org.springframework.data.domain.Pageable;
 import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
+import com.minh.shopee.domain.dto.request.filters.FilterOrderAdmin;
 
 public interface OrderService {
     void createOrder(CreateOrderRequest req, long userId);
 
-    <T> Page<T> getOrdersListByUser(Pageable pageable, Class<T> projectionClass , OrderStatus  status);
+    <T> Page<T> getOrdersListByUser(Pageable pageable, Class<T> projectionClass, OrderStatus status);
 
     void cancelOrder(UpdateOrderDTO req);
+
+    <T> Page<T> getOrderDetailsListByShop(Pageable pageable, Class<T> projectionClass, FilterOrderAdmin filter)
+            throws NoSuchMethodException;
 }

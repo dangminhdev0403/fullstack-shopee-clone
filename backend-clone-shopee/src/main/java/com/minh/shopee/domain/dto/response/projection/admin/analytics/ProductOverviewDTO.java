@@ -1,4 +1,4 @@
-package com.minh.shopee.domain.dto.response.analytics;
+package com.minh.shopee.domain.dto.response.projection.admin.analytics;
 
 import lombok.Builder;
 import lombok.Getter;

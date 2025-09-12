@@ -33,6 +33,7 @@ public class OrderDetail {
     @JoinColumn(name = "order_id")
     @JsonIgnore
     private Order order;
+    
 
     @ManyToOne
     @JoinColumn(name = "product_id")

@@ -1,5 +1,8 @@
 package com.minh.shopee.domain.constant;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum OrderStatus {
     PENDING("Đang chờ"),
     PROCESSING("Đang xử lý"),
@@ -41,5 +44,33 @@ public enum OrderStatus {
             default:
                 return false;
         }
+    }
+     @JsonCreator
+    public static OrderStatus from(Object input) {
+        if (input == null) return null;
+
+        // Nếu input là số → parse ordinal
+        if (input instanceof Integer) {
+            int ordinal = (Integer) input;
+            if (ordinal >= 0 && ordinal < values().length) {
+                return values()[ordinal];
+            }
+        }
+
+        // Nếu input là string → thử parse số hoặc enum name
+        String str = input.toString().trim();
+        try {
+            int ordinal = Integer.parseInt(str);
+            if (ordinal >= 0 && ordinal < values().length) {
+                return values()[ordinal];
+            }
+        } catch (NumberFormatException ignored) {}
+
+        return OrderStatus.valueOf(str.toUpperCase());
+    }
+
+    @JsonValue
+    public String toValue() {
+        return this.name(); // serialize ra "DELIVERED"
     }
 }

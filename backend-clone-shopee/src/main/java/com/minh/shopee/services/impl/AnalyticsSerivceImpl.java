@@ -3,7 +3,7 @@ package com.minh.shopee.services.impl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.minh.shopee.domain.dto.response.analytics.ProductOverviewDTO;
+import com.minh.shopee.domain.dto.response.projection.admin.analytics.ProductOverviewDTO;
 import com.minh.shopee.domain.model.Shop;
 import com.minh.shopee.domain.specification.ProductSpecification;
 import com.minh.shopee.repository.ProductRepository;
