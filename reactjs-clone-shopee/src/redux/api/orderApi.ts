@@ -81,7 +81,12 @@ export const orderApi = rootApi.injectEndpoints({
           discount: body.discount ?? 0,
         },
       }),
-      invalidatesTags: [{ type: "ORDER", id: "LIST" }], // ✅ chuyển ra đây
+      invalidatesTags: [
+        { type: "ORDER", id: "LIST" },
+        {
+          type: "Cart",
+        },
+      ], // ✅ chuyển ra đây
     }),
 
     getOrderHistory: builder.query<

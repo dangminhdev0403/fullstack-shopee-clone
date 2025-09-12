@@ -29,6 +29,7 @@ public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
 
     @Override
+    @Transactional
     public void addAddress(AddAddressDTO request, Long userId) {
         Long count = this.addressRepository.countByUserId(userId);
         if (count <= 0) {
