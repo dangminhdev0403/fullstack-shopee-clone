@@ -24,7 +24,8 @@ public interface ProductSerivce {
 
   Page<ProductResDTO> getAllProducts(Pageable pageable);
 
-  Page<ProductResDTO> searchProducts(String keyword, FiltersProduct filter, SortFilter sortFilte, Pageable pageable);
+  Page<ProductResDTO> searchProducts(String keyword, FiltersProduct filter, SortFilter sortFilte, Pageable pageable)
+      throws NoSuchMethodException;
 
   ProductResDTO createAProduct(ProductReqDTO productDTO, List<MultipartFile> imageProduct);
 

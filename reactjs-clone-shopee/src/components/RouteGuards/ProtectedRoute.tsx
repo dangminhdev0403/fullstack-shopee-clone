@@ -24,9 +24,11 @@ const ProtectedRoute = () => {
   const roles = user?.roles?.map((r) => r.name) || [];
 
   // Nếu không phải admin → chặn
-  if (roles.length === 0 || roles.every((role) => role === "ROLE_USER")) {
- 
-
+  if (
+    roles.length === 0 ||
+    (roles.every((role) => role === "ROLE_USER") &&
+      location.pathname.startsWith("/admin"))
+  ) {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 

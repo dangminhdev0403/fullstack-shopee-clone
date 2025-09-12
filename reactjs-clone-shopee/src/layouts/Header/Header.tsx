@@ -16,6 +16,7 @@ import {
   faEarthAsia,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useProductFilter } from "@hooks/useProductFilter";
 import { useLogOutMutation } from "@redux/api/authApi";
 import { useGetCartQuery } from "@redux/api/cartApi";
 import { authSlice } from "@redux/slices/authSlice";
@@ -40,10 +41,13 @@ const Header = () => {
   );
 
   const { data: cart } = useGetCartQuery();
+  const { filter, updateFilter } = useProductFilter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Tìm kiếm:", query);
+    updateFilter({ ...filter, keyword: query });
+
     // Thực hiện tìm kiếm tại đây
   };
 

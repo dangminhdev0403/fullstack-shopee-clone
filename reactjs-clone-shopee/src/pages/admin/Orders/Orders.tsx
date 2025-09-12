@@ -1,23 +1,28 @@
 "use client";
 
-import ProductForm from "@components/admin/ProductForm";
+import OrderForm from "@components/admin/OrderForm";
 import { Column, DataTable } from "@components/DataTable/DataTable";
+import { useAlert } from "@hooks/useAlert";
 import {
   OrderDetail,
   useGetOrdersQuery,
   useGetOrderStatusQuery,
+  useGetOverviewsQuery,
+  useUpdateOrderMutation,
 } from "@redux/api/admin/orderApi";
+import { formatDate } from "@utils/helper";
 import {
   CheckCircle,
   Edit,
   Hourglass,
   LucideClipboardList,
-  Plus,
+  LucideLoader,
+  Truck,
   XCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
-type StatusType =
+export type StatusType =
   | "DELIVERED"
   | "PENDING"
   | "PROCESSING"
@@ -49,9 +54,6 @@ export default function Orders() {
     5: "RETURNED", // Đã trả
   };
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
-    null,
-  );
   const [page, setPage] = useState(1);
   const { data: ordersData, isLoading: isLoadingOrders } = useGetOrdersQuery({
     keyword: searchTerm,
@@ -59,8 +61,13 @@ export default function Orders() {
     status,
     size: 10,
   });
+  const { confirm, success, error: errorAlert } = useAlert();
+  const [updateOrder, { isLoading: isLoadingUpdate }] =
+    useUpdateOrderMutation();
   const { data: orderStatus, isLoading: isLoadingOrderStatus } =
     useGetOrderStatusQuery();
+  const { data: orderOverview, isLoading: isLoadingOrderOverview } =
+    useGetOverviewsQuery();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -126,34 +133,30 @@ export default function Orders() {
     }
   };
 
-  const handleAddOrderDetail = () => {
-    setEditingOrderDetail(undefined);
-    setShowForm(true);
-  };
-
   const handleEditOrderDetail = (OrderDetail: OrderDetail) => {
     setEditingOrderDetail(OrderDetail);
     setShowForm(true);
   };
 
   const handleFormSubmit = (formData: any) => {
-    if (editingOrderDetail) {
-      updateOrderDetail(editingOrderDetail.id, formData);
-    } else {
-      addOrderDetail(formData);
-    }
-    setShowForm(false);
-    setEditingOrderDetail(undefined);
-  };
+    confirm("Xác nhận thay đổi", "Bạn có chắc chắn muốn cập nhật", async () => {
+      try {
+        await updateOrder(formData).unwrap();
+        success("Cập nhật thành công!");
+        setShowForm(false);
+      } catch (err) {
+        const apiErr = err as { data?: { message?: string } };
+        errorAlert("Cập nhật thất bại!", apiErr.data?.message);
+      }
+    });
 
-  const handleDeleteOrderDetail = (id: string) => {
-    deleteOrderDetail(id);
-    setShowDeleteConfirm(null);
+    // setShowForm(false);
+    setEditingOrderDetail(undefined);
   };
 
   const columns: Column<OrderDetail>[] = [
     {
-      key: "name",
+      key: "code",
       header: "Mã đơn hàng",
       render: (orderDetail) => (
         <div className="space-x-4">
@@ -164,16 +167,19 @@ export default function Orders() {
       ),
     },
     {
-      key: "price",
-      header: "Tổng tiền",
+      key: "product",
+      header: "Sản phẩm",
       render: (orderDetail) => (
-        <div>
-          <div className="font-semibold">
-            {formatPrice(orderDetail.order.totalPrice || 0)}
+        <div className="space-x-4">
+          <div>
+            <div className="max-w-[400px] truncate font-semibold">
+              {orderDetail.product.name || "-"}
+            </div>
           </div>
         </div>
       ),
     },
+
     {
       key: "quantity",
       header: "Số lượng mua",
@@ -184,11 +190,35 @@ export default function Orders() {
       ),
     },
     {
+      key: "price",
+      header: "Tổng tiền",
+      render: (orderDetail) => (
+        <div>
+          <div className="font-semibold">
+            {formatPrice(orderDetail.price * orderDetail.quantity || 0)}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "date",
+      header: "Ngày đặt hàng",
+      render: (orderDetail) => (
+        <div className="space-x-4">
+          <div>
+            <div className="font-semibold">
+              {formatDate(orderDetail.order.createdAt) || "-"}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
       key: "status",
       header: "Trạng thái",
       render: (orderDetail) =>
         getStatusBadge(
-          (orderDetail.order?.status || undefined) as
+          (orderDetail.shopStatus || undefined) as
             | "DELIVERED"
             | "PENDING"
             | "PROCESSING"
@@ -232,17 +262,11 @@ export default function Orders() {
             Quản lý toàn bộ đơn trong cửa hàng của bạn
           </p>
         </div>
-        <button
-          onClick={handleAddOrderDetail}
-          className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-orange-600 hover:to-red-600 hover:shadow-xl"
-        >
-          <Plus className="h-5 w-5" />
-          <span>Thêm đơn hàng mới</span>
-        </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-6">
+        {/* Tổng đơn hàng */}
         <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
           <div className="flex items-center justify-between">
             <div>
@@ -262,38 +286,106 @@ export default function Orders() {
             </div>
           </div>
         </div>
+
+        {/* Thành công */}
         <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Thành công
               </p>
+              {isLoadingOrderOverview ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">
+                  {orderOverview?.totalDelivered}
+                </p>
+              )}
             </div>
             <div className="rounded-2xl bg-green-100 p-3 dark:bg-green-900/20">
               <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>
+
+        {/* Đã huỷ */}
         <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Đã huỷ</p>
+              {isLoadingOrderOverview ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">
+                  {orderOverview?.totalCancel}
+                </p>
+              )}
             </div>
             <div className="rounded-2xl bg-red-100 p-3 dark:bg-red-900/20">
               <XCircle className="h-6 w-6 text-red-600" />
             </div>
           </div>
         </div>
+
+        {/* Chờ duyệt */}
         <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Chờ duyệt
               </p>
-              <p className="text-3xl font-bold"></p>
+              {isLoadingOrderOverview ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">
+                  {orderOverview?.totalPending}
+                </p>
+              )}
             </div>
             <div className="rounded-2xl bg-yellow-100 p-3 dark:bg-yellow-900/20">
               <Hourglass className="h-6 w-6 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Đang xử lý */}
+        <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Đang xử lý
+              </p>
+              {isLoadingOrderOverview ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">
+                  {orderOverview?.totalProcessing}
+                </p>
+              )}
+            </div>
+            <div className="rounded-2xl bg-purple-100 p-3 dark:bg-purple-900/20">
+              <LucideLoader className="h-6 w-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Đang giao */}
+        <div className="rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Đang giao
+              </p>
+              {isLoadingOrderOverview ? (
+                <BeatLoader color="#ee5c14" />
+              ) : (
+                <p className="text-3xl font-bold">
+                  {orderOverview?.totalShipping}
+                </p>
+              )}
+            </div>
+            <div className="rounded-2xl bg-indigo-100 p-3 dark:bg-indigo-900/20">
+              <Truck className="h-6 w-6 text-indigo-600" />
             </div>
           </div>
         </div>
@@ -322,40 +414,15 @@ export default function Orders() {
 
       {/* OrderDetail Form Modal */}
       {showForm && (
-        <ProductForm
+        <OrderForm
+          orderDetail={editingOrderDetail}
           onSubmit={handleFormSubmit}
           onCancel={() => {
             setShowForm(false);
             setEditingOrderDetail(undefined);
           }}
-          isLoading={isLoadingOrderStatus}
+          isLoading={isLoadingOrderStatus || isLoadingUpdate}
         />
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="bg-opacity-100 fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-          <div className="rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
-            <h3 className="mb-4 text-lg font-semibold">Xác nhận xóa</h3>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">
-              Bạn có chắc chắn muốn xóa ? Hành động này không thể hoàn tác.
-            </p>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowDeleteConfirm(null)}
-                className="rounded-xl border border-gray-200 px-4 py-2 transition-colors duration-200 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={() => handleDeleteOrderDetail(showDeleteConfirm)}
-                className="rounded-xl bg-red-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-red-700"
-              >
-                Xóa
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

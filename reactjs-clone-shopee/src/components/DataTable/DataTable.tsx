@@ -61,12 +61,14 @@ export function DataTable<T extends Record<string, any>>({
   useEffect(() => {
     const handler = setTimeout(() => {
       setSearchTerm(inputValue);
+      onPageChange(1); // reset page về 0
     }, 500);
     return () => clearTimeout(handler);
   }, [inputValue]);
 
   const handleFilterChange = (value: string) => {
     setSelectedFilter(value);
+    onPageChange(1); // reset page về 0
 
     onFilterChange?.(value);
   };

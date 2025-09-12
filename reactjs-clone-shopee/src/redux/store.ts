@@ -22,7 +22,8 @@ const rootReducer = combineReducers({
   auth: createPersistedReducer("auth", authReducer),
   checkout: createPersistedReducer("checkout", checkoutReducer),
   // Không persist api reducer (thường không nên lưu cache vào localStorage)
-  cart: cartReducer,
+  cart: createPersistedReducer("cart", cartReducer),
+
   alert: alertReducer,
   [rootApi.reducerPath]: rootApi.reducer,
 });

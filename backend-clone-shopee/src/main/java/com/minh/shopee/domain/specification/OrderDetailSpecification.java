@@ -31,12 +31,8 @@ public class OrderDetailSpecification {
     }
 
     public static Specification<OrderDetail> hasStatus(OrderStatus status) {
-        return (root, query, cb) -> {
-            if (status == null)
-                return cb.conjunction();
-            Join<OrderDetail, Order> orderJoin = root.join("order", JoinType.INNER);
-            return cb.equal(orderJoin.get("status"), status);
-        };
+        return (root, query, cb) -> cb.equal(root.get("shopStatus"), status);
+
     }
 
     public static Specification<OrderDetail> filterByShopStatusKeyword(
@@ -49,23 +45,31 @@ public class OrderDetailSpecification {
             // Shop filter (bắt buộc)
             Predicate pShop = cb.equal(productJoin.get("shop").get("id"), shopId);
 
-            // Status filter (optional) ✅ fix enum
-            Predicate pStatus = (status != null)
-                    ? cb.equal(orderJoin.get("status"), status)
+            // ShopStatus filter (optional) ✅ dùng orderDetail.shopStatus
+            Predicate pShopStatus = (status != null)
+                    ? cb.equal(root.get("shopStatus"),
+                            status)
                     : cb.conjunction();
 
             // Keyword filter (optional)
             Predicate pKeyword = cb.conjunction();
             if (keyword != null && !keyword.isBlank()) {
-                String pattern = "%" + keyword.toLowerCase() + "%";
+                String pattern = "%" + keyword.trim().toLowerCase() + "%";
                 pKeyword = cb.or(
                         cb.like(cb.lower(orderJoin.get("code")), pattern),
                         cb.like(cb.lower(orderJoin.get("receiverPhone")), pattern));
             }
 
+            query.orderBy(cb.desc(orderJoin.get("createdAt")));
+
             // Kết hợp tất cả
-            return cb.and(pShop, pStatus, pKeyword);
+            return cb.and(pShop, pShopStatus, pKeyword);
         };
     }
 
+    public static Specification<OrderDetail> hasIdAndShopId(Long orderDetailId, Long shopId) {
+        return (root, query, cb) -> cb.and(
+                cb.equal(root.get("id"), orderDetailId),
+                cb.equal(root.get("product").get("shop").get("id"), shopId));
+    }
 }

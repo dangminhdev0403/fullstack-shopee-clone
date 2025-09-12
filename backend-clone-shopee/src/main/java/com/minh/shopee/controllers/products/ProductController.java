@@ -52,7 +52,7 @@ public class ProductController {
     public ResponseEntity<Page<ProductResDTO>> searchProducts(
             @RequestParam(value = "keyword", required = false) String keyword,
             FiltersProduct filter, SortFilter sortFilter,
-            Pageable pageable) {
+            Pageable pageable) throws NoSuchMethodException {
 
         Page<ProductResDTO> products = productSerivce.searchProducts(keyword, filter, sortFilter, pageable);
 

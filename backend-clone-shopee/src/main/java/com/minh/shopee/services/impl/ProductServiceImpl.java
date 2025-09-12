@@ -117,25 +117,35 @@ public class ProductServiceImpl implements ProductSerivce {
     }
 
     @Override
-    public Page<ProductResDTO> searchProducts(String keyword, FiltersProduct filter, SortFilter sortFilter,
-            Pageable pageable) {
+    public Page<ProductResDTO> searchProducts(
+            String keyword,
+            FiltersProduct filter,
+            SortFilter sortFilter,
+            Pageable pageable) throws NoSuchMethodException {
+
+        // áp sort vào pageable
         pageable = applySortFromFilter(pageable, sortFilter);
         Specification<Product> spec = buildProductSpecification(keyword, filter);
 
-        log.info("getingg list product width filter: {}");
-        Page<ProductProjection> products = this.productCustomRepo.findAll(
-                spec,
-                pageable,
-                ProductProjection.class);
-        List<ProductProjection> productList = products.getContent();
+        // ===== Step 1: Lấy danh sách id theo paging =====
+        List<Long> ids = this.productCustomRepo.findIds(spec, pageable);
+        if (ids.isEmpty()) {
+            return Page.empty(pageable);
+        }
 
-        // Map từng Product sang ProductResDTO, tìm image đầu tiên theo productId
+        // ===== Step 2: Lấy projection chi tiết theo ids =====
+        List<ProductProjection> productList = this.productCustomRepo.findAllByIds(ids, ProductProjection.class);
+
+        // ===== Step 3: Map sang DTO + lấy ảnh =====
         log.info("Mapping product to ProductResDTO, find image first by productId");
         List<ProductResDTO> dtoList = productList.stream()
                 .map(product -> {
                     Optional<ProductImageDTO> firstImageOpt = this.productImageCustomRepo.findOne(
                             ProductImageSpecs.findFirstImageByProductId(product.getId()),
                             ProductImageDTO.class);
+
+                    log.info("ProductId={} | name={} | foundImage={}",
+                            product.getId(), product.getName(), firstImageOpt.isPresent());
 
                     String imageUrl = firstImageOpt.map(ProductImageDTO::getImageUrl).orElse(null);
                     return ProductResDTO.builder()
@@ -145,12 +155,21 @@ public class ProductServiceImpl implements ProductSerivce {
                             .imageUrl(imageUrl)
                             .stock(product.getStock())
                             .build();
-                }).toList();
+                })
+                .toList();
 
-        return new PageImpl<>(
-                dtoList,
-                pageable,
-                products.getTotalElements());
+        // ===== Step 4: Count tổng =====
+        long total = this.productRepository.count(spec);
+
+        log.info("Keyword: '{}'", keyword);
+        log.info("Filter: minPrice={}, maxPrice={}, stock={}, categoryId={}",
+                filter != null ? filter.getMinPrice() : null,
+                filter != null ? filter.getMaxPrice() : null,
+                filter != null ? filter.getStock() : null,
+                filter != null ? filter.getCategoryId() : null);
+        log.info("Pageable: page={}, size={}, total={}", pageable.getPageNumber(), pageable.getPageSize(), total);
+
+        return new PageImpl<>(dtoList, pageable, total);
     }
 
     @Override
@@ -305,10 +324,10 @@ public class ProductServiceImpl implements ProductSerivce {
     }
 
     private Specification<Product> buildProductSpecification(String keyword, FiltersProduct filter) {
-        Specification<Product> spec = Specification.where(null);
+        Specification<Product> spec = Specification.where(ProductSpecification.hasStatus(ProductStatus.ACTIVE));
+
         if (keyword != null && !keyword.isEmpty()) {
             log.info("Searching product with keyword: {}", keyword);
-
             spec = spec.and(ProductSpecification.hasName(keyword));
         }
         if (filter != null) {

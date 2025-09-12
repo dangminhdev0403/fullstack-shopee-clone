@@ -127,6 +127,13 @@ const statusConfig: Record<
     bg: "bg-red-50",
     border: "border-red-200",
   },
+  returned: {
+    label: "Đã trả",
+    icon: RotateCcw,
+    color: "text-orange-600",
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+  },
 };
 
 export default function OrderSection() {
@@ -272,7 +279,15 @@ export default function OrderSection() {
           </div>
         ) : (
           orderList.map((order) => {
-            const statusInfo = statusConfig[order.status.toLocaleLowerCase()];
+            const statusInfo = statusConfig[
+              order.status.toLocaleLowerCase()
+            ] ?? {
+              label: order.status,
+              icon: Package,
+              color: "text-gray-600",
+              bg: "bg-gray-50",
+              border: "border-gray-200",
+            };
             const StatusIcon = statusInfo.icon;
             const isExpanded = expandedOrders.has(order.id);
 

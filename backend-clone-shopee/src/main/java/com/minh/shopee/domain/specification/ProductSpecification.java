@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.minh.shopee.domain.constant.OrderStatus;
+import com.minh.shopee.domain.constant.ProductStatus;
 import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.domain.model.Product;
@@ -68,5 +69,9 @@ public class ProductSpecification {
 
     public static Specification<Product> isZeroStock() {
         return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("stock"), 0);
+    }
+
+    public static Specification<Product> hasStatus(ProductStatus status) {
+        return (root, query, cb) -> cb.equal(root.get("status"), status);
     }
 }

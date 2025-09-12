@@ -30,11 +30,20 @@ public enum OrderStatus {
      * Định nghĩa rule chuyển trạng thái hợp lệ
      */
     public boolean canChangeTo(OrderStatus newStatus) {
+        // Cho phép giữ nguyên trạng thái
+        if (newStatus == this) {
+            return true;
+        }
+
         switch (this) {
             case PENDING:
-                return newStatus == PROCESSING || newStatus == CANCELED;
+                return newStatus == PROCESSING || newStatus == CANCELED
+                        || newStatus == RETURNED || newStatus == DELIVERED
+                        || newStatus == SHIPPING;
             case PROCESSING:
-                return newStatus == SHIPPING || newStatus == CANCELED;
+                return newStatus == PROCESSING || newStatus == CANCELED
+                        || newStatus == RETURNED || newStatus == DELIVERED
+                        || newStatus == SHIPPING;
             case SHIPPING:
                 return newStatus == DELIVERED || newStatus == RETURNED;
             case DELIVERED:
@@ -45,9 +54,11 @@ public enum OrderStatus {
                 return false;
         }
     }
-     @JsonCreator
+
+    @JsonCreator
     public static OrderStatus from(Object input) {
-        if (input == null) return null;
+        if (input == null)
+            return null;
 
         // Nếu input là số → parse ordinal
         if (input instanceof Integer) {
@@ -64,7 +75,8 @@ public enum OrderStatus {
             if (ordinal >= 0 && ordinal < values().length) {
                 return values()[ordinal];
             }
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
 
         return OrderStatus.valueOf(str.toUpperCase());
     }

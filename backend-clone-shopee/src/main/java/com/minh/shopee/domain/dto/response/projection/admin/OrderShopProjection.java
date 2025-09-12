@@ -12,6 +12,9 @@ public interface OrderShopProjection {
 
     OrderProjection getOrder();
 
+    ProductProjection getProduct();
+    String getShopStatus();
+
     interface OrderProjection {
         String getCode();
 
@@ -23,8 +26,12 @@ public interface OrderShopProjection {
 
         String getStatus();
 
-        BigDecimal getTotalPrice();
-
         Instant getCreatedAt();
+
+    }
+
+    public interface ProductProjection {
+        String getName();
+
     }
 }

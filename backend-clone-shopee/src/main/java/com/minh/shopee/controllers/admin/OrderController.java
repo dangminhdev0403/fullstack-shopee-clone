@@ -10,16 +10,23 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
 import com.minh.shopee.domain.constant.OrderStatus;
+import com.minh.shopee.domain.dto.request.OrderShopUpdateDTO;
 import com.minh.shopee.domain.dto.request.filters.FilterOrderAdmin;
+import com.minh.shopee.domain.dto.response.OverviewOrderDTO;
 import com.minh.shopee.domain.dto.response.projection.admin.OrderShopProjection;
+import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.services.OrderService;
+import com.minh.shopee.services.utils.error.AppException;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController("orderAdminController")
@@ -32,6 +39,7 @@ public class OrderController {
     record OrderStatusResponse(int id, String name) {
     }
 
+    // ==============================GET==============================
     @GetMapping("")
     @ApiDescription("Lấy danh sách đơn hàng")
     public ResponseEntity<Page<OrderShopProjection>> getOrderList(
@@ -41,7 +49,7 @@ public class OrderController {
                     pageable, OrderShopProjection.class, filter);
             return ResponseEntity.ok(page);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Projection class không hợp lệ", e);
+            throw new AppException(400, "Projection class không hợp lệ", e);
         }
     }
 
@@ -55,4 +63,17 @@ public class OrderController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/overview")
+    @ApiDescription("Lấy báo cáo doanh thu")
+    public ResponseEntity<OverviewOrderDTO> overviewOrder() {
+        return ResponseEntity.ok(this.orderService.overviewOrder());
+    }
+
+    // ==============================PUT==============================
+    @PutMapping("")
+    @ApiDescription("Cập nhật đơn hàng")
+    public ResponseEntity<OrderDetail> updateOrder(@RequestBody @Valid OrderShopUpdateDTO entity) {
+
+        return ResponseEntity.ok(this.orderService.updateOrderByShop(entity));
+    }
 }
