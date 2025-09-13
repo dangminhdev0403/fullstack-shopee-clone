@@ -1,6 +1,11 @@
 "use client";
 
+import { LoadingSkeleton } from "@components/Loading";
 import { useRealtimeData } from "@hooks/useRealtimeData";
+import {
+  useGetAnalyticsQuery,
+  useGetAnalyticsWeeklyQuery,
+} from "@redux/api/admin/analyticsApi";
 import {
   Activity,
   ArrowDownRight,
@@ -115,6 +120,11 @@ const topProducts = [
 ];
 
 export function Dashboard() {
+  const { data: analytics, isLoading: isLoadingAnalytics } =
+    useGetAnalyticsQuery();
+  const { data: weekly, isLoading: isLoadingWeekly } =
+    useGetAnalyticsWeeklyQuery();
+
   const realtimeData = useRealtimeData();
 
   const formatPrice = (price: number) => {
@@ -156,10 +166,11 @@ export function Dashboard() {
     );
   };
 
+  if (isLoadingAnalytics || isLoadingWeekly) return <LoadingSkeleton />;
   const stats = [
     {
       title: "Tổng sản phẩm",
-      value: realtimeData.totalProducts.toLocaleString(),
+      value: analytics?.data?.totalProducts?.toLocaleString(),
       change: "+12.5%",
       trend: "up",
       icon: Package,
@@ -168,7 +179,7 @@ export function Dashboard() {
     },
     {
       title: "Đơn hàng hôm nay",
-      value: realtimeData.todayOrders.toLocaleString(),
+      value: analytics?.data?.toltalOrdersNow?.toLocaleString(),
       change: "+23.1%",
       trend: "up",
       icon: ShoppingCart,
@@ -177,8 +188,8 @@ export function Dashboard() {
       realtime: true,
     },
     {
-      title: "Khách hàng mới",
-      value: realtimeData.newCustomers.toLocaleString(),
+      title: "Khách hàng tham gia",
+      value: analytics?.data?.totalCustomer?.toLocaleString(),
       change: "-2.4%",
       trend: "down",
       icon: Users,

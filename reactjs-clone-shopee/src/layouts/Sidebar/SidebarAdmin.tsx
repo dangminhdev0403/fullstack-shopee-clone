@@ -11,7 +11,6 @@ import {
   Package,
   Shield,
   ShoppingCart,
-  Users,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
@@ -58,14 +57,14 @@ export default function SidebarAdmin({
       path: ROUTES.ADMIN.ABS.ORDERS,
       badge: realtimeData.notifications,
     },
-    {
-      id: "users",
-      label: "Người dùng",
-      icon: Users,
-      color: "text-purple-500",
-      gradient: "from-purple-500 to-purple-600",
-      path: ROUTES.ADMIN.ABS.USERS,
-    },
+    // {
+    //   id: "users",
+    //   label: "Người dùng",
+    //   icon: Users,
+    //   color: "text-purple-500",
+    //   gradient: "from-purple-500 to-purple-600",
+    //   path: ROUTES.ADMIN.ABS.USERS,
+    // },
     {
       id: "analytics",
       label: "Thống kê",

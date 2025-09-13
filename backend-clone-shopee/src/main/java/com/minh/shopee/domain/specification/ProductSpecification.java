@@ -28,6 +28,10 @@ public class ProductSpecification {
         };
     }
 
+    public static Specification<Product> hasShopId(long shopId) {
+        return (root, query, cb) -> cb.equal(root.get("shop").get("id"), shopId);
+    }
+
     public static Specification<Product> hasCategoryId(String categoryId) {
         return (root, query, cb) -> {
             if (categoryId == null || categoryId.isBlank()) {

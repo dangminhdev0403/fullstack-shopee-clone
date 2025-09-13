@@ -11,6 +11,8 @@ export const API_ROUTES = {
     CATEGORIES: `${version}/admin/categories`,
     ANALYTICS: {
       PRODUCT_OVERVIEW: `${version}/admin/analytics/product-overview`,
+      COMMON: `${version}/admin/analytics/common-analytics`,
+      WEEKLY: `${version}/admin/analytics/weekly-data`,
     },
     ORDERS: `${version}/admin/orders`,
     ORDER_STATUS: `${version}/admin/orders/statuses`,

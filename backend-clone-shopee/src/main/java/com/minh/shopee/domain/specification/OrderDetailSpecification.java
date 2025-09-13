@@ -1,5 +1,9 @@
 package com.minh.shopee.domain.specification;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import com.minh.shopee.domain.constant.OrderStatus;
@@ -17,6 +21,10 @@ public class OrderDetailSpecification {
         return (root, query, cb) -> cb.equal(root.get("product").get("shop").get("id"), shopId);
     }
 
+    public static Specification<OrderDetail> createdBetween(Instant start, Instant end) {
+        return (root, query, cb) -> cb.between(root.get("order").get("createdAt"), start, end);
+    }
+
     public static Specification<OrderDetail> hasKeyword(String keyword) {
         return (root, query, cb) -> {
             if (keyword == null || keyword.isBlank())
@@ -27,6 +35,20 @@ public class OrderDetailSpecification {
                     cb.like(cb.lower(orderJoin.get("code")), pattern),
                     cb.like(cb.lower(orderJoin.get("receiverName")), pattern),
                     cb.like(cb.lower(orderJoin.get("receiverPhone")), pattern));
+        };
+    }
+
+    public static Specification<OrderDetail> createdToday() {
+        return (root, query, cb) -> {
+            Join<OrderDetail, Order> orderJoin = root.join("order", JoinType.INNER);
+
+            // Ngày hôm nay theo múi giờ hệ thống
+            LocalDate today = LocalDate.now();
+            ZoneId zone = ZoneId.systemDefault();
+            Instant startOfDay = today.atStartOfDay(zone).toInstant();
+            Instant endOfDay = today.plusDays(1).atStartOfDay(zone).minusNanos(1).toInstant();
+
+            return cb.between(orderJoin.get("createdAt"), startOfDay, endOfDay);
         };
     }
 
