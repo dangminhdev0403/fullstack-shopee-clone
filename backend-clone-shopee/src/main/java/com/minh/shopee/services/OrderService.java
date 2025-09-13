@@ -9,10 +9,11 @@ import com.minh.shopee.domain.dto.request.OrderShopUpdateDTO;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.request.filters.FilterOrderAdmin;
 import com.minh.shopee.domain.dto.response.OverviewOrderDTO;
+import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.OrderDetail;
 
 public interface OrderService {
-    void createOrder(CreateOrderRequest req, long userId);
+    Order createOrder(CreateOrderRequest req, long userId);
 
     <T> Page<T> getOrdersListByUser(Pageable pageable, Class<T> projectionClass, OrderStatus status);
 
@@ -24,4 +25,6 @@ public interface OrderService {
     OverviewOrderDTO overviewOrder();
 
     OrderDetail updateOrderByShop(OrderShopUpdateDTO req);
+
+    void deleteOrder(Long id);
 }

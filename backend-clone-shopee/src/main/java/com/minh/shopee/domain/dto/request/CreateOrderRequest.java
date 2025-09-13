@@ -44,4 +44,5 @@ public class CreateOrderRequest {
 
     @NotEmpty(message = "Danh sách sản phẩm không được để trống")
     private List<OrderItemRequest> items;
+
 }

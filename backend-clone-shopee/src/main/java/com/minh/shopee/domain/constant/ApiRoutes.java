@@ -26,7 +26,7 @@ public class ApiRoutes {
 
         public static final String[] PUBLIC_VERSIONED_ENDPOINTS = {
                         "/posts/**", "/auth/login", "/auth/refresh", "/auth/logout", "/auth/register",
-                        "/provinces/**", "/districts/**", "/wards/**"
+                        "/provinces/**", "/districts/**", "/wards/**", "/vnpay/**"
         };
 
         public static final String[] PUBLIC_COMMON_ENDPOINTS = {

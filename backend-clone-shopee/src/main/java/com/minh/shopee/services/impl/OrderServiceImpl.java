@@ -60,9 +60,10 @@ public class OrderServiceImpl implements OrderService {
 
         @Override
         @Transactional
-        public void createOrder(CreateOrderRequest req, long userId) {
+        public Order createOrder(CreateOrderRequest req, long userId) {
                 log.info("Creating order for user: {}", userId);
                 User currentUser = User.builder().id(userId).build();
+                Order order = new Order();
 
                 Map<Long, List<OrderItemRequest>> groupedByShop = req.getItems()
                                 .stream()
@@ -77,12 +78,16 @@ public class OrderServiceImpl implements OrderService {
                                                         "Không tìm thấy cửa hàng"));
 
                         // Tạo Order
-                        Order order = new Order();
                         order.setUser(currentUser);
                         order.setReceiverName(req.getReceiverName());
                         order.setReceiverAddress(req.getReceiverAddress());
                         order.setReceiverPhone(req.getReceiverPhone());
                         order.setStatus(OrderStatus.PENDING);
+
+                        if (req.getPaymentMethod() != null) {
+                                order.setPaymentMethod(req.getPaymentMethod());
+
+                        }
 
                         List<OrderDetail> orderItems = new ArrayList<>();
                         BigDecimal subtotal = BigDecimal.ZERO;
@@ -145,7 +150,9 @@ public class OrderServiceImpl implements OrderService {
                                 this.cartDetailRepository.deleteByCartIdAndProductIdIn(cartUser.getId(),
                                                 orderedProductIds);
                         }
+
                 }
+                return order;
         }
 
         @Override
@@ -331,6 +338,15 @@ public class OrderServiceImpl implements OrderService {
 
                 // ⚠️ Trường hợp không match logic trên -> mặc định coi là PROCESSING
                 return OrderStatus.PROCESSING;
+        }
+
+        @Override
+        public void deleteOrder(Long id) {
+                long userId = SecurityUtils.getCurrentUserId();
+                Order order = this.orderRepository.findOne(OrderSpecification.hasIdAndUser(id, userId))
+                                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Order not found",
+                                                "Order not found"));
+                this.orderRepository.delete(order);
         }
 
 }

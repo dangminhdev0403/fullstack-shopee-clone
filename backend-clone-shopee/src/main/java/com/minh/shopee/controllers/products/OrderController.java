@@ -4,7 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +20,7 @@ import com.minh.shopee.domain.constant.OrderStatus;
 import com.minh.shopee.domain.dto.request.CreateOrderRequest;
 import com.minh.shopee.domain.dto.request.UpdateOrderDTO;
 import com.minh.shopee.domain.dto.response.projection.OrderHistoryProjection;
+import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.services.OrderService;
 import com.minh.shopee.services.utils.SecurityUtils;
 
@@ -32,19 +35,20 @@ public class OrderController {
 
     @PostMapping(ApiRoutes.CHECKOUT)
     @ApiDescription("Checkout order")
-    public ResponseEntity<CreateOrderRequest> checkout(@RequestBody @Valid CreateOrderRequest entity) {
+    public ResponseEntity<Order> checkout(@RequestBody @Valid CreateOrderRequest entity) {
 
         Long userId = SecurityUtils.getCurrentUserId();
-        this.orderService.createOrder(entity, userId);
-        return ResponseEntity.ok(entity);
+
+        return ResponseEntity.ok(this.orderService.createOrder(entity, userId));
 
     }
 
     @GetMapping("")
     @ApiDescription("Get order history")
     public ResponseEntity<Page<OrderHistoryProjection>> getOrdersList(
-            @PageableDefault(page = 0, size = 20) Pageable pageable ,  @RequestParam(required = false) OrderStatus  status) {
-        Page<OrderHistoryProjection> orders = orderService.getOrdersListByUser(pageable, OrderHistoryProjection.class ,
+            @PageableDefault(page = 0, size = 20) Pageable pageable,
+            @RequestParam(required = false) OrderStatus status) {
+        Page<OrderHistoryProjection> orders = orderService.getOrdersListByUser(pageable, OrderHistoryProjection.class,
                 status);
         return ResponseEntity.ok(orders);
     }
@@ -54,5 +58,11 @@ public class OrderController {
     public ResponseEntity<String> cancelOrder(@Valid @RequestBody UpdateOrderDTO req) {
         this.orderService.cancelOrder(req);
         return ResponseEntity.ok("Huỷ đơn hàng thành công");
+    }
+    @DeleteMapping("/{id}")
+    @ApiDescription("Xoá đơn hàng")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        this.orderService.deleteOrder(id);
+        return ResponseEntity.ok().build();
     }
 }

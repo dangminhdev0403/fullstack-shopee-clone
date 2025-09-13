@@ -1,8 +1,8 @@
 package com.minh.shopee.domain.constant;
 
 public enum PaymentMethod {
-    COD("Đang chờ"),
-    MOMO("Chấp nhận");
+    COD("Tiền mặt"),
+    VNPAY("VNPAY");
 
     private final String displayName;
 

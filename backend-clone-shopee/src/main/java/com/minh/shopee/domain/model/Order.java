@@ -10,7 +10,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.minh.shopee.domain.constant.OrderStatus;
+import com.minh.shopee.domain.constant.PaymentMethod;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -59,7 +61,7 @@ public class Order {
     @Enumerated(EnumType.STRING) // Lưu trạng thái dưới dạng chuỗi
     private OrderStatus status;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderDetail> orderDetail;
 
     @Transient // Không được lưu vào cơ sở dữ liệu
@@ -72,8 +74,13 @@ public class Order {
         this.status = newStatus; // Cập nhật trạng thái mới
     }
 
+    PaymentMethod paymentMethod;
+
     @PrePersist
     public void prePersist() {
+        if (paymentMethod == null) {
+            paymentMethod = PaymentMethod.COD;
+        }
         if (status == null) {
             status = OrderStatus.PENDING; // Gán mặc định trước khi lưu
         }

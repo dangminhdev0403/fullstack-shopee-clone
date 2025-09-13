@@ -1,12 +1,13 @@
 import { rootApi } from "@redux/api/rootApi";
 import { API_ROUTES } from "@service/apiRoutes";
+import { ApiResponse } from "@utils/constants/types/response";
 import Swal from "sweetalert2";
 
 export interface CreateOrderRequest {
   receiverName: string;
   receiverAddress: string;
   receiverPhone: string;
-  paymentMethod?: "COD" | "MOMO";
+  paymentMethod?: "COD" | "VNPAY";
   shippingFee: number;
   discount: number;
   items: { productId: number; quantity: number; shopId: number }[];
@@ -69,9 +70,28 @@ export interface OrderHistoryResponse {
   message: string;
   data: OrderHistoryData;
 }
+interface CheckOutResponse {
+  id: number;
+  totalPrice: number;
+}
+
+interface PayOutRequest {
+  amount: number;
+  orderId: number;
+  bankCode?: string;
+  language?: string;
+  orderInfo?: string;
+}
+interface PayOutResponse {
+  code: string;
+  data: string;
+}
 export const orderApi = rootApi.injectEndpoints({
   endpoints: (builder) => ({
-    checkOut: builder.mutation<void, CreateOrderRequest>({
+    checkOut: builder.mutation<
+      ApiResponse<CheckOutResponse>,
+      CreateOrderRequest
+    >({
       query: (body) => ({
         url: API_ROUTES.ORDER.CHECKOUT,
         method: "POST",
@@ -81,6 +101,7 @@ export const orderApi = rootApi.injectEndpoints({
           discount: body.discount ?? 0,
         },
       }),
+
       invalidatesTags: [
         { type: "ORDER", id: "LIST" },
         {
@@ -88,7 +109,23 @@ export const orderApi = rootApi.injectEndpoints({
         },
       ], // ✅ chuyển ra đây
     }),
-
+    payOut: builder.mutation<ApiResponse<PayOutResponse>, PayOutRequest>({
+      query: (params) => {
+        const formData = new URLSearchParams();
+        formData.append("amount", params.amount.toString());
+        formData.append("orderId", params.orderId.toString());
+        formData.append("bankCode", params.bankCode ?? "VNBANK");
+        formData.append("language", params.language ?? "vn");
+        formData.append("orderInfo", params.orderInfo ?? "Thanh toán đơn hàng");
+        return {
+          url: `${API_ROUTES.PAYMENT.BASE}?orderId=${params.orderId}`, // API_ROUTES.PAYMENT,
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData,
+        };
+      },
+      invalidatesTags: [{ type: "ORDER", id: "LIST" }],
+    }),
     getOrderHistory: builder.query<
       OrderHistoryResponse,
       GetOrderHistoryParams | void
@@ -141,6 +178,12 @@ export const orderApi = rootApi.injectEndpoints({
         }
       },
     }),
+    deleteOrder: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `${API_ROUTES.ORDER.BASE}/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 
   overrideExisting: false,
@@ -151,4 +194,6 @@ export const {
   useGetOrderHistoryQuery,
   useCancelOrderMutation,
   useLazyGetOrderHistoryQuery,
+  usePayOutMutation,
+  useDeleteOrderMutation,
 } = orderApi;

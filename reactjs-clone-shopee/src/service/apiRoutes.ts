@@ -54,4 +54,7 @@ export const API_ROUTES = {
     BASE: `${version}/profile`,
     CHANGE_PASSWORD: `${version}/profile/change-password`,
   },
+  PAYMENT: {
+    BASE: `${version}/vnpay/pay`,
+  },
 };

@@ -121,7 +121,7 @@ const ProductDetail = () => {
       .catch((error) => {
         // Handle error, e.g., show an error message
         console.log(error);
-        toast.error(` ${error.data.message}`);
+        toast.error(`Số lượng mua vượt quá tồn kho`);
       });
   };
   return (

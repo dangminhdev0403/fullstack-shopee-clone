@@ -24,7 +24,12 @@ import {
 } from "@mui/material";
 import { useShippingFee } from "@react-query/callApi";
 import { AddressDTO, useGetAddressesQuery } from "@redux/api/addressApi";
-import { CreateOrderRequest, useCheckOutMutation } from "@redux/api/orderApi";
+import {
+  CreateOrderRequest,
+  useCheckOutMutation,
+  useDeleteOrderMutation,
+  usePayOutMutation,
+} from "@redux/api/orderApi";
 import { RootState } from "@redux/store";
 import { GHNShippingFeeRequest } from "@service/product.service";
 import { ROUTES } from "@utils/constants/route";
@@ -48,7 +53,6 @@ import {
   RefreshCw,
   Shield,
   ShoppingBag,
-  Smartphone,
   Truck,
   Wallet,
   XCircle,
@@ -80,40 +84,19 @@ const mockPaymentMethods: PaymentMethodDTO[] = [
     type: "cod",
     icon: Truck,
     description: "Kiểm tra hàng trước khi thanh toán",
-    fee: 15000,
+
     processingTime: "Khi giao hàng",
     benefits: ["Kiểm tra hàng", "An toàn 100%"],
   },
   {
-    id: "momo",
-    name: "Ví MoMo",
+    id: "vnpay",
+    name: "Ví VNPAY",
     type: "ewallet",
     icon: Wallet,
     description: "Thanh toán nhanh chóng, bảo mật cao",
-    discount: 15000,
     isRecommended: true,
     processingTime: "Tức thì",
     benefits: ["Hoàn tiền 2%", "Tích điểm", "Bảo mật 2 lớp"],
-  },
-  {
-    id: "zalopay",
-    name: "ZaloPay",
-    type: "ewallet",
-    icon: Smartphone,
-    description: "Ưu đãi độc quyền cho người dùng mới",
-    discount: 20000,
-    processingTime: "Tức thì",
-    benefits: ["Giảm 20k cho đơn đầu", "Tích xu đổi quà"],
-  },
-
-  {
-    id: "bank",
-    name: "Chuyển khoản ngân hàng",
-    type: "bank",
-    icon: Building2,
-    description: "Chuyển khoản trực tiếp qua ngân hàng",
-    processingTime: "5-15 phút",
-    benefits: ["Bảo mật cao", "Không phí giao dịch"],
   },
 ];
 
@@ -190,7 +173,6 @@ export default function CheckOutPage() {
     },
   );
 
-
   const [selectedPayment, setSelectedPayment] = useState<string>("cod");
   const [selectedShipping, setSelectedShipping] = useState<string>("express");
   const [showAddressDialog, setShowAddressDialog] = useState(false);
@@ -222,6 +204,8 @@ export default function CheckOutPage() {
     message: "",
     type: "success",
   });
+  const [payment] = usePayOutMutation();
+  const [deleteOrder] = useDeleteOrderMutation();
 
   const [estimatedDelivery, setEstimatedDelivery] = useState<Date>(new Date());
   const { data: shippingFeeData, error: shippingFeeError } =
@@ -339,21 +323,7 @@ export default function CheckOutPage() {
     setAppliedVouchers((prev) => prev.filter((v) => v.id !== voucherId));
     setNotification({ open: true, message: "Đã bỏ voucher", type: "info" });
   };
-
   const handlePlaceOrder = async () => {
-    let data: CreateOrderRequest = {
-      receiverName: selectedAddress?.name || "",
-      receiverAddress: selectedAddress?.fullAddress || "",
-      receiverPhone: selectedAddress?.phone || "",
-      shippingFee,
-      paymentMethod: selectedPaymentMethod?.id.toUpperCase() as "COD" | "MOMO",
-      discount: paymentDiscount,
-      items: checkoutCart.map((item) => ({
-        productId: item.id,
-        quantity: item.quantity,
-        shopId: item.shop,
-      })),
-    };
     if (!selectedAddress) {
       setNotification({
         open: true,
@@ -362,26 +332,98 @@ export default function CheckOutPage() {
       });
       return;
     }
+    const data: CreateOrderRequest = {
+      receiverName: selectedAddress.name || "",
+      receiverAddress: selectedAddress.fullAddress || "",
+      receiverPhone: selectedAddress.phone || "",
+      shippingFee,
+      paymentMethod: selectedPaymentMethod?.id.toUpperCase() as "COD" | "VNPAY",
+      discount: paymentDiscount,
+      items: checkoutCart.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        shopId: item.shop,
+      })),
+    };
 
     confirm(
       "Xác nhận đặt hàng",
       "Bạn có chắc chắn muốn đặt hàng?",
       async () => {
         try {
-          await checkOut(data).unwrap(); // gọi mutation
-          setLoading(false);
+          setLoading(true);
+          const res = await checkOut(data).unwrap(); // tạo đơn
 
-          toast.success("Đặt hàng thành công!");
-          navigate(ROUTES.ACCOUNT.ORDER);
+          if (data.paymentMethod === "COD") {
+            toast.success("Đặt hàng thành công!");
+            navigate(ROUTES.ACCOUNT.ORDER);
+          } else if (data.paymentMethod === "VNPAY") {
+            // gọi API lấy URL thanh toán VNPAY
+            const res2 = await payment({
+              amount: res?.data?.totalPrice,
+              orderId: res?.data?.id,
+            }).unwrap();
+            const urlPayment = res2.data.data;
+
+            const paymentWindow = window.open(
+              urlPayment,
+              "_blank",
+              "width=800,height=600",
+            );
+
+            if (!paymentWindow) {
+              toast.error("Không thể mở cửa sổ thanh toán");
+              return;
+            }
+            let paymentCompleted = false; // cờ theo dõi
+
+            const handleMessage = (event: MessageEvent) => {
+              const { status, message } = event.data;
+              console.log("Message received:", status, message);
+              paymentCompleted = true; // đã nhận kết quả thanh toán
+
+              if (status === "success") {
+                toast.success(message);
+                navigate(ROUTES.ACCOUNT.ORDER);
+              } else {
+                deleteOrder(res?.data?.id);
+                toast.error(message);
+                navigate(ROUTES.HOME);
+              }
+
+              window.removeEventListener("message", handleMessage);
+            };
+            window.addEventListener("message", handleMessage);
+
+            // Kiểm tra popup bị đóng mà không gửi message
+            const checkPopupClosed = setInterval(() => {
+              if (paymentWindow.closed) {
+                clearInterval(checkPopupClosed);
+
+                window.removeEventListener("message", handleMessage);
+                // Nếu vẫn chưa có phản hồi từ server
+                deleteOrder(res?.data?.id);
+
+                if (!paymentCompleted) {
+                  // Chỉ xoá order khi chưa nhận được kết quả từ VNPAY
+                  deleteOrder(res?.data?.id);
+                  toast.info("Bạn đã đóng cửa sổ thanh toán");
+                  navigate(ROUTES.HOME);
+                }
+              }
+            }, 500);
+          } else {
+            // COD
+            toast.success("Đặt hàng thành công");
+            navigate(ROUTES.ACCOUNT.ORDER);
+          }
         } catch (error) {
-          setLoading(false);
           errorAlert("Đặt hàng thất bại", "Vui lòng thử lại sau.");
           console.error("Checkout error:", error);
         }
       },
     );
   };
-
   if (pageLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">

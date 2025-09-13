@@ -19,7 +19,48 @@ interface OrderDetailData {
   totalPrice: number;
   status?: string;
 }
+interface OrderStatusOption {
+  value: string;
+  label: string;
+}
 
+const allStatuses: OrderStatusOption[] = [
+  { value: "PENDING", label: "Đang chờ" },
+  { value: "PROCESSING", label: "Đang xử lý" },
+  { value: "SHIPPING", label: "Đang giao" },
+  { value: "DELIVERED", label: "Đã giao" },
+  { value: "CANCELED", label: "Đã hủy" },
+  { value: "RETURNED", label: "Đã trả" },
+];
+const canChangeTo = (currentStatus: string, newStatus: string): boolean => {
+  if (currentStatus === newStatus) return true;
+
+  switch (currentStatus) {
+    case "PENDING":
+    case "PROCESSING":
+      return [
+        "PROCESSING",
+        "CANCELED",
+        "RETURNED",
+        "DELIVERED",
+        "SHIPPING",
+      ].includes(newStatus);
+    case "SHIPPING":
+      return ["DELIVERED", "RETURNED"].includes(newStatus);
+    case "DELIVERED":
+      return newStatus === "RETURNED";
+    case "RETURNED":
+    case "CANCELED":
+      return false;
+    default:
+      return false;
+  }
+};
+
+// Lấy danh sách trạng thái có thể chuyển đổi
+const getAvailableStatuses = (currentStatus: string) => {
+  return allStatuses.filter((s) => canChangeTo(currentStatus, s.value));
+};
 export function OrderForm({
   orderDetail,
   onSubmit,
@@ -32,6 +73,7 @@ export function OrderForm({
     totalPrice: (orderDetail?.quantity || 0) * (orderDetail?.price || 0),
     status: orderDetail?.shopStatus,
   });
+  const availableStatuses = getAvailableStatuses(orderDetail?.shopStatus || "");
 
   const handleChange = (field: keyof OrderDetailData, value: any) => {
     setFormData((prev) => {
@@ -165,12 +207,11 @@ export function OrderForm({
               onChange={(e) => handleChange("status", e.target.value)}
               className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
             >
-              <option value="PENDING">Đang chờ</option>
-              <option value="PROCESSING">Đang xử lý</option>
-              <option value="SHIPPING">Đang giao</option>
-              <option value="DELIVERED">Đã giao</option>
-              <option value="CANCELED">Đã huỷ</option>
-              <option value="RETURNED">Đã trả</option>
+              {availableStatuses.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
             </select>
           </div>
 
