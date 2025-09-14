@@ -24,12 +24,14 @@ import {
 } from "@mui/material";
 import { useShippingFee } from "@react-query/callApi";
 import { AddressDTO, useGetAddressesQuery } from "@redux/api/addressApi";
+import { useRestoreCartMutation } from "@redux/api/cartApi";
 import {
   CreateOrderRequest,
   useCheckOutMutation,
   useDeleteOrderMutation,
   usePayOutMutation,
 } from "@redux/api/orderApi";
+import { checkoutSlice } from "@redux/slices/checkoutSlice";
 import { RootState } from "@redux/store";
 import { GHNShippingFeeRequest } from "@service/product.service";
 import { ROUTES } from "@utils/constants/route";
@@ -59,7 +61,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
@@ -193,7 +195,7 @@ export default function CheckOutPage() {
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const { confirm, error: errorAlert } = useAlert();
-
+  const [restoreCart] = useRestoreCartMutation();
   type NotificationType = "success" | "error" | "info" | "warning";
   const [notification, setNotification] = useState<{
     open: boolean;
@@ -206,7 +208,7 @@ export default function CheckOutPage() {
   });
   const [payment] = usePayOutMutation();
   const [deleteOrder] = useDeleteOrderMutation();
-
+  const dispatch = useDispatch();
   const [estimatedDelivery, setEstimatedDelivery] = useState<Date>(new Date());
   const { data: shippingFeeData, error: shippingFeeError } =
     useShippingFee(feeRequest);
@@ -324,6 +326,11 @@ export default function CheckOutPage() {
     setNotification({ open: true, message: "Đã bỏ voucher", type: "info" });
   };
   const handlePlaceOrder = async () => {
+    const backupCart = [...checkoutCart];
+    const dataBackup = backupCart.map((item) => ({
+      productId: item.id,
+      quantity: item.quantity,
+    }));
     if (!selectedAddress) {
       setNotification({
         open: true,
@@ -379,17 +386,28 @@ export default function CheckOutPage() {
             }
 
             const handleMessage = (event: MessageEvent) => {
-              const { status, message } = event.data;
+              const { status, message } = event.data || {};
               console.log("Message received:", status, message);
               paymentCompleted = true; // đã nhận kết quả thanh toán
 
+              // chỉ xử lý khi data có status hợp lệ
               if (status === "success") {
+                paymentCompleted = true;
                 toast.success(message);
                 navigate(ROUTES.ACCOUNT.ORDER);
-              } else {
+              } else if (status === "fail" || status === "error") {
+                paymentCompleted = true;
                 deleteOrder(res?.data?.id);
+                restoreCart(dataBackup);
+
                 toast.error(message);
+                dispatch(checkoutSlice.actions.setCart(backupCart));
+
                 navigate(ROUTES.HOME);
+              } else {
+                // ignore message không liên quan (tránh redirect sai)
+                console.log("Ignored message:", event.data);
+                return;
               }
 
               window.removeEventListener("message", handleMessage);
@@ -404,10 +422,11 @@ export default function CheckOutPage() {
                 window.removeEventListener("message", handleMessage);
                 // Nếu vẫn chưa có phản hồi từ server
                 deleteOrder(res?.data?.id);
-
                 if (!paymentCompleted) {
                   // Chỉ xoá order khi chưa nhận được kết quả từ VNPAY
                   deleteOrder(res?.data?.id);
+                  dispatch(checkoutSlice.actions.setCart(backupCart));
+                  restoreCart(dataBackup);
                   toast.info("Bạn đã đóng cửa sổ thanh toán");
                   navigate(ROUTES.HOME);
                 }

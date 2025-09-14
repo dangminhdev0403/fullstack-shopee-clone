@@ -500,4 +500,24 @@ public class ProductServiceImpl implements ProductSerivce {
         return new PageImpl<>(ordered, pageable, total);
     }
 
+    @Override
+    @Transactional
+    public void restoreCart(List<AddProductDTO> cartRestores) {
+        long userId = SecurityUtils.getCurrentUserId();
+        if (cartRestores == null || cartRestores.isEmpty()) {
+            return;
+        }
+
+        for (AddProductDTO item : cartRestores) {
+            try {
+                this.addProductToCart(item, userId);
+            } catch (AppException ex) {
+                // Nếu có lỗi (ví dụ hết hàng) thì bỏ qua hoặc log lại
+                log.warn("Cannot restore productId={} for userId={} | reason={}",
+                        item.getProductId(), userId, ex.getMessage());
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Có lỗi xảy ra",
+                        ex.getMessage());
+            }
+        }
+    }
 }

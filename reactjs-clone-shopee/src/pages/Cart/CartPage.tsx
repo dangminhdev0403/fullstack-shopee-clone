@@ -138,12 +138,6 @@ export default function CartPage() {
     (total, item) => total + item.quantity * item.product.price,
     0,
   );
-
-  const totalItems = selectedCartItems.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  );
-
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
       toast.error("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");

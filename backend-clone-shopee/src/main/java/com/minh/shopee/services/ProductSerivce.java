@@ -45,4 +45,5 @@ public interface ProductSerivce {
 
   Page<ProductShopProjection> getAllProductsByShop(Pageable pageable, FiltersProductAdmin filtersProduct);
 
+  void restoreCart(List<AddProductDTO> cartRestores);
 }

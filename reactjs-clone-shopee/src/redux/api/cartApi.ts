@@ -42,6 +42,17 @@ export const cartApi = rootApi.injectEndpoints({
       }),
       invalidatesTags: ["Cart"],
     }),
+    restoreCart: builder.mutation<
+      void,
+      { productId: number; quantity: number }[]
+    >({
+      query: (body) => ({
+        url: API_ROUTES.CART.RESTORE,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Cart"],
+    }),
     removeFromCart: builder.mutation<void, { productId: number }>({
       query: (body) => ({
         url: API_ROUTES.CART.REMOVE,
@@ -67,4 +78,5 @@ export const {
   useAddToCartMutation,
   useRemoveFromCartMutation,
   useRemoveListFromCartMutation,
+  useRestoreCartMutation,
 } = cartApi;

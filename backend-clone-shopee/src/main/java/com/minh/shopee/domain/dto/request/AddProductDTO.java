@@ -19,7 +19,6 @@ public class AddProductDTO {
 
     @NotNull(message = "Quantity is required")
     private Integer quantity;
-    @NotNull(message = "Action is required")
-    private QuantityAction action;
+    private QuantityAction action = QuantityAction.INCREASE;
 
 }
