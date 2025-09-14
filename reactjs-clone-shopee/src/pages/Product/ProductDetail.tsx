@@ -156,7 +156,7 @@ const ProductDetail = () => {
                   return (
                     <div
                       key={image.id}
-                      className="relative ml-2 w-full pt-[100%]"
+                      className="relative ml-26 w-full pt-[100%]"
                       onMouseEnter={() => handleActive(image.id)}
                     >
                       <img
@@ -170,6 +170,7 @@ const ProductDetail = () => {
                     </div>
                   );
                 })}
+
               <button
                 title="Next"
                 className="absolute top-1/2 right-0 z-10 h-10 w-10 -translate-y-1/2 cursor-pointer bg-[rgba(100,100,100,0.5)]"

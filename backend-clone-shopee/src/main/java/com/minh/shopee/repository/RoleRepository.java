@@ -21,4 +21,9 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
 
     Optional<RoleProjection> findProjectedById(Long id);
 
+    Optional<Role> findByName(String name);
+
+    // ⚡ Thêm lại method gốc để không bị shadow
+    @Override
+    Optional<Role> findById(Long id);
 }

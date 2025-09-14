@@ -103,9 +103,9 @@ public class RoleServiceImp implements RoleService {
     }
 
     @Override
-    public RoleProjection getRoleById(Long id) {
+    public Role getRoleById(Long id) {
         log.info("Fetching role by id: {}", id);
-        return this.roleRepository.findProjectedById(id)
+        return this.roleRepository.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Role not found",
                         "Role with id " + id + " not found")); // Placeholder exception
     }

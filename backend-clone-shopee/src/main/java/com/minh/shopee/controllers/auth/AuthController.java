@@ -33,6 +33,7 @@ import com.minh.shopee.domain.dto.response.projection.RoleProjection;
 import com.minh.shopee.domain.dto.response.projection.UserLoginProjection;
 import com.minh.shopee.domain.dto.response.rbac.RoleDTO;
 import com.minh.shopee.domain.dto.response.users.ResLoginDTO;
+import com.minh.shopee.domain.model.Role;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.services.UserService;
 import com.minh.shopee.services.utils.SecurityUtils;
@@ -78,7 +79,7 @@ public class AuthController {
                                 currentUser.getId(),
                                 currentUser.getEmail(),
                                 currentUser.getName(),
-                                mapRoles(currentUser.getRoles()));
+                                mapRolesDTO(currentUser.getRoles()));
 
                 String accessToken = this.securityUtils.createAccessToken(userRequest.getEmail(), userLogin);
                 log.debug("Access token generated for user: {}", email);
@@ -136,7 +137,7 @@ public class AuthController {
                                 currentUser.getId(),
                                 currentUser.getEmail(),
                                 currentUser.getName(),
-                                mapRoles(currentUser.getRoles()));
+                                mapRolesDTO(currentUser.getRoles()));
 
                 String accessToken = this.securityUtils.createAccessToken(email, userLogin);
                 ResLoginDTO resLoginDTO = ResLoginDTO.builder().user(userLogin).accessToken(accessToken).build();
@@ -200,14 +201,13 @@ public class AuthController {
 
                 User createUser = userService.createUser(userRequest);
 
-                Set<RoleProjection> roleProjections = createUser.getRoles().stream()
-                                .map(RoleProjection.class::cast)
-                                .collect(Collectors.toSet());
+                Set<Role> roles = createUser.getRoles();
+
                 ResLoginDTO.UserLogin userLogin = buildUserLogin(
                                 createUser.getId(),
                                 createUser.getEmail(),
                                 createUser.getName(),
-                                mapRoles(roleProjections));
+                                mapRoles(roles));
                 String email = createUser.getEmail();
 
                 String accessToken = this.securityUtils.createAccessToken(email, userLogin);
@@ -236,10 +236,11 @@ public class AuthController {
                                 .build();
         }
 
-        private Set<RoleDTO> mapRoles(Set<? extends RoleProjection> roleProjections) {
-                return roleProjections.stream()
+        private Set<RoleDTO> mapRoles(Set<Role> roles) {
+                return roles.stream()
                                 .map(r -> {
-                                        int permissionCount = r.getPermissions() != null ? r.getPermissions().size()
+                                        int permissionCount = r.getPermissions() != null
+                                                        ? r.getPermissions().size()
                                                         : 0;
 
                                         String roleName;
@@ -252,6 +253,25 @@ public class AuthController {
                                         return new RoleDTO(
                                                         r.getId(),
                                                         roleName);
+                                })
+                                .collect(Collectors.toSet());
+        }
+
+        private Set<RoleDTO> mapRolesDTO(Set<? extends RoleProjection> roles) {
+                return roles.stream()
+                                .map(r -> {
+                                        int permissionCount = r.getPermissions() != null
+                                                        ? r.getPermissions().size()
+                                                        : 0;
+
+                                        String roleName;
+                                        if (permissionCount > 1 || r.getId() == 1) {
+                                                roleName = "ROLE_ADMIN";
+                                        } else {
+                                                roleName = "ROLE_USER";
+                                        }
+
+                                        return new RoleDTO(r.getId(), roleName);
                                 })
                                 .collect(Collectors.toSet());
         }

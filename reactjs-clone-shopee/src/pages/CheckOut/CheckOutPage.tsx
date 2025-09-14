@@ -359,6 +359,8 @@ export default function CheckOutPage() {
             navigate(ROUTES.ACCOUNT.ORDER);
           } else if (data.paymentMethod === "VNPAY") {
             // gọi API lấy URL thanh toán VNPAY
+            let paymentCompleted = false; // cờ theo dõi
+
             const res2 = await payment({
               amount: res?.data?.totalPrice,
               orderId: res?.data?.id,
@@ -375,7 +377,6 @@ export default function CheckOutPage() {
               toast.error("Không thể mở cửa sổ thanh toán");
               return;
             }
-            let paymentCompleted = false; // cờ theo dõi
 
             const handleMessage = (event: MessageEvent) => {
               const { status, message } = event.data;

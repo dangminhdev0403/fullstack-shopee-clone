@@ -15,7 +15,7 @@ public interface RoleService {
 
     <T> T getRoleById(Long id, Class<T> type);
 
-    RoleProjection getRoleById(Long id);
+    Role getRoleById(Long id);
     Page<RoleProjection> getAllRoles(Pageable pageable);
 
     <T> Page<T> getAllRoles(Class<T> type, Pageable pageable);

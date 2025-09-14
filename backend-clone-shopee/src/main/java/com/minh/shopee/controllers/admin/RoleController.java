@@ -48,8 +48,8 @@ public class RoleController {
 
     @GetMapping("/{id}")
     @ApiDescription("Lấy vai trò theo ID")
-    public ResponseEntity<RoleProjection> getRoleById(@PathVariable Long id) {
-        RoleProjection role = this.roleService.getRoleById(id);
+    public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
+        Role role = this.roleService.getRoleById(id);
         return ResponseEntity.ok(role);
     }
 

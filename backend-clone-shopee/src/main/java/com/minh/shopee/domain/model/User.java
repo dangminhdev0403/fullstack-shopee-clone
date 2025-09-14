@@ -13,6 +13,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -54,5 +55,14 @@ public class User extends BaseEntity {
     @ManyToMany
     @JoinTable(name = "user_has_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
+
+    @PrePersist
+    public void assignDefaultRole() {
+        if (roles == null || roles.isEmpty()) {
+            Role defaultRole = new Role();
+            defaultRole.setId(3L); // chỉ cần set id, JPA sẽ map đúng
+            this.roles = Set.of(defaultRole);
+        }
+    }
 
 }

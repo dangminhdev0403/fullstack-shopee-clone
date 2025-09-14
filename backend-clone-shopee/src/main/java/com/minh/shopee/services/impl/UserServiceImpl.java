@@ -2,7 +2,6 @@ package com.minh.shopee.services.impl;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import com.minh.shopee.domain.dto.request.UserReqDTO;
 import com.minh.shopee.domain.dto.request.UserResgisterDTO;
 import com.minh.shopee.domain.dto.response.users.UpdateUserResDTO;
 import com.minh.shopee.domain.dto.response.users.UserDTO;
-import com.minh.shopee.domain.model.Role;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.domain.specification.UserSpecification;
 import com.minh.shopee.repository.GenericRepositoryCustom;
@@ -63,12 +61,7 @@ public class UserServiceImpl implements UserService {
                 .name(user.getName())
                 .build();
 
-        log.info("Assigning default role to user: {}", user.getEmail());
-        Role defaultRole = roleRepository.findById(3L)
-                .orElseThrow(() -> new RuntimeException("Role ID=3 not found"));
-        newUser.setRoles(Set.of(defaultRole));
-
-        User savedUser = userRepository.save(newUser);
+         User savedUser = userRepository.save(newUser);
         log.info("User created successfully with email: {}", savedUser.getEmail());
         return savedUser;
     }

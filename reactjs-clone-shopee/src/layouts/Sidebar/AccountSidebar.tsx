@@ -61,6 +61,7 @@ export default function AccountSidebar() {
             <div className="bg-primary flex h-16 w-16 items-center justify-center rounded-full shadow-lg">
               <span className="text-primary-foreground text-lg font-bold">
                 {user?.name?.charAt(0) || "U"}
+                
               </span>
             </div>
             <div className="border-sidebar absolute -right-1 -bottom-1 h-5 w-5 rounded-full border-2 bg-green-500"></div>
