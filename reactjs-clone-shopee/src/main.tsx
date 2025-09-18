@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
@@ -19,7 +19,11 @@ createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
       <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
         <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
+          {/* 👇 Bọc RouterProvider trong Suspense */}
+          <Suspense fallback={<LoadingSpinner />}>
+            <RouterProvider router={router} />
+          </Suspense>
+
           <ToastContainer
             position="top-right"
             autoClose={2000}
@@ -33,9 +37,10 @@ createRoot(document.getElementById("root")!).render(
             theme="light"
             transition={Bounce}
           />
+
           {proccess.VITE_MODE === "development" && (
             <ReactQueryDevtools initialIsOpen={false} />
-          )}{" "}
+          )}
         </QueryClientProvider>
       </PersistGate>
     </Provider>

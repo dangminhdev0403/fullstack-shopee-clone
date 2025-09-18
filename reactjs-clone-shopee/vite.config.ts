@@ -9,4 +9,15 @@ export default defineConfig({
   css: {
     devSourcemap: true,
   },
+  esbuild: {
+    target: "esnext", // cho phép top-level await
+  },
+
+  build: {
+    target: "esnext",
+  },
+  base: "./",
+  server: {
+    middlewareMode: false,
+  },
 });
