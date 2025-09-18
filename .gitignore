@@ -43,6 +43,7 @@ target/
 *.log
 logs/
 */logs/
+./logs
 
 # ======================
 # Node.js / React frontend
