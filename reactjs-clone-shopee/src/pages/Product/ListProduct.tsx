@@ -76,15 +76,17 @@ const ListProduct = () => {
 
   const totalPages = listProduct?.data?.page?.totalPages;
 
-  const sortedProducts = [...listProduct?.data.content].sort((a, b) => {
-    if (sortState === "price_asc") {
-      return a.price - b.price;
-    }
-    if (sortState === "price_desc") {
-      return b.price - a.price;
-    }
-    return 0; // giữ nguyên nếu không sort theo price
-  });
+  const sortedProducts = [...(listProduct?.data?.content ?? [])].sort(
+    (a, b) => {
+      if (sortState === "price_asc") {
+        return a.price - b.price;
+      }
+      if (sortState === "price_desc") {
+        return b.price - a.price;
+      }
+      return 0;
+    },
+  );
 
   const handleSort = (id: SortType) => {
     if (id === "price_asc") {
