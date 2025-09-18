@@ -76,6 +76,16 @@ const ListProduct = () => {
 
   const totalPages = listProduct?.data?.page?.totalPages;
 
+  const sortedProducts = [...listProduct?.data.content].sort((a, b) => {
+    if (sortState === "price_asc") {
+      return a.price - b.price;
+    }
+    if (sortState === "price_desc") {
+      return b.price - a.price;
+    }
+    return 0; // giữ nguyên nếu không sort theo price
+  });
+
   const handleSort = (id: SortType) => {
     if (id === "price_asc") {
       updateFilter({ ...filter, sortBy: "price", order: "asc" });
@@ -189,19 +199,19 @@ const ListProduct = () => {
 
         {/* List Product */}
         <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-5">
-          {listProduct?.data?.content?.length === 0 ? (
+          {sortedProducts.length === 0 ? (
             <div className="col-span-5 flex w-full items-center justify-center py-10 text-lg text-gray-500">
               Không có sản phẩm nào được tìm thấy
             </div>
           ) : (
-            listProduct?.data?.content?.map((item: ProductItem) => (
+            sortedProducts.map((item: ProductItem) => (
               <ItemProduct key={item.id} {...item} />
             ))
           )}
         </div>
 
         {/* Pagination */}
-        {listProduct?.data?.content?.length > 0 && (
+        {sortedProducts.length > 0 && (
           <div className="mt-10 flex w-full items-center justify-center gap-2">
             {listProduct?.data?.page && (
               <Pagination

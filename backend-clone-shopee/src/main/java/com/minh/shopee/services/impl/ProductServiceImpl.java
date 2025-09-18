@@ -306,21 +306,36 @@ public class ProductServiceImpl implements ProductSerivce {
         log.info("Applying sort from filter: {}", sortFilter);
         if (sortFilter != null) {
 
+            // map lại tên field
             String sortBy = switch (sortFilter.getSortBy()) {
                 case "ctime" -> "createdAt";
+                case "price" -> "price"; // đảm bảo đúng tên entity
                 default -> sortFilter.getSortBy();
             };
 
+            // map lại order
             String order = sortFilter.getOrder();
+            Sort.Direction direction;
 
-            Sort.Direction direction = Sort.Direction.fromString(order);
+            if (order == null) {
+                direction = Sort.Direction.DESC;
+            } else {
+                switch (order.toLowerCase()) {
+                    case "asc", "ascending" -> direction = Sort.Direction.ASC;
+                    case "desc", "descending" -> direction = Sort.Direction.DESC;
+                    default -> throw new IllegalArgumentException("Invalid sort order: " + order);
+                }
+            }
+
             Sort sort = Sort.by(direction, sortBy);
-
             return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-
         }
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
 
+        // default sort
+        return PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending());
     }
 
     private Specification<Product> buildProductSpecification(String keyword, FiltersProduct filter) {
