@@ -33,8 +33,8 @@ public class JWTConfiguration {
 
     // Constructor injection cho các giá trị từ properties
     public JWTConfiguration(
-            @Value("${minh.jwt.base64.secret}") String jwtKey,
-            @Value("${minh.jwt.base64.secret.refresh}") String refreshJwtKey) {
+            @Value("${minh.jwt.access-token.secret}") String jwtKey,
+            @Value("${minh.jwt.refresh-token.secret}") String refreshJwtKey) {
         this.jwtKey = jwtKey;
         this.refreshJwtKey = refreshJwtKey;
     }

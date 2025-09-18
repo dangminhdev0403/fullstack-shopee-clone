@@ -1,0 +1,74 @@
+# ======================
+# Maven / Spring Boot backend
+# ======================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE files
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+
+# Spring config (giữ docker config, ignore local config)
+**/application.properties
+**/application-*.yml
+!src/main/resources/application-docker.yml
+
+# Logs
+*.log
+logs/
+*/logs/
+
+# ======================
+# Node.js / React frontend
+# ======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+build/
+
+# Vite cache
+*.local
+*.cache
+
+# ======================
+# OS / System
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Docker / Env
+# ======================
+docker-compose.override.yml
+.env.local
+.env.development
+.env.production.local

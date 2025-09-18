@@ -57,7 +57,7 @@ public class AuthController {
         private Map<String, Instant> refreshTokensRequestTime = new ConcurrentHashMap<>();
         private Duration refreshTokenAccessRequestExpiration = Duration.ofSeconds(3);
 
-        @Value("${minh.jwt.refresh-token.validity.in.seconds}")
+        @Value("${minh.jwt.refresh-token.validity}")
         private long refreshTokenExpiration;
 
         @PostMapping("/login")

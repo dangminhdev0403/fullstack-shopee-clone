@@ -62,10 +62,10 @@ public class SecurityUtils {
     public SecurityUtils(
             @Qualifier("accessTokenEncoder") JwtEncoder accessTokenEncoder,
             @Qualifier("refreshTokenEncoder") JwtEncoder refreshTokenEncoder,
-            @Value("${minh.jwt.base64.secret}") String jwtKey,
-            @Value("${minh.jwt.base64.secret.refresh}") String refreshJwtKey,
-            @Value("${minh.jwt.access-token.validity.in.seconds}") long accessTokenExpiration,
-            @Value("${minh.jwt.refresh-token.validity.in.seconds}") long refreshTokenExpiration) {
+            @Value("${minh.jwt.access-token.secret}") String jwtKey,
+            @Value("${minh.jwt.refresh-token.secret}") String refreshJwtKey,
+            @Value("${minh.jwt.access-token.validity}") long accessTokenExpiration,
+            @Value("${minh.jwt.refresh-token.validity}") long refreshTokenExpiration) {
         this.accessTokenEncoder = accessTokenEncoder;
         this.refreshTokenEncoder = refreshTokenEncoder;
         this.jwtKey = jwtKey;

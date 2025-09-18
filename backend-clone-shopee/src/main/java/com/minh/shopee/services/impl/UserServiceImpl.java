@@ -21,7 +21,6 @@ import com.minh.shopee.domain.dto.response.users.UserDTO;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.domain.specification.UserSpecification;
 import com.minh.shopee.repository.GenericRepositoryCustom;
-import com.minh.shopee.repository.RoleRepository;
 import com.minh.shopee.repository.UserRepository;
 import com.minh.shopee.services.UserService;
 import com.minh.shopee.services.utils.SecurityUtils;
@@ -38,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UploadCloud uploadCloud;
     private final GenericRepositoryCustom<User> userCustomRepo;
@@ -61,7 +59,7 @@ public class UserServiceImpl implements UserService {
                 .name(user.getName())
                 .build();
 
-         User savedUser = userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
         log.info("User created successfully with email: {}", savedUser.getEmail());
         return savedUser;
     }
