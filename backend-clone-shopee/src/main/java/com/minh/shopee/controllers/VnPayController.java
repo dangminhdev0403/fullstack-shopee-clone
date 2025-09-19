@@ -41,7 +41,7 @@ public class VnPayController {
         try {
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
-            String vnp_TmnCode = VnPayUtil.vnp_TmnCode;
+            String vnp_TmnCode = VnPayUtil.vnpTmnCode;
 
             String vnp_TxnRef = String.valueOf(System.currentTimeMillis()); // Mã đơn hàng duy nhất
             String vnp_IpAddr = req.getRemoteAddr();
@@ -61,7 +61,7 @@ public class VnPayController {
             vnp_Params.put("vnp_OrderInfo", orderInfo);
             vnp_Params.put("vnp_OrderType", orderType);
             vnp_Params.put("vnp_Locale", language);
-            vnp_Params.put("vnp_ReturnUrl", VnPayUtil.vnp_ReturnUrl);
+            vnp_Params.put("vnp_ReturnUrl", VnPayUtil.vnpApiUrl);
             vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
             Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -100,7 +100,7 @@ public class VnPayController {
             String vnp_SecureHash = VnPayUtil.hmacSHA512(VnPayUtil.secretKey, hashData.toString());
             query.append("&vnp_SecureHash=").append(vnp_SecureHash);
 
-            String paymentUrl = VnPayUtil.vnp_PayUrl + "?" + query;
+            String paymentUrl = VnPayUtil.vnpPayUrl + "?" + query;
 
             Map<String, Object> result = new HashMap<>();
             result.put("code", "00");

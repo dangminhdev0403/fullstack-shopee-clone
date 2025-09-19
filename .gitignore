@@ -36,7 +36,7 @@ target/
 
 # Spring config (giữ docker config, ignore local config)
 **/application.properties
-**/application-*.yml
+# **/application-*.yml
 !src/main/resources/application-docker.yml
 
 # Logs

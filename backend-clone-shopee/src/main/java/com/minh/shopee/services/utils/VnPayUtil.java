@@ -14,15 +14,42 @@ import java.util.Random;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Value;
+
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class VnPayUtil {
 
-    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/api/v1/vnpay/return";
-    public static String vnp_TmnCode = "X69NK85M";
-    public static String secretKey = "R8TBKWA3Q10F2RCRWGRZHT6205124ZMS";
-    public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+     @Value("${app.vnpay.pay-url}")
+    private String vnpPayUrlProp;
+
+    @Value("${app.vnpay.return-url}")
+    private String vnpReturnUrlProp;
+
+    @Value("${app.vnpay.tmn-code}")
+    private String vnpTmnCodeProp;
+
+    @Value("${app.vnpay.secret-key}")
+    private String secretKeyProp;
+
+    @Value("${app.vnpay.api-url}")
+    private String vnpApiUrlProp;
+
+    public static String vnpPayUrl;
+    public static String vnpReturnUrl;
+    public static String vnpTmnCode;
+    public static String secretKey;
+    public static String vnpApiUrl;
+
+    @PostConstruct
+    public void init() {
+        vnpPayUrl = vnpPayUrlProp;
+        vnpReturnUrl = vnpReturnUrlProp;
+        vnpTmnCode = vnpTmnCodeProp;
+        secretKey = secretKeyProp;
+        vnpApiUrl = vnpApiUrlProp;
+    }
 
     public static String md5(String message) {
         String digest = null;

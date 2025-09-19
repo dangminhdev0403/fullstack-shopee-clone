@@ -68,6 +68,7 @@ export default function Orders() {
     useGetOrderStatusQuery();
   const { data: orderOverview, isLoading: isLoadingOrderOverview } =
     useGetOverviewsQuery();
+  console.log(ordersData);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {

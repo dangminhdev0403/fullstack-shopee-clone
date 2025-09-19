@@ -117,7 +117,6 @@ public class OrderServiceImpl implements OrderService {
                                 item.setProduct(product);
                                 item.setQuantity(itemReq.getQuantity());
                                 item.setPrice(product.getPrice());
-
                                 orderItems.add(item);
 
                                 subtotal = subtotal.add(
