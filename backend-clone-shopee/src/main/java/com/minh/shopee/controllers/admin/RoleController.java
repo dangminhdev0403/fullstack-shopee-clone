@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.minh.shopee.domain.anotation.ApiDescription;
 import com.minh.shopee.domain.constant.ApiRoutes;
 import com.minh.shopee.domain.dto.request.rbac.RoleRequest;
-import com.minh.shopee.domain.dto.response.projection.RoleProjection;
 import com.minh.shopee.domain.dto.response.rbac.RoleDTO;
 import com.minh.shopee.domain.model.Role;
 import com.minh.shopee.services.RoleService;
