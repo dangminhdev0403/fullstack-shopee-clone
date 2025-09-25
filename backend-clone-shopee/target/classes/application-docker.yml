@@ -16,11 +16,6 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
 URL_FONTENT: ${URL_FRONTEND:http://localhost:5173}
-
 app:
   vnpay:
-    pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-    return-url: http://localhost:8080/api/v1/vnpay/return
-    tmn-code: X69NK85M
-    secret-key: R8TBKWA3Q10F2RCRWGRZHT6205124ZMS
-    api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+    return-url: ${VNPAY_RETURN_URL:http://localhost:8080/api/v1/vnpay/return}

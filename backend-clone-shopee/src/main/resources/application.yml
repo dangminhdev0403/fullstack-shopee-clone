@@ -4,7 +4,7 @@ spring:
   mvc:
     trailing-slash-match: true
   profiles:
-    active: dev # default chạy dev khi local
+    active: docker # default chạy dev khi local
 
 # Config upload file chung
 file:
@@ -27,5 +27,10 @@ minh:
     cloud_name: dwjqosrrk
     api_key: 391995177417558
     api_secret: AYhNLy8Ol7umHf_9p00s_kJTnw8
-    
-
+app:
+  vnpay:
+    pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    return-url: http://localhost:8080/api/v1/vnpay/return
+    tmn-code: X69NK85M
+    secret-key: HT8EQ8SLUE0S3CXXHOCXT8U0A2NRWO74
+    api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
