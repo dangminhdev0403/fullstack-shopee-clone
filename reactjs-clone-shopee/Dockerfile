@@ -1,15 +1,22 @@
 FROM node:20-alpine as build
 WORKDIR /app
 
-# copy code và node_modules từ local
+# Copy package info
 COPY package*.json ./
+
+# Copy node_modules từ local (build nhanh)
 COPY node_modules ./node_modules
+
+# Copy source code
 COPY . .
 
 ARG VITE_BASE_URL
 ENV VITE_BASE_URL=$VITE_BASE_URL
 
-RUN chmod +x node_modules/.bin/vite
+# Fix quyền cho các file .bin (vite, eslint, prettier…)
+RUN chmod +x node_modules/.bin/*
+
+# Build
 RUN npm run build && rm -rf node_modules
 
 # Stage 2: Serve với Nginx
