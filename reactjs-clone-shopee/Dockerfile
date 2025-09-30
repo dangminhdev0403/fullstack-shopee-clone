@@ -9,7 +9,7 @@ COPY . .
 ARG VITE_BASE_URL
 ENV VITE_BASE_URL=$VITE_BASE_URL
 
-RUN npm run build
+RUN npm run build && rm -rf node_modules
 
 # Stage 2: Serve với Nginx
 FROM nginx:alpine
