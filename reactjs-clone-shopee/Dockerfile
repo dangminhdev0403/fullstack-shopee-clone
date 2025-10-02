@@ -6,17 +6,17 @@ WORKDIR /app
 # Copy package.json trước để cache layer
 COPY package*.json ./
 
-# Cài dependencies
+# Cài dependencies dự án
 RUN npm install
+
+# Cài vite global để tránh lỗi permission
+RUN npm install -g vite
 
 # Copy toàn bộ source code
 COPY . .
 
-# Fix quyền cho vite và các bin khác (sau khi copy xong)
-RUN chmod +x node_modules/.bin/*
-
-# Build ra dist
-RUN npm run build
+# Build ra dist (dùng vite global)
+RUN vite build --mode production
 
 # Stage 2: Serve với nginx
 FROM nginx:alpine
