@@ -3,18 +3,17 @@ FROM node:20 AS build
 
 WORKDIR /app
 
-# Copy package.json trước để cache npm install
+# Copy package.json trước để cache
 COPY package*.json ./
 
-# Cài dependencies trong container
+# Cài dependencies
 RUN npm install
 
-# Copy toàn bộ source code
-COPY . .
+# Fix quyền cho vite và các bin khác
+RUN chmod +x node_modules/.bin/*
 
-# Nhận biến từ docker-compose.yml
-ARG VITE_BASE_URL
-ENV VITE_BASE_URL=$VITE_BASE_URL
+# Copy source code
+COPY . .
 
 # Build ra dist
 RUN npm run build
