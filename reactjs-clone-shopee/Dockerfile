@@ -1,27 +1,29 @@
-FROM node:20-alpine as build
+# Stage 1: Build
+FROM node:20-alpine AS build
+
 WORKDIR /app
 
-# Copy package info
+# Copy package.json để cache layer install
 COPY package*.json ./
 
-# Copy node_modules từ local (build nhanh)
-COPY node_modules ./node_modules
+# Install dependencies (trong container, đảm bảo tương thích)
+RUN npm install
 
-# Copy source code
+# Copy toàn bộ source code
 COPY . .
 
+# Build app (có ARG từ docker-compose)
 ARG VITE_BASE_URL
 ENV VITE_BASE_URL=$VITE_BASE_URL
+RUN npm run build
 
-# Fix quyền cho các file .bin (vite, eslint, prettier…)
-RUN chmod +x node_modules/.bin/*
-
-# Build
-RUN npm run build && rm -rf node_modules
-
-# Stage 2: Serve với Nginx
+# Stage 2: Serve với nginx
 FROM nginx:alpine
+
+# Copy build output sang nginx
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy file nginx.conf custom (proxy API)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

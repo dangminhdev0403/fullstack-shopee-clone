@@ -9,7 +9,7 @@ services:
       context: ./backend-clone-shopee
       dockerfile: Dockerfile
     container_name: backend
-    environment: # Runtime variables (Spring Boot đọc khi chạy container)
+    environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/shopee_clone?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
@@ -29,8 +29,8 @@ services:
     build:
       context: ./reactjs-clone-shopee
       dockerfile: Dockerfile
-      args: # Build-time variables (Vite cần khi npm run build)
-        VITE_BASE_URL: /api # <--- chỉ gọi /api
+      args:
+        VITE_BASE_URL: http://backend:8080/api # dùng service name backend
     container_name: frontend
     ports:
       - "80:80"
@@ -44,7 +44,7 @@ services:
   db:
     image: mysql:8.0
     container_name: mysql
-    environment: # Runtime variables (MySQL đọc khi container start)
+    environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=shopee_clone
       - MYSQL_PASSWORD=root
