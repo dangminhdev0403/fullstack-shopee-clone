@@ -3,17 +3,17 @@ FROM node:20 AS build
 
 WORKDIR /app
 
-# Copy package.json trước để cache
+# Copy package.json trước để cache layer
 COPY package*.json ./
 
 # Cài dependencies
 RUN npm install
 
-# Fix quyền cho vite và các bin khác
-RUN chmod +x node_modules/.bin/*
-
-# Copy source code
+# Copy toàn bộ source code
 COPY . .
+
+# Fix quyền cho vite và các bin khác (sau khi copy xong)
+RUN chmod +x node_modules/.bin/*
 
 # Build ra dist
 RUN npm run build
