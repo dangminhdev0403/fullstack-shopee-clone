@@ -30,11 +30,26 @@ services:
       context: ./reactjs-clone-shopee
       dockerfile: Dockerfile
       args:
-        VITE_BASE_URL: http://backend:8080/api # dùng service name backend
+        VITE_BASE_URL: http://backend:8080/api
     container_name: frontend
     ports:
       - "8081:80"
     depends_on:
+      - backend
+    restart: unless-stopped
+
+  # =======================
+  # Reverse Proxy (Nginx)
+  # =======================
+  nginx-proxy:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
       - backend
     restart: unless-stopped
 
