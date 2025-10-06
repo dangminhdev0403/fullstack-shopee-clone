@@ -33,7 +33,7 @@ services:
         VITE_BASE_URL: http://backend:8080/api # dùng service name backend
     container_name: frontend
     ports:
-      - "80:80"
+      - "8081:80"
     depends_on:
       - backend
     restart: unless-stopped
