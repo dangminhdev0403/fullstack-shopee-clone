@@ -284,10 +284,15 @@ public class ProductServiceImpl implements ProductSerivce {
     @Override
     public void createListProduct(MultipartFile file) {
         try {
+            long userId = SecurityUtils.getCurrentUserId();
+            Shop shop = shopRepository.findByOwnerId(userId)
+                    .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST.value(),
+                            "Shop not found", "Không tìm thấy shop của User này"));
             ProductData productData = this.excelHelper.readExcelProductFile(file);
             List<Product> listProducts = productData.getListProducts();
             List<ProductImage> listProductImages = productData.getListProductImages();
             if (listProducts != null && !listProducts.isEmpty()) {
+                listProducts.forEach(p -> p.setShop(shop));
                 log.info("Save List product: {}", listProducts);
                 productRepository.saveAll(listProducts);
             }

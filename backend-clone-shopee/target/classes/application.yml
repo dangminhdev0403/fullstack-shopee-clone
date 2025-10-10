@@ -4,7 +4,7 @@ spring:
   mvc:
     trailing-slash-match: true
   profiles:
-    active: docker # default chạy dev khi local
+    active: dev # default chạy dev khi local
 
 # Config upload file chung
 file:
