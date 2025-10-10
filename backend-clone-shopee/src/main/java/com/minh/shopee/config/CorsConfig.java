@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "CorsConfiguration")
 public class CorsConfig {
 
-    @Value("${URL_FONTENT}")
+    @Value("${URL_FRONTEND}")
     String urlFontend;
 
     @Bean

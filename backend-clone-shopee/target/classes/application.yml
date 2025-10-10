@@ -4,7 +4,7 @@ spring:
   mvc:
     trailing-slash-match: true
   profiles:
-    active: docker # default chạy dev khi local
+    active: dev # default chạy dev khi local
 
 # Config upload file chung
 file:
@@ -12,7 +12,7 @@ file:
     dir: uploads
 
 # URL frontend (override trong từng profile nếu cần)
-URL_FONTENT: http://localhost:5173
+URL_FRONTEND: http://localhost:5173
 
 # JWT config (có fallback nếu không truyền ENV)
 minh:
