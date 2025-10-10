@@ -16,6 +16,8 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+    ports:
+      - "8080:8080"
 
   frontend:
     build:
