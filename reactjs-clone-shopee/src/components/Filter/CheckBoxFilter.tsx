@@ -17,8 +17,7 @@ const CheckBoxFilter = ({ filterData }: FilterCheckBox) => {
   const activeValue = filter[key]?.toString();
 
   const handleFilter = (id: string) => {
-
-    updateFilter({ ...filter, [key]: Number(id) });
+    updateFilter({ ...filter, [key]: Number(id), page: 1 });
   };
 
   return (

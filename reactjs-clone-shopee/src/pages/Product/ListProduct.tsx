@@ -90,7 +90,7 @@ const ListProduct = () => {
 
   const handleSort = (id: SortType) => {
     if (id === "price_asc") {
-      updateFilter({ ...filter, sortBy: "price", order: "asc" });
+      updateFilter({ ...filter, sortBy: "price", order: "asc", page: 1 });
     } else if (id === "price_desc") {
       updateFilter({ ...filter, sortBy: "price", order: "desc" });
     } else {
@@ -98,6 +98,7 @@ const ListProduct = () => {
         ...filter,
         sortBy: id as "ctime" | "relevancy" | "sold",
         order: "desc",
+        page: 1,
       });
     }
   };
