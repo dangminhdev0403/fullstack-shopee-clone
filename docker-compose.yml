@@ -28,7 +28,7 @@ services:
       - backend
     restart: unless-stopped
     # ❌ bỏ port mapping, chỉ chạy internal port 80
-    expose:
+    ports:
       - "80:8081"
 
   db:
