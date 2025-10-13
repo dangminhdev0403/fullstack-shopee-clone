@@ -5,8 +5,8 @@ spring:
 
   datasource:
     url: jdbc:mysql://160.250.65.242:3306/shopee_clone
-    username: root
-    password: root
+    username: minh
+    password: matkhau_baomat
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

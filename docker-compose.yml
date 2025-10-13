@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build:
@@ -43,9 +41,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      # ✅ Mount thẳng vào thư mục thật trên VPS (dữ liệu nằm ngoài Docker)
+      - /var/www/fullstack-shopee-clone/mysql_data:/var/lib/mysql
       - ./data.sql:/docker-entrypoint-initdb.d/data.sql
     restart: unless-stopped
-
-volumes:
-  mysql_data:
