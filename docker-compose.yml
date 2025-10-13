@@ -29,7 +29,7 @@ services:
     restart: unless-stopped
     # ❌ bỏ port mapping, chỉ chạy internal port 80
     ports:
-      - "80:80811"
+      - "80:8081"
 
   db:
     image: mysql:8.0
