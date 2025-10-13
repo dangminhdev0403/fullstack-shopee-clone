@@ -27,9 +27,8 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-    # ❌ bỏ port mapping, chỉ chạy internal port 80
     ports:
-      - "80:8081"
+      - "8081:80"
 
   db:
     image: mysql:8.0
