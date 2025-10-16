@@ -25,6 +25,7 @@ export const API_ROUTES = {
   },
   PRODUCT: {
     BASE: `${version}/products`,
+    HINTS: `${version}/products/search_hints`,
   },
   USER: {
     BASE: `${version}/user`,

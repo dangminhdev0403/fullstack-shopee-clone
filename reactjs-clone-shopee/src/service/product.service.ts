@@ -62,6 +62,14 @@ const productApi = {
     const { data } = response;
     return data;
   },
+
+  getSearchHints: async (keyword: string) => {
+    const response = await instance.get(API_ROUTES.PRODUCT.HINTS, {
+      params: { keyword },
+    });
+
+    return response.data;
+  },
 };
 export const ghnService = {
   calculateShippingFee: async (payload: GHNShippingFeeRequest) => {

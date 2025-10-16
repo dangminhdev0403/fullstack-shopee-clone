@@ -5,15 +5,16 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export interface BaseResponse<T> {
-  status: number;
-  error: string | null;
-  message: string;
-  data: {
-    content: T[] ;
-    page: PageInfo;
-  };
-}
+  export interface BaseResponse<T> {
+    status: number;
+    error: string | null;
+    message: string;
+    data: {
+      content: T;
+      page: PageInfo;
+    };
+  }
+
 export interface DataUserLogin {
   access_token: string;
   user: {

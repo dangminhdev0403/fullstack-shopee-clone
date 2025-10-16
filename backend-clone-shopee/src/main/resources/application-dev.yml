@@ -4,9 +4,12 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:mysql://160.250.65.242:3306/shopee_clone
-    username: minh
-    password: matkhau_baomat
+    # url: jdbc:mysql://160.250.65.242:3306/shopee_clone
+    # username: minh
+    # password: matkhau_baomat
+    url: jdbc:mysql://localhost:3306/shopee_clone
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

@@ -16,6 +16,7 @@ import com.minh.shopee.domain.dto.request.filters.FiltersProductAdmin;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
+import com.minh.shopee.domain.dto.response.projection.ProductHintProjection;
 import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 
 public interface ProductSerivce {
@@ -46,4 +47,6 @@ public interface ProductSerivce {
   Page<ProductShopProjection> getAllProductsByShop(Pageable pageable, FiltersProductAdmin filtersProduct);
 
   void restoreCart(List<AddProductDTO> cartRestores);
+
+  Page<ProductHintProjection> searchProductsHints(String keyword) throws NoSuchMethodException;
 }

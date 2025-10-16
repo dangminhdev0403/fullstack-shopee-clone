@@ -39,6 +39,7 @@ import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductImageDTO;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
 import com.minh.shopee.domain.dto.response.projection.CartProjection;
+import com.minh.shopee.domain.dto.response.projection.ProductHintProjection;
 import com.minh.shopee.domain.dto.response.projection.ProductProjection;
 import com.minh.shopee.domain.dto.response.projection.admin.ProductShopProjection;
 import com.minh.shopee.domain.model.Cart;
@@ -539,5 +540,15 @@ public class ProductServiceImpl implements ProductSerivce {
                         ex.getMessage());
             }
         }
+    }
+
+    @Override
+    public Page<ProductHintProjection> searchProductsHints(String keyword) throws NoSuchMethodException {
+        Pageable pageable = PageRequest.of(0, 10); // Giới hạn 10 kết quả
+        return this.productCustomRepo.findAll(
+                Specification.where(ProductSpecification.hasStatus(ProductStatus.ACTIVE))
+                        .and(ProductSpecification.hasName(keyword)),
+                pageable,
+                ProductHintProjection.class);
     }
 }

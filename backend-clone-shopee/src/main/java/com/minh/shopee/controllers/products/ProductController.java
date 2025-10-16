@@ -27,6 +27,7 @@ import com.minh.shopee.domain.dto.request.filters.FiltersProduct;
 import com.minh.shopee.domain.dto.request.filters.SortFilter;
 import com.minh.shopee.domain.dto.response.carts.CartDTO;
 import com.minh.shopee.domain.dto.response.products.ProductResDTO;
+import com.minh.shopee.domain.dto.response.projection.ProductHintProjection;
 import com.minh.shopee.domain.dto.response.projection.ProductProjection;
 import com.minh.shopee.services.ProductSerivce;
 import com.minh.shopee.services.utils.error.AppException;
@@ -57,6 +58,16 @@ public class ProductController {
             Pageable pageable) throws NoSuchMethodException {
 
         Page<ProductResDTO> products = productSerivce.searchProducts(keyword, filter, sortFilter, pageable);
+
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/search_hints")
+    @ApiDescription("Gợi ý tìm kiếm sản phẩm theo từ khoá")
+    public ResponseEntity<Page<ProductHintProjection>> searchNameProducts(
+            @RequestParam(value = "keyword", required = false) String keyword) throws NoSuchMethodException {
+
+        Page<ProductHintProjection> products = productSerivce.searchProductsHints(keyword);
 
         return ResponseEntity.ok(products);
     }

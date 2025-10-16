@@ -16,7 +16,9 @@ import {
   faEarthAsia,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useDebounce } from "@hooks/useDebounce";
 import { useProductFilter } from "@hooks/useProductFilter";
+import { useProductHints } from "@react-query/useProductHints";
 import { useLogOutMutation } from "@redux/api/authApi";
 import { useGetCartQuery } from "@redux/api/cartApi";
 import { authSlice } from "@redux/slices/authSlice";
@@ -24,7 +26,7 @@ import { RootState } from "@redux/store";
 import { ROUTES } from "@utils/constants/route";
 import ErrorResponse from "@utils/constants/types/errors.response";
 import { language } from "@utils/items.dropdown";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
@@ -36,21 +38,44 @@ const Header = () => {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
+  const debouncedQuery = useDebounce(query, 400);
+  const { data: hintData, isLoading } = useProductHints(debouncedQuery);
+  const hints = hintData?.content ?? [];
   const isAmdmin = (user?.roles?.map((r) => r.name) || []).every(
     (role) => role === "ROLE_ADMIN",
   );
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const { data: cart } = useGetCartQuery();
   const { filter, updateFilter } = useProductFilter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Tìm kiếm:", query);
     updateFilter({ ...filter, keyword: query });
 
     // Thực hiện tìm kiếm tại đây
   };
 
+  const [showHints, setShowHints] = useState(false);
+
+  useEffect(() => {
+    // Nếu có query thì mở gợi ý
+    if (query.trim() !== "") {
+      setShowHints(true);
+    }
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowHints(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [query]);
   const handleProfileClick = async (value: string) => {
     switch (value) {
       case "profile":
@@ -162,7 +187,10 @@ const Header = () => {
           <Link to={ROUTES.HOME}>
             <Logo />
           </Link>
-          <div className="mx-auto mt-4 w-full max-w-3xl">
+          <div
+            className="search-container relative mx-auto mt-4 w-full max-w-3xl"
+            ref={searchRef}
+          >
             <form
               onSubmit={handleSubmit}
               className="flex overflow-hidden rounded-md bg-white shadow-sm"
@@ -170,10 +198,12 @@ const Header = () => {
               <input
                 type="text"
                 value={query}
+                onFocus={() => setShowHints(true)}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Shopee bao ship 0Đ - Đăng ký ngay!"
-                className="flex-grow px-4 py-2 text-gray-700 outline-none"
+                className="w-full flex-grow px-4 py-2 text-gray-700 outline-none"
               />
+
               <button
                 type="submit"
                 title="Search"
@@ -182,6 +212,23 @@ const Header = () => {
                 <FiSearch size={15} />
               </button>
             </form>
+            {query && hints.length > 0 && showHints && (
+              <ul className="absolute z-[9999] w-full border border-gray-300 bg-white">
+                {hints.map((item: { id: number; name: string }) => (
+                  <li
+                    key={item.id}
+                    onClick={() => {
+                      setQuery(item.name);
+                      updateFilter({ ...filter, keyword: item.name });
+                      setShowHints(false); // 🔥 Ẩn gợi ý sau khi chọn
+                    }}
+                    className="w-full cursor-pointer px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    {item.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="group mr-auto min-w-10 cursor-pointer">
