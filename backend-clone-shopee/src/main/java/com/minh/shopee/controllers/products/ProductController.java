@@ -75,7 +75,6 @@ public class ProductController {
     @GetMapping("/{id:[0-9]+}")
     @ApiDescription("Lấy thông tin sản phẩm theo ID")
     public ResponseEntity<ProductProjection> getProductById(@PathVariable("id") Long id) {
-
         ProductProjection product = productSerivce.getProductById(id, ProductProjection.class);
         return ResponseEntity.ok(product);
     }
