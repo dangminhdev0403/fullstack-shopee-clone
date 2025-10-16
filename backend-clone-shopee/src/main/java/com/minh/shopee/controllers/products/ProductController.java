@@ -72,7 +72,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:[0-9]+}")
     @ApiDescription("Lấy thông tin sản phẩm theo ID")
     public ResponseEntity<ProductProjection> getProductById(@PathVariable("id") Long id) {
 
