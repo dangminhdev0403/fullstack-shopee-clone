@@ -64,7 +64,7 @@ const productApi = {
   },
 
   getSearchHints: async (keyword: string) => {
-    const response = await instance.get(API_ROUTES.PRODUCT.HINTS, {
+    const response = await instance.post(API_ROUTES.PRODUCT.HINTS, {
       params: { keyword },
     });
 

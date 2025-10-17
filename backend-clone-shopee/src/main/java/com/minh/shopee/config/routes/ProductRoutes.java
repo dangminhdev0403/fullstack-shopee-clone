@@ -10,7 +10,7 @@ public class ProductRoutes {
     }
 
     public static final String[] PUBLIC_ENDPOINTS = {
-            // BASE + "/v1/products/**",
+            BASE + "/v1/products/search_hints/**",
             // BASE + "/v2/products/**"
     };
 

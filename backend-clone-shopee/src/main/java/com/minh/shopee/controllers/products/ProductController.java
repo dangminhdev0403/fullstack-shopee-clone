@@ -62,7 +62,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/search_hints")
+    @PostMapping("/search_hints")
     @ApiDescription("Gợi ý tìm kiếm sản phẩm theo từ khoá")
     public ResponseEntity<Page<ProductHintProjection>> searchNameProducts(
             @RequestParam(value = "keyword", required = false) String keyword) throws NoSuchMethodException {
