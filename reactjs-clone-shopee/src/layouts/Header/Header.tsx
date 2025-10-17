@@ -46,7 +46,9 @@ const Header = () => {
   );
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const { data: cart } = useGetCartQuery();
+  const { data: cart } = useGetCartQuery(undefined, {
+    skip: !auth.isAuthenticated,
+  });
   const { filter, updateFilter } = useProductFilter();
 
   const handleSubmit = (e: React.FormEvent) => {
