@@ -54,7 +54,6 @@ public class CategoryController {
         }
 
         Category categoryCreated = this.categoryService.createCategory(category);
-
         return ResponseEntity.ok("Tạo danh mục " + categoryCreated.getName() + " thành công ");
     }
 
