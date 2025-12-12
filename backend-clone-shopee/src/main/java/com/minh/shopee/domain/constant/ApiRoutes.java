@@ -30,7 +30,7 @@ public class ApiRoutes {
         };
 
         public static final String[] PUBLIC_COMMON_ENDPOINTS = {
-                        "/swagger-ui/**", "/v3/api-docs/**"
+                        "/swagger-ui/**", "/v3/api-docs/**", "/ws/**"
         };
 
         public static final Map<HttpMethod, String[]> METHOD_SPECIFIC_ENDPOINTS = Map.of(

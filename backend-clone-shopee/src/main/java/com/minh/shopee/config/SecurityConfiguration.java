@@ -52,6 +52,7 @@ public class SecurityConfiguration {
                                 .authorizeHttpRequests(authz -> {
                                         // 3. Public routes
                                         authz.requestMatchers(whitelist).permitAll();
+                                        authz.requestMatchers("/ws/**").permitAll();
 
                                         // 4. Các route chỉ cho phép method cụ thể (GET, POST, ...)
                                         ApiRoutes.METHOD_SPECIFIC_ENDPOINTS.forEach((method, paths) -> authz
