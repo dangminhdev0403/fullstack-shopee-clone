@@ -1,4 +1,4 @@
-import { StrictMode, Suspense } from "react";
+import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
@@ -15,7 +15,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  <>
     <Provider store={store}>
       <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
         <QueryClientProvider client={queryClient}>
@@ -44,5 +44,5 @@ createRoot(document.getElementById("root")!).render(
         </QueryClientProvider>
       </PersistGate>
     </Provider>
-  </StrictMode>,
+  </>,
 );

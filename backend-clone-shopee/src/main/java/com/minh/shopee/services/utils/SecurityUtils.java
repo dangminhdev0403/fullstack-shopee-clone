@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -263,4 +264,20 @@ public class SecurityUtils {
         throw new AppException(401, "Unauthorized", "Không thể lấy thông tin người dùng từ token");
     }
 
+    public Authentication getAuthentication(String token) {
+        try {
+            Jwt jwt = validateAccessToken(token);
+
+            return new JwtAuthenticationToken(
+                    jwt,
+                    jwt.getClaimAsStringList("permission") != null
+                            ? jwt.getClaimAsStringList("permission").stream()
+                                    .map(role -> (GrantedAuthority) () -> role)
+                                    .toList()
+                            : List.of());
+        } catch (Exception e) {
+            log.error("JWT authentication error: {}", e.getMessage());
+            return null;
+        }
+    }
 }

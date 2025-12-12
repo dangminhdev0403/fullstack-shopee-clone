@@ -1,4 +1,6 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.debug.settings.onBuildFailureProceed": true
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.debug.settings.onBuildFailureProceed": true,
+  "codium.codeCompletion.enable": false,
+  "java.configuration.updateBuildConfiguration": "automatic"
 }
