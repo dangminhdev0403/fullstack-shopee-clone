@@ -204,3 +204,315 @@ org.springframework.security.oauth2.jwt.JwtValidationException: An error occurre
 2025-12-12 15:52:25 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
 2025-12-12 15:52:25 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
 2025-12-12 15:52:45 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 21.314 seconds (process running for 22.545)
+2025-12-12 15:53:01 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 20796 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 15:53:01 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 15:53:01 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 15:53:17 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 17.299 seconds (process running for 18.357)
+2025-12-12 16:14:20 ERROR c.m.shopee.config.JWTConfiguration - JWT Decode Error: An error occurred while attempting to decode the Jwt: Jwt expired at 2025-12-12T09:12:29Z
+org.springframework.security.oauth2.jwt.JwtValidationException: An error occurred while attempting to decode the Jwt: Jwt expired at 2025-12-12T09:12:29Z
+	at org.springframework.security.oauth2.jwt.NimbusJwtDecoder.validateJwt(NimbusJwtDecoder.java:193)
+	at org.springframework.security.oauth2.jwt.NimbusJwtDecoder.decode(NimbusJwtDecoder.java:139)
+	at com.minh.shopee.config.JWTConfiguration.lambda$0(JWTConfiguration.java:64)
+	at org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider.getJwt(JwtAuthenticationProvider.java:99)
+	at org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider.authenticate(JwtAuthenticationProvider.java:88)
+	at org.springframework.security.authentication.ProviderManager.authenticate(ProviderManager.java:182)
+	at org.springframework.security.authentication.ObservationAuthenticationManager.lambda$authenticate$1(ObservationAuthenticationManager.java:54)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.security.authentication.ObservationAuthenticationManager.authenticate(ObservationAuthenticationManager.java:53)
+	at org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter.doFilterInternal(BearerTokenAuthenticationFilter.java:137)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1740)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-12-12 16:14:20 ERROR c.m.shopee.config.JWTConfiguration - JWT Decode Error: An error occurred while attempting to decode the Jwt: Jwt expired at 2025-12-12T09:12:29Z
+org.springframework.security.oauth2.jwt.JwtValidationException: An error occurred while attempting to decode the Jwt: Jwt expired at 2025-12-12T09:12:29Z
+	at org.springframework.security.oauth2.jwt.NimbusJwtDecoder.validateJwt(NimbusJwtDecoder.java:193)
+	at org.springframework.security.oauth2.jwt.NimbusJwtDecoder.decode(NimbusJwtDecoder.java:139)
+	at com.minh.shopee.config.JWTConfiguration.lambda$0(JWTConfiguration.java:64)
+	at org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider.getJwt(JwtAuthenticationProvider.java:99)
+	at org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider.authenticate(JwtAuthenticationProvider.java:88)
+	at org.springframework.security.authentication.ProviderManager.authenticate(ProviderManager.java:182)
+	at org.springframework.security.authentication.ObservationAuthenticationManager.lambda$authenticate$1(ObservationAuthenticationManager.java:54)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.security.authentication.ObservationAuthenticationManager.authenticate(ObservationAuthenticationManager.java:53)
+	at org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter.doFilterInternal(BearerTokenAuthenticationFilter.java:137)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1740)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-12-12 16:19:58 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 23636 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:19:58 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:19:58 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:20:21 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 24.249 seconds (process running for 25.671)
+2025-12-12 16:25:54 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 18612 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:25:54 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:25:54 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:26:12 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 18.225 seconds (process running for 19.52)
+2025-12-12 16:27:01 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 22568 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:27:01 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:27:01 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:27:17 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 17.281 seconds (process running for 18.632)
+2025-12-12 16:29:59 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 24072 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:29:59 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:29:59 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:30:21 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 23.005 seconds (process running for 24.437)
+2025-12-12 16:31:12 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 16668 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:31:12 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:31:12 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:31:32 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 20.951 seconds (process running for 21.939)
+2025-12-12 16:34:24 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 24568 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:34:24 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:34:24 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:34:47 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 24.395 seconds (process running for 25.43)
+2025-12-12 16:35:35 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 13124 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:35:35 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:35:35 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:35:54 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 20.332 seconds (process running for 21.86)
+2025-12-12 16:42:15 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 400 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:42:15 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:42:15 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:42:35 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 20.691 seconds (process running for 22.022)
+2025-12-12 16:44:06 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 20256 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:44:06 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:44:06 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:44:27 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 21.264 seconds (process running for 22.787)
+2025-12-12 16:46:01 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 23220 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:46:01 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:46:01 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:46:32 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 31.817 seconds (process running for 33.006)
+2025-12-12 16:46:52 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 23124 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 16:46:52 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 16:46:52 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 16:47:13 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 21.736 seconds (process running for 23.372)
+2025-12-12 17:17:08 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 16564 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 17:17:08 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 17:17:08 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 17:17:35 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 28.417 seconds (process running for 30.145)
+2025-12-12 17:18:51 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 3268 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 17:18:51 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 17:18:51 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 17:19:26 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 36.707 seconds (process running for 42.741)
+2025-12-12 17:40:44 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 15588 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 17:40:44 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 17:40:44 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 17:41:11 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 27.95 seconds (process running for 29.119)
+2025-12-12 17:41:59 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 14828 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 17:41:59 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 17:41:59 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 17:42:19 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 21.244 seconds (process running for 22.55)
+2025-12-12 17:46:44 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 18872 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 17:46:44 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 17:46:44 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 17:47:06 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 23.67 seconds (process running for 24.793)
+2025-12-12 17:56:10 INFO  c.minh.shopee.ShopeeApplicationTests - Starting ShopeeApplicationTests using Java 17.0.12 with PID 18512 (started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 17:56:10 DEBUG c.minh.shopee.ShopeeApplicationTests - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 17:56:10 INFO  c.minh.shopee.ShopeeApplicationTests - The following 1 profile is active: "dev"
+2025-12-12 17:56:22 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/products/get-cart, /api/v1/shops, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/admin/analytics/common-analytics, /api/v1/orders/checkout, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs/swagger-config, /v3/api-docs, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 17:56:27 INFO  c.minh.shopee.ShopeeApplicationTests - Started ShopeeApplicationTests in 17.325 seconds (process running for 19.158)
+2025-12-12 17:56:40 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 17:56:40 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 17:56:40 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 17:56:54 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 17:56:59 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 19.374 seconds (process running for 20.309)
+2025-12-12 18:01:20 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:01:20 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:01:20 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:01:26 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:01:29 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 9.215 seconds (process running for 290.951)
+2025-12-12 18:01:32 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:01:32 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:01:32 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:01:37 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:01:38 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 6.844 seconds (process running for 299.898)
+2025-12-12 18:01:40 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:01:40 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:01:40 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:01:43 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:01:44 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 3.836 seconds (process running for 305.604)
+2025-12-12 18:01:49 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:01:49 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:01:49 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:01:51 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:01:52 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 3.126 seconds (process running for 313.265)
+2025-12-12 18:02:07 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:02:07 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:02:07 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:02:12 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:02:12 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:02:12 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:02:37 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:02:37 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:02:37 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:02:43 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:02:43 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:02:43 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:02:56 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:02:56 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:02:56 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:02:59 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:03:00 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 4.187 seconds (process running for 381.588)
+2025-12-12 18:04:16 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:04:16 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:04:16 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:04:18 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:04:19 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 3.527 seconds (process running for 460.933)
+2025-12-12 18:04:28 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:04:28 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:04:28 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:04:31 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:04:31 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 3.165 seconds (process running for 473.055)
+2025-12-12 18:04:52 INFO  com.minh.shopee.ShopeeApplication - Starting ShopeeApplication using Java 17.0.12 with PID 17660 (C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee\target\classes started by abcxy in C:\Users\abcxy\OneDrive\Desktop\workspace\projects\shopee_clone\backend-clone-shopee)
+2025-12-12 18:04:52 DEBUG com.minh.shopee.ShopeeApplication - Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-12-12 18:04:52 INFO  com.minh.shopee.ShopeeApplication - The following 1 profile is active: "dev"
+2025-12-12 18:04:54 INFO  c.m.s.c.CustomAuthenticationEntryPoint - ? Cached API routes: [/api/v1/admin/categories, /api/v1/admin/orders/overview, /api/v1/admin/analytics/weekly-data, /api/v1/products/search, /api/v1/vnpay/pay, /api/v1/admin/analytics/product-overview, /api/v1/profile/change-password, /api/v1/shops, /api/v1/products/get-cart, /api/v1/auth/refresh, /api/v1/admin/shops/update, /api/v1/admin/roles/{id}, /api/v1/admin/orders/statuses, /api/v1/products/search_hints, /api/v1/products/restore-cart, /api/v1/admin/orders, /api/v1/admin/shops/orders, /api/v1/orders/{id}, /api/v1/addresses, /api/v1/orders/checkout, /api/v1/admin/analytics/common-analytics, /api/v1/admin/roles, /api/v1/admin/users/search, /api/v1/auth/logout, /api/v1/auth/register, /api/v1/admin/users, /api/v1/admin/products/import, /error, /api/v1/auth/login, /api/v1/products/add-to-cart, /swagger-ui.html, /v3/api-docs, /v3/api-docs/swagger-config, /api/v1/profile, /api/v1/orders/cancel, /api/v1/orders, /api/v1/vnpay/return, /api/v1/admin/products/images/{id}, /api/v1/admin/products, /api/v1/products/remove-from-cart, /api/v1/products/remove-list-from-cart, /api/v1/products/{id:[0-9]+}, /api/v1/admin/permissions/{id}, /api/v1/admin/shops/update-status, /api/v1/addresses/{id}, /v3/api-docs.yaml, /api/v1/products, /api/v1/admin/permissions, /api/v1/categories]
+2025-12-12 18:04:55 INFO  com.minh.shopee.ShopeeApplication - Started ShopeeApplication in 3.322 seconds (process running for 496.996)

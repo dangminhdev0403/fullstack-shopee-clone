@@ -50,6 +50,11 @@ public class GlobalExceptionHandler {
             message = extractFieldErrors(e.getBindingResult());
             log.error("⚠️ [400 VALIDATION ERROR]   Message: {}", message);
         } else if (ex instanceof NoResourceFoundException) {
+            // ⛔ BỎ QUA WebSocket SockJS ENDPOINT
+            String path = request.getRequestURI();
+            if (path.startsWith("/ws")) {
+                return ResponseEntity.ok().build(); // <-- Fix duy nhất đúng
+            }
             statusCode = HttpStatus.NOT_FOUND.value();
             error = "Endpoint không tồn tại";
             message = "URL " + request.getRequestURL() + " không tồn tại";

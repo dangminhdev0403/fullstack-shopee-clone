@@ -21,71 +21,84 @@ import com.minh.shopee.domain.dto.response.ResponseData;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component("authenticationEntryPoint")
+@Slf4j
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
     private final ObjectMapper objectMapper;
-    private final PathMatcher pathMatcher = new AntPathMatcher(); // Thêm PathMatcher để khớp route
-    private final RequestMappingHandlerMapping handlerMapping; // Inject từ ApplicationContext
+    private final PathMatcher pathMatcher = new AntPathMatcher();
+    private final Set<String> cachedRoutes; // <== Cache lại để không build mỗi request
 
     public CustomAuthenticationEntryPoint(
             ObjectMapper objectMapper,
             @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping) {
         this.objectMapper = objectMapper;
-        this.handlerMapping = handlerMapping;
+
+        // Build routes duy nhất 1 lần khi Spring khởi động
+        this.cachedRoutes = handlerMapping.getHandlerMethods()
+                .keySet()
+                .stream()
+                .flatMap(info -> {
+                    if (info.getPathPatternsCondition() != null) {
+                        return info.getPathPatternsCondition().getPatterns().stream()
+                                .map(PathPattern::getPatternString);
+                    }
+                    return Stream.empty();
+                })
+                .collect(Collectors.toSet());
+
+        log.info("📌 Cached API routes: {}", cachedRoutes);
     }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType("application/json;charset=UTF-8");
-        String path = request.getRequestURI();
+            AuthenticationException ex) throws IOException, ServletException {
 
-        // Kiểm tra xem route có hợp lệ không
+        String path = request.getRequestURI();
+        response.setContentType("application/json;charset=UTF-8");
+
+        // 1) Skip tất cả WebSocket/SockJS
+        if (path.startsWith("/ws")) {
+
+            return;
+        }
+
+        // 2) Check API route
         if (!isValidRoute(path)) {
-            // Route không hợp lệ -> trả về 404
+            log.warn("⚠️ [404 NOT FOUND] URL: {}", request.getRequestURL());
+
             int statusCode = HttpStatus.NOT_FOUND.value();
             response.setStatus(statusCode);
+
             ResponseData<Object> data = ResponseData.<Object>builder()
                     .status(statusCode)
                     .data(null)
                     .error("Endpoint không tồn tại")
-                    .message("Không tìm thấy này " + path)
+                    .message("Không tìm thấy url: " + path)
                     .build();
+
             response.getWriter().write(objectMapper.writeValueAsString(data));
             return;
         }
 
-        // Route hợp lệ nhưng token không hợp lệ -> trả về 401
-
+        // 3) Token invalid -> 401
         int statusCode = HttpStatus.UNAUTHORIZED.value();
         response.setStatus(statusCode);
+
         ResponseData<Object> data = ResponseData.<Object>builder()
                 .status(statusCode)
                 .data(null)
-                .error("401")
+                .error("401 Unauthorized")
                 .message("Token không hợp lệ")
                 .build();
 
         response.getWriter().write(objectMapper.writeValueAsString(data));
     }
 
-    @SuppressWarnings("null")
     private boolean isValidRoute(String uri) {
-
-        Set<String> allRoutes = handlerMapping.getHandlerMethods()
-                .keySet()
-                .stream()
-                .flatMap(info -> {
-                    if (info.getPathPatternsCondition() != null) {
-                        return info.getPathPatternsCondition().getPatterns().stream()
-                                .map(PathPattern::getPatternString); // Lấy đường dẫn thực tế
-                    }
-                    return Stream.empty();
-                })
-                .collect(Collectors.toSet());
-
-        return allRoutes.stream().anyMatch(route -> pathMatcher.match(route, uri));
+        // WebSocket đã xử lý phía trên
+        return cachedRoutes.stream().anyMatch(route -> pathMatcher.match(route, uri));
     }
-
 }

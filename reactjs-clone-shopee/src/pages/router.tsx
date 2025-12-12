@@ -1,4 +1,5 @@
 import App from "@App";
+import ChatBox from "@components/chat/ChatBox";
 import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import AdminLayout from "@layouts/AdminLayout";
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: "/chat",
+        element: <ChatBox />,
       },
     ],
   },

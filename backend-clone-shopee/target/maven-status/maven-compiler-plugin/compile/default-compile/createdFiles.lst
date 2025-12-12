@@ -17,6 +17,7 @@ com\minh\shopee\repository\RoleRepository.class
 com\minh\shopee\domain\dto\request\AddProductDTO.class
 com\minh\shopee\domain\model\Order.class
 com\minh\shopee\domain\dto\response\analytics\CommonAnalyticsDTO.class
+com\minh\shopee\controllers\MessageController.class
 com\minh\shopee\domain\base\BaseEntity$BaseEntityBuilder.class
 com\minh\shopee\domain\model\ChartData.class
 com\minh\shopee\domain\dto\response\projection\OrderHistoryProjection$ProductProjection.class
@@ -34,7 +35,6 @@ com\minh\shopee\domain\dto\response\products\ProductImageDTO$ProductImageDTOBuil
 com\minh\shopee\domain\dto\request\UpdateShopDTO.class
 com\minh\shopee\services\repocustom\GenericRepositoryImpl.class
 com\minh\shopee\domain\dto\request\UpdateOrderDTO.class
-com\minh\shopee\services\utils\VnPayUtil.class
 com\minh\shopee\domain\dto\response\projection\PermissionProjection.class
 com\minh\shopee\config\prefix\AdminPathPrefixConfig.class
 com\minh\shopee\domain\dto\response\users\UserAuthDTO.class
@@ -50,6 +50,7 @@ com\minh\shopee\domain\model\CartDetail.class
 com\minh\shopee\domain\dto\response\products\ProductDetailDTO.class
 com\minh\shopee\repository\PermissionRepository.class
 com\minh\shopee\ShopeeApplication.class
+com\minh\shopee\domain\dto\response\products\ProductHintDTO$ProductHintDTOBuilder.class
 com\minh\shopee\repository\ProductImageRepository.class
 com\minh\shopee\controllers\admin\ProductController.class
 com\minh\shopee\services\impl\AddressServiceImpl.class
@@ -57,6 +58,7 @@ com\minh\shopee\controllers\admin\PermissionController.class
 com\minh\shopee\domain\model\ProductImage.class
 com\minh\shopee\domain\dto\request\OrderItemRequest.class
 com\minh\shopee\domain\dto\response\projection\admin\OrderShopProjection$ProductProjection.class
+com\minh\shopee\domain\dto\response\products\ProductHintDTO.class
 com\minh\shopee\config\CustomAuthenticationEntryPoint.class
 com\minh\shopee\controllers\auth\AuthController.class
 com\minh\shopee\config\routes\UserRoutes.class
@@ -75,6 +77,7 @@ com\minh\shopee\domain\dto\response\users\ResLoginDTO$UserLogin$UserLoginBuilder
 com\minh\shopee\domain\dto\request\ListIdCartDetailDTO.class
 com\minh\shopee\services\AnalyticsService.class
 com\minh\shopee\services\impl\UserServiceImpl.class
+com\minh\shopee\domain\dto\response\projection\ProductHintProjection.class
 com\minh\shopee\config\interceptor\PermissionInterceptor.class
 com\minh\shopee\services\CategoryService.class
 com\minh\shopee\domain\dto\response\users\ProfileDTO.class
@@ -91,6 +94,7 @@ com\minh\shopee\domain\dto\request\ProductUpdateDTO.class
 com\minh\shopee\domain\dto\request\UserResgisterDTO.class
 com\minh\shopee\services\RoleService.class
 com\minh\shopee\domain\dto\request\ChangePassDTO.class
+com\minh\shopee\config\WebSocketConfig.class
 com\minh\shopee\services\utils\FormatResponse.class
 com\minh\shopee\domain\dto\request\OrderShopUpdateDTO.class
 com\minh\shopee\domain\dto\request\CategoryDTO.class
@@ -100,6 +104,7 @@ com\minh\shopee\domain\model\Cart$CartBuilder.class
 com\minh\shopee\controllers\users\AddressController.class
 com\minh\shopee\domain\dto\mappers\AddressMapper.class
 com\minh\shopee\domain\constant\ShopStatus.class
+com\minh\shopee\config\WebSocketBypassFilter.class
 com\minh\shopee\services\utils\mapper\ProductMapper.class
 com\minh\shopee\domain\dto\response\products\ProductResDTO.class
 com\minh\shopee\domain\dto\request\LoginRequest.class
@@ -133,10 +138,12 @@ com\minh\shopee\domain\dto\response\projection\ProductProjection.class
 com\minh\shopee\domain\model\CartDetail$CartDetailBuilder.class
 com\minh\shopee\domain\dto\response\OverviewOrderDTO.class
 com\minh\shopee\domain\dto\response\projection\ProductProjection$CategoryName.class
+com\minh\shopee\services\utils\VnPayService.class
 com\minh\shopee\domain\specification\ProductSpecification.class
 com\minh\shopee\controllers\users\ProfileController.class
 com\minh\shopee\domain\model\Product$ProductBuilder.class
 com\minh\shopee\repository\GenericRepositoryCustom.class
+com\minh\shopee\domain\model\Message.class
 com\minh\shopee\controllers\VnPayController.class
 com\minh\shopee\domain\dto\response\carts\CartDTO.class
 com\minh\shopee\config\routes\CommonRoutes.class
@@ -201,6 +208,7 @@ com\minh\shopee\domain\specification\ProductImageSpecs.class
 com\minh\shopee\domain\dto\response\projection\ProductProjection$ShopId.class
 com\minh\shopee\domain\model\Address$AddressBuilder.class
 com\minh\shopee\domain\model\User.class
+com\minh\shopee\config\VnPayConfig.class
 com\minh\shopee\domain\model\ProductImage$ProductImageBuilder.class
 com\minh\shopee\domain\dto\request\UserReqDTO$UserReqDTOBuilder.class
 com\minh\shopee\domain\dto\response\projection\OrderProjection.class
