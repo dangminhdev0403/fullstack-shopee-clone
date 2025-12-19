@@ -1,57 +1,29 @@
-"use client";
-
-import { Stomp } from "@stomp/stompjs";
+import { useChatSocket } from "@hooks/useChatSocket";
+import { chatSlice } from "@redux/slices/chatSlice";
+import { RootState } from "@redux/store";
 import { MessageCircle, Send } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import SockJS from "sockjs-client";
+import { useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const ChatBox = () => {
-  const clientRef = useRef<any>(null);
+  const { connected } = useChatSocket();
+
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
   const chatRef = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
 
-  const URL = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
-
-  useEffect(() => {
-    const socketFactory = () => new SockJS(URL + "/ws");
-    const stompClient = Stomp.over(socketFactory);
-    stompClient.debug = () => {};
-
-    stompClient.reconnectDelay = 5000;
-
-    stompClient.onConnect = () => {
-      stompClient.subscribe("/topic/messages", (msg) => {
-        const body = JSON.parse(msg.body);
-        setMessages((prev) => [...prev, body]);
-
-        setTimeout(() => {
-          chatRef.current?.scrollTo({
-            top: chatRef.current.scrollHeight,
-            behavior: "smooth",
-          });
-        }, 150);
-      });
-    };
-
-    stompClient.activate();
-    clientRef.current = stompClient;
-
-    return () => {
-      if (clientRef.current?.active) clientRef.current.deactivate();
-    };
-  }, []);
+  const messages = useSelector((s: RootState) => s.chat.messages);
 
   const sendMessage = () => {
     if (!input.trim()) return;
 
-    clientRef.current.publish({
-      destination: "/app/send",
-      body: JSON.stringify({
+    dispatch(
+      chatSlice.actions.addMessage({
         sender: "You",
+        receiver: "admin@gmail.com",
         content: input,
       }),
-    });
+    );
 
     setInput("");
   };

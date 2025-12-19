@@ -24,7 +24,7 @@ export interface DataUserLogin {
     roles: {
       name: string;
     }[];
-  };
+  }| null;
 }
 
 export interface PageInfo {

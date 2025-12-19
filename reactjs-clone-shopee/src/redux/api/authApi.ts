@@ -1,6 +1,8 @@
 // redux/api/authApi.ts
+import { RefreshResponse } from "@redux/api/baseQuery";
 import { API_ROUTES } from "@service/apiRoutes";
 import { UserLogin, UserRegister } from "@utils/constants/types/auth";
+import { ApiResponse } from "@utils/constants/types/response";
 import { rootApi } from "./rootApi";
 
 export const authApi = rootApi.injectEndpoints({
@@ -17,6 +19,13 @@ export const authApi = rootApi.injectEndpoints({
         url: API_ROUTES.AUTH.LOGIN,
         method: "POST",
         body: { email, password },
+      }),
+    }),
+    refresh: builder.mutation<ApiResponse<RefreshResponse>, void>({
+      query: () => ({
+        url: API_ROUTES.AUTH.REFRESH,
+        method: "POST",
+        credentials: "include",
       }),
     }),
     logOut: builder.mutation({

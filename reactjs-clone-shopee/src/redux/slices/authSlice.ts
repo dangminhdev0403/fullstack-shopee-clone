@@ -3,8 +3,8 @@ import { DataUserLogin } from "@utils/constants/types/response";
 
 interface AuthState {
   isAuthenticated: boolean;
-  accessToken?: string;
-  user?: {
+  accessToken: string;
+  user: {
     id: string;
     name: string;
     email: string;

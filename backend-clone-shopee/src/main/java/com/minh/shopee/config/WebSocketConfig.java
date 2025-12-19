@@ -34,8 +34,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Endpoint để client kết nối WebSocket
         // Ví dụ: ws://localhost:8080/ws
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*")// cho phép mọi domain (dev)
-                .withSockJS(); // fallback nếu browser không hỗ trợ websocket
+        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();// cho phép mọi domain (dev)
+                                                                               // fallback nếu browser không hỗ trợ
+                                                                               // websocket
     }
 
     /**

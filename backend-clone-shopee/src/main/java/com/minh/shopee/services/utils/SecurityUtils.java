@@ -14,6 +14,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.MessagingException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -337,7 +338,7 @@ public class SecurityUtils {
                             : List.of());
         } catch (Exception e) {
             log.error("JWT authentication error: {}", e.getMessage());
-            return null;
+           throw new MessagingException("BAD_CREDENTIALS");
         }
     }
 }
