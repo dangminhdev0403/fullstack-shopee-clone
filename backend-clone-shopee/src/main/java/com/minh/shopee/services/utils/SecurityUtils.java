@@ -195,7 +195,16 @@ public class SecurityUtils {
     }
 
     /**
-     * Lấy JWT hiện tại (token string) từ SecurityContext.
+     * Lấy JWT dạng raw String từ SecurityContext.
+     *
+     * ⚠️ LƯU Ý QUAN TRỌNG:
+     * - Với OAuth2 Resource Server (jwt()), Spring KHÔNG lưu JWT trong credentials
+     * - auth.getCredentials() thường là null
+     * - Hàm này CHỈ hữu ích nếu bạn:
+     * + Tự custom Authentication
+     * + Hoặc tự set credentials ở filter
+     *
+     * 👉 KHÔNG dùng hàm này để lấy userId hay claim trong JWT
      */
     public static Optional<String> getCurrentUserJWT() {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -205,6 +214,26 @@ public class SecurityUtils {
                     log.debug("Current JWT: {}", auth.getCredentials());
                     return (String) auth.getCredentials();
                 });
+    }
+
+    /**
+     * Lấy đối tượng Jwt hiện tại từ SecurityContext.
+     *
+     * ✔ Áp dụng CHUẨN cho Spring Security OAuth2 Resource Server
+     * ✔ Jwt nằm trong JwtAuthenticationToken#getToken()
+     * ✔ Trả về Optional để tránh ClassCastException
+     *
+     * @return Optional<Jwt> nếu request đã được xác thực bằng JWT
+     */
+    public static Optional<Jwt> getCurrentJwt() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth instanceof JwtAuthenticationToken jwtAuth) {
+            return Optional.of(jwtAuth.getToken());
+        }
+
+        // Có thể là AnonymousAuthenticationToken hoặc null
+        return Optional.empty();
     }
 
     /**
@@ -244,24 +273,55 @@ public class SecurityUtils {
     }
 
     /**
-     * Lấy ID của user hiện tại từ JWT (claim "user.id").
+     * Lấy claim "user" từ JWT hiện tại.
      *
-     * @return userId nếu tồn tại trong token
-     * @throws AppException nếu không thể tìm thấy id
+     * 🔒 Đây là HÀM CHỐT CHẶN:
+     * - Nếu chưa đăng nhập
+     * - Hoặc token không hợp lệ
+     * - Hoặc không có claim "user"
+     *
+     * 👉 Sẽ throw AppException (401) NGAY TẠI ĐÂY
+     * 👉 Các chỗ khác có thể dùng `.get()` an toàn
      */
-    public static Long getCurrentUserId() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
 
-        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
-            Map<String, Object> userClaim = jwtAuth.getToken().getClaim("user");
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> getCurrentUserClaim() {
 
-            if (userClaim != null && userClaim.containsKey("id")) {
-                return Long.valueOf(userClaim.get("id").toString());
-            }
+        Jwt jwt = getCurrentJwt()
+                .orElseThrow(() -> new AppException(401, "Unauthorized", "Chưa đăng nhập"));
+
+        Object userClaim = jwt.getClaim("user");
+
+        if (!(userClaim instanceof Map)) {
+            throw new AppException(401, "Unauthorized", "Token không chứa user");
         }
 
-        throw new AppException(401, "Unauthorized", "Không thể lấy thông tin người dùng từ token");
+        return (Map<String, Object>) userClaim;
+    }
+
+    /**
+     * Lấy userId từ JWT hiện tại.
+     *
+     * ✔ Dùng trực tiếp trong controller / service
+     * ✔ Không cast JwtAuthenticationToken
+     * ✔ Không crash khi Anonymous
+     * ✔ Nếu chưa đăng nhập → throw AppException 401
+     *
+     * @return userId (Long)
+     * @throws AppException nếu chưa đăng nhập hoặc token không hợp lệ
+     */
+    public static Long getCurrentUserId() {
+        Map<String, Object> userClaim = getCurrentUserClaim();
+        Object id = userClaim.get("id");
+        
+        if (id == null) {
+            throw new AppException(
+                    401,
+                    "Unauthorized",
+                    "Người dùng chưa đăng nhập hoặc token không hợp lệ");
+        }
+        
+        return Long.valueOf(id.toString());
     }
 
     public Authentication getAuthentication(String token) {

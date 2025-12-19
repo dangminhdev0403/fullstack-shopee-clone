@@ -103,7 +103,7 @@ public class AuthController {
                 return ResponseEntity.ok().header(HEADER_NAME, cookie.toString()).body(resLoginDTO);
         }
 
-        @GetMapping("/refresh")
+        @PostMapping("/refresh")
         @ApiDescription("Refresh token")
         public ResponseEntity<ResLoginDTO> refreshToken(
                         @CookieValue(name = "refresh_token", required = false) Optional<String> refreshToken) {
@@ -150,6 +150,7 @@ public class AuthController {
                         log.info("Refresh token is nearing expiry, generating new one for user: {}", email);
                         tokenValue = this.securityUtils.createRefreshToken(email, resLoginDTO);
                         this.userService.updateRefreshToken(email, tokenValue);
+                        
                 }
 
                 ResponseCookie cookie = ResponseCookie.from(
@@ -181,7 +182,7 @@ public class AuthController {
                 log.debug("Refresh token validated during logout for user: {}", email);
 
                 this.userService.updateRefreshToken(email, null);
-                log.info("Refresh token cleared from database for user: {}", email);
+                log.info("Refresh token cleared from database for user: {} ", email);
 
                 ResponseCookie cookie = ResponseCookie.from(
                                 REFRESH_TOKEN,

@@ -10,12 +10,12 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minh.shopee.domain.dto.response.ResponseData;
 import com.minh.shopee.domain.model.Permission;
 import com.minh.shopee.domain.model.Role;
 import com.minh.shopee.domain.model.User;
 import com.minh.shopee.repository.PermissionRepository;
 import com.minh.shopee.services.UserService;
+import com.minh.shopee.services.utils.CommonUtils;
 import com.minh.shopee.services.utils.SecurityUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class PermissionInterceptor implements HandlerInterceptor {
 
-    private final ObjectMapper objectMapper; // Dùng để trả JSON response
     private final UserService userService; // Lấy thông tin User từ DB
     private final PermissionRepository permissionRepository; // Lấy thông tin Permission từ DB
 
@@ -76,12 +75,13 @@ public class PermissionInterceptor implements HandlerInterceptor {
                     return true;
                 } else {
                     // Nếu không có quyền -> trả về 403
-                    writeErrorResponse(response, HttpStatus.FORBIDDEN, "Không có quyền hạn");
+                    CommonUtils.writeErrorResponse(response, HttpStatus.FORBIDDEN, "Không có quyền hạn");
+
                     return false;
                 }
             } else {
                 // User không có role nào -> 403
-                writeErrorResponse(response, HttpStatus.FORBIDDEN, "Không có quyền hạn");
+                CommonUtils.writeErrorResponse(response, HttpStatus.FORBIDDEN, "Không có quyền hạn");
                 return false;
             }
         }
@@ -91,19 +91,4 @@ public class PermissionInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    /**
-     * Helper method để viết JSON trả về khi bị từ chối
-     */
-    private void writeErrorResponse(HttpServletResponse response, HttpStatus status, String message)
-            throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(status.value());
-        ResponseData<Object> data = ResponseData.<Object>builder()
-                .status(status.value())
-                .data(null)
-                .error(String.valueOf(status.value()))
-                .message(message)
-                .build();
-        response.getWriter().write(objectMapper.writeValueAsString(data));
-    }
 }

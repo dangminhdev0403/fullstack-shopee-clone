@@ -7,8 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +28,7 @@ import com.minh.shopee.domain.dto.response.products.ProductResDTO;
 import com.minh.shopee.domain.dto.response.projection.ProductHintProjection;
 import com.minh.shopee.domain.dto.response.projection.ProductProjection;
 import com.minh.shopee.services.ProductSerivce;
+import com.minh.shopee.services.utils.SecurityUtils;
 import com.minh.shopee.services.utils.error.AppException;
 
 import jakarta.validation.Valid;
@@ -82,9 +81,7 @@ public class ProductController {
     @PostMapping("/add-to-cart")
     @ApiDescription("Thêm sản phẩm vào giỏ hàng")
     public ResponseEntity<String> addToCart(@RequestBody @Valid AddProductDTO productReq) {
-        JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> userClaim = auth.getToken().getClaim("user");
-
+        Map<String, Object> userClaim = SecurityUtils.getCurrentUserClaim();
         if (userClaim != null && userClaim.containsKey("id")) {
             String userId = userClaim.get("id").toString();
             Long userIdLong = Long.valueOf(userId);
@@ -98,8 +95,7 @@ public class ProductController {
     @GetMapping("/get-cart")
     @ApiDescription("Xem giỏ hàng")
     public ResponseEntity<CartDTO> getCart() {
-        JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> userClaim = auth.getToken().getClaim("user");
+        Map<String, Object> userClaim = SecurityUtils.getCurrentUserClaim();
         if (userClaim != null && userClaim.containsKey("id")) {
             String userId = userClaim.get("id").toString();
             Long userIdLong = Long.valueOf(userId);
@@ -119,9 +115,7 @@ public class ProductController {
             throw new AppException(400, "Product ID is invalid", "Invalid product ID");
         }
 
-        JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> userClaim = auth.getToken().getClaim("user");
-
+        Map<String, Object> userClaim = SecurityUtils.getCurrentUserClaim();
         if (userClaim != null && userClaim.containsKey("id")) {
             Long userIdLong = Long.valueOf(userClaim.get("id").toString());
             this.productSerivce.removeFromCart(productIdLong, userIdLong);
@@ -135,9 +129,7 @@ public class ProductController {
     @ApiDescription("Xoá danh sách sản phẩm khỏi giỏ hàng")
     public ResponseEntity<String> removeListFromCart(@RequestBody ListIdCartDetailDTO req) {
 
-        JwtAuthenticationToken auth = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> userClaim = auth.getToken().getClaim("user");
-
+        Map<String, Object> userClaim = SecurityUtils.getCurrentUserClaim();
         if (userClaim != null && userClaim.containsKey("id")) {
             Long userIdLong = Long.valueOf(userClaim.get("id").toString());
             this.productSerivce.removeListFromCart(req, userIdLong);

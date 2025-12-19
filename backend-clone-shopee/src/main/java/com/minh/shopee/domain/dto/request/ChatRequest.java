@@ -10,6 +10,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRequest {
-    private String content;
+    // Người gửi 
     private String sender;
+
+    // ⭐ Người nhận (bắt buộc cho chat riêng)
+    private String receiver;
+
+    // Nội dung tin nhắn
+    private String content;
 }
