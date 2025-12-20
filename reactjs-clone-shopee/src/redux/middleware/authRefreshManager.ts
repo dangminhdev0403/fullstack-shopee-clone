@@ -1,18 +1,9 @@
-// src/auth/authRefreshManager.ts
 import { authApi } from "@redux/api/authApi";
 import { RefreshResponse } from "@redux/api/baseQuery";
 import { authSlice } from "@redux/slices/authSlice";
 import type { AppDispatch } from "@redux/store";
 import websocketService from "@service/websocketService";
 
-/**
- * AuthRefreshManager
- *
- * Chỉ chịu trách nhiệm:
- * - Refresh token
- * - setLogin
- * - Reconnect WebSocket
- */
 class AuthRefreshManager {
   private refreshing: Promise<RefreshResponse | null> | null = null;
 
@@ -27,7 +18,6 @@ class AuthRefreshManager {
           authApi.endpoints.refresh.initiate(undefined),
         ).unwrap();
 
-        console.log("Case refresh");
         if (!result.data) return null;
 
         dispatch(
@@ -37,8 +27,11 @@ class AuthRefreshManager {
           }),
         );
 
-        if (result.data.access_token) {
-          await websocketService.disconnect(); // chờ WS cũ ngắt
+        // **Chỉ reconnect WS nếu WS đang active (ChatBox mount)**
+        if (websocketService.getCurrentToken()) {
+          console.log("Refresh with WS");
+
+          await websocketService.disconnect();
           await websocketService.connect(result.data.access_token);
         }
 

@@ -1,23 +1,38 @@
-// useChatSocket.ts
-import { RootState } from "@redux/store";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { authRefreshManager } from "@redux/middleware/authRefreshManager";
+import { AppDispatch, RootState } from "@redux/store";
 import websocketService from "@service/websocketService";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export const useChatSocket = () => {
   const token = useSelector((s: RootState) => s.auth.accessToken);
-  const connected = useSelector((s: RootState) => s.chat.connected);
+  const dispatch = useDispatch();
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    if (!token && !connected) return;
-    console.log(connected);
+    if (!token) return;
 
-    websocketService.connect(token);
+    const handlers = {
+      onConnected: () => setConnected(true),
+      onDisconnected: () => setConnected(false),
+      onAuthError: async () => {
+        console.log("🔄 WS auth error, refreshing token...");
+        await authRefreshManager.ensureValidToken(dispatch as AppDispatch);
+      },
+      onMessage: (msg: any) => {
+        console.log("💬 Message received in hook:", msg);
+      },
+    };
+
+    websocketService.registerHandlers(handlers);
+    websocketService.connect(token).catch(console.error);
 
     return () => {
-      websocketService.disconnect();
+      websocketService.disconnect().catch(console.error);
+      setConnected(false);
     };
-  }, [token, connected]);
+  }, [token, dispatch]);
 
   return { connected };
 };
