@@ -21,4 +21,6 @@ public interface ShopService {
     Page<OrderProjection> getOrdersList(Pageable pageable);
 
     Order updateOrder(UpdateOrderDTO req);
+
+    long getOnerIdByShopId(long shopId);
 }

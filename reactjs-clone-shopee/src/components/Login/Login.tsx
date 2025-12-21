@@ -8,7 +8,7 @@ import { ApiResponse, DataUserLogin } from "@utils/constants/types/response";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 interface UserLogin {
@@ -19,7 +19,7 @@ interface UserLogin {
 const Login = () => {
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -40,9 +40,11 @@ const Login = () => {
 
       const roles = res.data.user?.roles?.map((r) => r.name) || [];
       if (roles.includes("ROLE_ADMIN")) {
-        window.location.href = ROUTES.ADMIN.BASE;
+        console.log('admin page');
+        
+        navigate(ROUTES.ADMIN.BASE, { replace: true });
       } else {
-        window.location.href = ROUTES.HOME;
+        navigate(ROUTES.HOME, { replace: true });
       }
       toast.success("Đăng nhập thành công");
     } catch (error) {

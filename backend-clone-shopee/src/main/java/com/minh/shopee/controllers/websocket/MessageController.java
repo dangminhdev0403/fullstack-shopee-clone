@@ -1,4 +1,4 @@
-package com.minh.shopee.controllers;
+package com.minh.shopee.controllers.websocket;
 
 import java.security.Principal;
 
@@ -7,8 +7,10 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import com.minh.shopee.domain.constant.SenderType;
+import com.minh.shopee.domain.dto.request.ChatMessage;
 import com.minh.shopee.domain.dto.request.ChatRequest;
-import com.minh.shopee.domain.model.ChatMessage;
+import com.minh.shopee.services.ShopService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ public class MessageController {
          * - Không cần @SendTo
          */
         private final SimpMessagingTemplate messagingTemplate;
+        private final ShopService shopService;
 
         /*
          * Client gửi message tới: /app/send
@@ -37,18 +40,17 @@ public class MessageController {
          * → Đây chính là CHAT CÔNG KHAI
          */
         @SendTo("/topic/messages")
-        public ChatMessage sendMessage(ChatRequest message) {
+        public ChatRequest sendMessage(ChatRequest message) {
                 /*
                  * Tạo message mới để gửi xuống client
                  * message.getSender() : người gửi
                  * message.getContent() : nội dung
                  * System.currentTimeMillis(): thời gian gửi
                  */
-                ChatMessage sendMessage = new ChatMessage(message.getSender(), message.getContent(),
-                                System.currentTimeMillis());
-                log.info(sendMessage.getContent());
-                // Return object → Spring tự gửi xuống /topic/messages
-                return sendMessage;
+                // ChatMessage sendMessage = new ChatMessage(message.getContent());
+                // log.info(sendMessage.getContent());
+                // // Return object → Spring tự gửi xuống /topic/messages
+                return message;
         }
 
         @MessageMapping("/chat.private")
@@ -58,14 +60,20 @@ public class MessageController {
                 if (principal == null) {
                         throw new IllegalStateException("WebSocket Principal is null");
                 }
-                log.info("check userId" + principal.getName() + " Send message:" + request.getContent());
+                long receiverId = Long.parseLong(request.getReceiver());
+                if (request.getSenderType().compareTo(SenderType.USER) == 0) {
+                        receiverId = this.shopService.getOnerIdByShopId(receiverId);
+                }
+                log.info(request.getSenderType() + " " + principal.getName() + " Send message:" + request.getContent()
+                                + " to "
+                                + receiverId);
                 messagingTemplate.convertAndSendToUser(
-                                request.getReceiver(), // username người nhận
+                                String.valueOf(receiverId), // username người nhận
                                 "/queue/messages",
                                 new ChatMessage(
                                                 principal.getName(), // sender từ JWT
-                                                request.getContent(),
-                                                System.currentTimeMillis()));
+
+                                                request.getContent()));
         }
 
 }

@@ -26,6 +26,7 @@ export const ROUTES = {
       USERS: "users",
       SETTING: "users",
       ANALYTICS: "analytics",
+      MESSAGES: "messages",
     },
     ABS: {
       DASHBOARD: "/admin",
@@ -34,6 +35,7 @@ export const ROUTES = {
       USERS: "/admin/users",
       SETTING: "/admin/settings",
       ANALYTICS: "/admin/analytics",
+      MESSAGES: "/admin/messages",
     },
   },
 };

@@ -19,7 +19,7 @@ minh:
   jwt:
     access-token:
       secret: hxd9VMgxBcNfQaxRp+cqsPNWobWR+ZGC5HjN7daezaZLooCp8xBanW+siQ12wGkGscH+a3iHVfbds21jt/qtkA==
-      validity: 1
+      validity: 300
     refresh-token:
       secret: hxd9VMgxBcNfQaxRp+cqsPNWobWR+ZGC5HjN7daezaZLooCp8xBanW+siQ12wGkGscH+a3iHVfbds21jt/qtkA==
       validity: 604800

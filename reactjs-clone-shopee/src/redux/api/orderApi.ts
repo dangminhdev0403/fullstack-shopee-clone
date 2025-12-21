@@ -33,6 +33,10 @@ export interface OrderDetail {
   product: {
     name: string;
     image: string;
+    shop: {
+      id: number;
+      shopName: string;
+    };
   };
 }
 

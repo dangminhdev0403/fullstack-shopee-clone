@@ -70,13 +70,13 @@ class WebSocketService {
     this.connecting = null;
   }
 
-  sendPrivate(receiver: string, content: string) {
+  sendPrivate(receiver: string, content: string, senderType: "SHOP" | "USER") {
     if (!this.client?.connected) {
       console.warn("Cannot send WS message: client not connected");
       return;
     }
 
-    const msg = { receiver, content };
+    const msg = { receiver, content, senderType };
     console.log("📤 Sending:", msg);
     this.client.publish({
       destination: "/app/chat.private",

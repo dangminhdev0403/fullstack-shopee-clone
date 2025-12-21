@@ -13,6 +13,7 @@ public interface OrderShopProjection {
     OrderProjection getOrder();
 
     ProductProjection getProduct();
+
     String getShopStatus();
 
     interface OrderProjection {

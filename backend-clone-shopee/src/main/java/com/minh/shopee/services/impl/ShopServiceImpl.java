@@ -111,4 +111,10 @@ public class ShopServiceImpl implements ShopService {
                 () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
         return shop.getId();
     }
+
+    public long getOnerIdByShopId(long shopId) {
+        Shop shop = this.shopRepository.findById(shopId).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST.value(), "Shop not found", "Không tìm thấy shop"));
+        return shop.getOwner().getId();
+    }
 }

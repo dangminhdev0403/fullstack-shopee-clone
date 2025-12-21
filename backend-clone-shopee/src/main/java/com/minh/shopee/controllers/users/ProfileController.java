@@ -3,8 +3,6 @@ package com.minh.shopee.controllers.users;
 import java.io.IOException;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,9 +38,8 @@ public class ProfileController {
     public ResponseEntity<UpdateUserResDTO> updateProfile(
             @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
             @ModelAttribute @Valid UserReqDTO userRequest) throws IOException {
-      
 
-        UpdateUserResDTO updatUser = this.userService.updateProfile( userRequest, avatarFile);
+        UpdateUserResDTO updatUser = this.userService.updateProfile(userRequest, avatarFile);
 
         return ResponseEntity.ok().body(updatUser);
     }

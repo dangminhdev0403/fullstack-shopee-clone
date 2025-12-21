@@ -3,6 +3,7 @@ package com.minh.shopee.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.minh.shopee.domain.model.Message;
 import com.minh.shopee.domain.model.Order;
 import com.minh.shopee.domain.model.OrderDetail;
 import com.minh.shopee.domain.model.Product;
@@ -37,6 +38,11 @@ public class RepositoryConfig {
     @Bean
     public GenericRepositoryCustom<OrderDetail> orderDetailCustomRepo() {
         return new GenericRepositoryImpl<>(OrderDetail.class);
+    }
+
+    @Bean
+    public GenericRepositoryCustom<Message> messageCustomRepo() {
+        return new GenericRepositoryImpl<>(Message.class);
     }
 
 }

@@ -26,6 +26,7 @@ wsListener.startListening({
       websocketService.sendPrivate(
         action.payload.receiver,
         action.payload.content,
+        action.payload.senderType,
       );
     } catch (err) {
       console.error("WS send failed", err);

@@ -2,6 +2,8 @@ package com.minh.shopee.domain.dto.response.projection.admin;
 
 import java.math.BigDecimal;
 
+import com.minh.shopee.domain.model.Shop;
+
 public interface ProductShopProjection {
     Long getId();
 
@@ -26,7 +28,13 @@ public interface ProductShopProjection {
     }
 
     interface ProductImageProjection {
+        Shop getShop();
+
         String getImageUrl();
+    }
+
+    interface ShopProjection {
+        long getId();
     }
 
 }

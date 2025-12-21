@@ -6,6 +6,7 @@ import { alertReducer } from "@redux/slices/alertSlice";
 import { authReducer } from "@redux/slices/authSlice";
 import { cartReducer } from "@redux/slices/cartSlice";
 import { chatReducer } from "@redux/slices/chatSlice";
+import { chatUiReducer } from "@redux/slices/chatUiSlice";
 import { checkoutReducer } from "@redux/slices/checkoutSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { createPersistedReducer } from "@utils/redux/persistReducerHelper";
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   // Không persist api reducer (thường không nên lưu cache vào localStorage)
 
   chat: chatReducer,
+  chatUi: chatUiReducer,
   alert: alertReducer,
   [rootApi.reducerPath]: rootApi.reducer,
 });

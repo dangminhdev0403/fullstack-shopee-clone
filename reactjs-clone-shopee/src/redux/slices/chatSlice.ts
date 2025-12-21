@@ -3,8 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface ChatMessage {
   sender: string;
   receiver: string;
+  senderType: "SHOP" | "USER";
   content: string;
-  createdAt?: string;
 }
 interface ChatState {
   connected: boolean;

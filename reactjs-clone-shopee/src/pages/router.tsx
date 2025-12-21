@@ -10,6 +10,7 @@ import {
   ProfileSection,
 } from "@pages/AccountPage/section";
 import OrderSection from "@pages/AccountPage/section/OrderSection/OrderSection";
+import AdminChatBox from "@pages/admin/AdminChat";
 
 import { ROUTES } from "@utils/constants/route";
 import { lazy } from "react";
@@ -83,6 +84,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.ADMIN.CHILDREN.ORDERS, element: <Orders /> },
           { path: ROUTES.ADMIN.CHILDREN.USERS, element: <UserManagement /> },
           { path: ROUTES.ADMIN.CHILDREN.ANALYTICS, element: <Analytics /> },
+          { path: ROUTES.ADMIN.CHILDREN.MESSAGES, element: <AdminChatBox /> },
         ],
       },
     ],

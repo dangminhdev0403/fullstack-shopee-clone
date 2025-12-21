@@ -21,11 +21,11 @@ export interface RefreshResponse {
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BASE_URL,
   credentials: "include",
-  prepareHeaders: (headers, { getState }) => {
+  prepareHeaders: (headers, { endpoint, getState }) => {
     const state = getState() as RootState;
     const token = state.auth.accessToken;
 
-    if (token && !API_ROUTES.AUTH.REFRESH) {
+    if (token && endpoint !== "refresh") {
       headers.set("Authorization", `Bearer ${token}`);
     }
     return headers;

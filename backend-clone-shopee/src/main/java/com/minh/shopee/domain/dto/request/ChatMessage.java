@@ -1,4 +1,4 @@
-package com.minh.shopee.domain.model;
+package com.minh.shopee.domain.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +12,5 @@ import lombok.Setter;
 public class ChatMessage {
     private String sender;
     private String content;
-    private long timestamp;
-
+   
 }

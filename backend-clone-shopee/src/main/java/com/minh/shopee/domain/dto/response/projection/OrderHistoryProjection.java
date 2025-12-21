@@ -42,5 +42,13 @@ public interface OrderHistoryProjection {
         // Projection SpEL để lấy phần tử đầu tiên trong list
         @Value("#{target.images != null && !target.images.isEmpty() ? target.images[0].imageUrl : null}")
         String getImage();
+
+        ShopProjection getShop();
+    }
+
+    interface ShopProjection {
+        long getId();
+
+        String getShopName();
     }
 }

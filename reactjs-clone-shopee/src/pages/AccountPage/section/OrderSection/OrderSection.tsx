@@ -1,5 +1,6 @@
 "use client";
 
+import ChatBoxContainer from "@components/chat/ChatBoxContainer";
 import { LoadingSkeleton } from "@components/Loading";
 import { useAlert } from "@hooks/useAlert";
 import { Pagination } from "@mui/material";
@@ -7,12 +8,14 @@ import {
   useCancelOrderMutation,
   useLazyGetOrderHistoryQuery,
 } from "@redux/api/orderApi";
+import { openChatBox } from "@redux/slices/chatUiSlice";
 import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
   Clock,
   MapPin,
+  MessageCircle,
   Package,
   Phone,
   RotateCcw,
@@ -22,6 +25,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 // Thông tin một đơn hàng
 // Trạng thái đơn hàng
@@ -36,6 +40,10 @@ export interface OrderDetail {
   product: {
     name: string;
     image: string;
+    shop: {
+      id: number;
+      shopName: string;
+    };
   };
 }
 
@@ -138,13 +146,13 @@ const statusConfig: Record<
 
 export default function OrderSection() {
   const [page, setPage] = useState(1);
-
-  const [getOrderHistory, { data: orderData, isFetching, isLoading }] =
+  const dispatch = useDispatch();
+  const [getOrderHistory, { data: orderData, isLoading }] =
     useLazyGetOrderHistoryQuery();
   const [cancelOrder] = useCancelOrderMutation();
   const orderList = orderData?.data.content || [];
 
-  const { confirm, success, error, info, warning } = useAlert();
+  const { confirm } = useAlert();
 
   const [activeFilter, setActiveFilter] = useState<OrderFilter>("all");
   const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
@@ -209,6 +217,21 @@ export default function OrderSection() {
   if (isLoading || !orderData) {
     return <LoadingSkeleton />;
   }
+  const handleOpenMessage = (
+    orderId: number,
+    shop: { id: number; shopName: string },
+  ) => {
+    dispatch(
+      openChatBox({
+        orderId: orderId.toString(),
+        shopId: shop.id.toString(),
+        shopName: shop.shopName,
+      }),
+    );
+    console.log(
+      `Open chat for order ID: ${orderId} with shop: ${shop.shopName}`,
+    );
+  };
   return (
     <div className="animate-slide-in mx-auto max-w-6xl p-6">
       <div className="mb-8 flex items-center justify-between">
@@ -457,6 +480,21 @@ export default function OrderSection() {
                     </div>
 
                     <div className="flex gap-3">
+                      <button
+                        onClick={() =>
+                          handleOpenMessage(
+                            order.id,
+                            order.orderDetail[0].product.shop,
+                          )
+                        }
+                        className="flex items-center gap-2 rounded-lg border border-blue-500 px-4 py-2 transition-colors hover:bg-blue-50"
+                      >
+                        <MessageCircle className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">
+                          Chat với người bán
+                        </span>
+                      </button>
+
                       {order.status.toLocaleLowerCase() === "delivered" && (
                         <>
                           <button className="hover:bg-muted border-border flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors">
@@ -503,6 +541,7 @@ export default function OrderSection() {
           color="standard"
         />
       </div>
+      <ChatBoxContainer />
     </div>
   );
 }
