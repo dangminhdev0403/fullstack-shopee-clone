@@ -21,4 +21,15 @@ public class MessageSpecification {
         };
     }
 
+    public static Specification<Message> belongsToUser(Long userId) {
+        return (root, query, cb) -> {
+            var predicate = cb.or(
+                    cb.equal(root.get("sender").get("id"), userId),
+                    cb.equal(root.get("receiver").get("id"), userId));
+            query.orderBy(cb.desc(root.get("createdAt")));
+
+            return predicate;
+        };
+    }
+
 }

@@ -1,7 +1,5 @@
 package com.minh.shopee.domain.dto.request;
 
-import com.minh.shopee.domain.constant.SenderType;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +16,5 @@ public class ChatRequest {
 
     // Nội dung tin nhắn
     private String content;
-    private SenderType senderType; // USER | SHOP
 
 }

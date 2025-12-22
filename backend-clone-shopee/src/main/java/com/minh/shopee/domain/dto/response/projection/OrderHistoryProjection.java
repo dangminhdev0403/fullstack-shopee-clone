@@ -49,6 +49,12 @@ public interface OrderHistoryProjection {
     interface ShopProjection {
         long getId();
 
+        OwnerInfo getOwner();
+
+        interface OwnerInfo {
+            Long getId();
+        }
+
         String getShopName();
     }
 }
