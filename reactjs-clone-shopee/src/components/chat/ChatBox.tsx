@@ -1,8 +1,13 @@
+import {
+  chatApi,
+  ChatMessage,
+  useGetConversationsQuery,
+} from "@redux/api/chatApi";
 import { chatSlice } from "@redux/slices/chatSlice";
 import { closeChatBox } from "@redux/slices/chatUiSlice";
-import { RootState } from "@redux/store";
+import { AppDispatch, RootState } from "@redux/store";
 import { MessageCircle, OctagonX, Send } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ChatBox = ({
@@ -16,13 +21,41 @@ const ChatBox = ({
 }) => {
   const [input, setInput] = useState("");
   const chatRef = useRef<HTMLDivElement>(null);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const { data: messages = [], isLoading } = useGetConversationsQuery({
+    receiver: shopId,
+  });
+  const idMe = useSelector((state: RootState) => state.auth.user?.id);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const messages = useSelector((s: RootState) => s.chat.messages);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+  const queryArg = {
+    receiver: shopId,
+  };
   const sendMessage = () => {
     if (!input.trim()) return;
+    const optimisticMsg: ChatMessage = {
+      id: Date.now(),
+      content: input,
+      createdAt: new Date().toISOString(),
+      read: true,
+      senderId: Number(idMe),
+      receiverId: Number(shopId),
+    };
 
+    // 1️⃣ optimistic message list
+
+    dispatch(
+      chatApi.util.updateQueryData("getConversations", queryArg, (draft) => {
+        draft.push(optimisticMsg);
+      }),
+    );
     dispatch(
       chatSlice.actions.addMessage({
         sender: "You",
@@ -33,6 +66,7 @@ const ChatBox = ({
     );
 
     setInput("");
+    requestAnimationFrame(scrollToBottom);
   };
 
   return (
@@ -85,32 +119,34 @@ const ChatBox = ({
             </p>
           </div>
         )}
-
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`flex animate-[fadeIn_0.3s_ease-out] ${
-              m.sender === "You" ? "justify-end" : "justify-start"
-            }`}
-          >
+        {messages.map((msg) => {
+          const isMe = msg.senderId === Number(idMe);
+          return (
             <div
-              className={`group relative max-w-[75%] px-4 py-3 text-sm transition-all duration-200 ${
-                m.sender === "You"
-                  ? "rounded-2xl rounded-br-md bg-gradient-to-br from-[#EE4D2D] to-[#FF6A3D] text-white shadow-lg shadow-orange-200"
-                  : "rounded-2xl rounded-bl-md border border-gray-100 bg-white text-gray-800 shadow-md shadow-gray-100"
+              key={msg.id}
+              className={`flex animate-[fadeIn_0.3s_ease-out] ${
+                isMe ? "justify-end" : "justify-start"
               }`}
             >
-              <p
-                className={`mb-1 text-[10px] font-semibold tracking-wider uppercase ${
-                  m.sender === "You" ? "text-white/70" : "text-[#EE4D2D]"
+              <div
+                className={`group relative max-w-[75%] px-4 py-3 text-sm transition-all duration-200 ${
+                  isMe
+                    ? "rounded-2xl rounded-br-md bg-gradient-to-br from-[#EE4D2D] to-[#FF6A3D] text-white shadow-lg shadow-orange-200"
+                    : "rounded-2xl rounded-bl-md border border-gray-100 bg-white text-gray-800 shadow-md shadow-gray-100"
                 }`}
               >
-                {m.sender}
-              </p>
-              <p className="leading-relaxed">{m.content}</p>
+                <p
+                  className={`mb-1 text-[10px] font-semibold tracking-wider uppercase ${
+                    isMe ? "text-white/70" : "text-[#EE4D2D]"
+                  }`}
+                >
+                  {isMe}
+                </p>
+                <p className="leading-relaxed">{msg.content}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* INPUT */}

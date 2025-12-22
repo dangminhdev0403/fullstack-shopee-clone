@@ -61,4 +61,8 @@ export const API_ROUTES = {
   PAYMENT: {
     BASE: `${version}/vnpay/pay`,
   },
+  CHAT: {
+    BASE: `${version}/chats`,
+    CONVERSATIONS: `${version}/chats/conversation`,
+  },
 };

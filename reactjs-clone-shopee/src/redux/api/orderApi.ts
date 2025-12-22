@@ -36,6 +36,9 @@ export interface OrderDetail {
     shop: {
       id: number;
       shopName: string;
+      owner: {
+        id: number;
+      };
     };
   };
 }

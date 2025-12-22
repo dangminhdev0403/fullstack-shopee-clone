@@ -43,6 +43,9 @@ export interface OrderDetail {
     shop: {
       id: number;
       shopName: string;
+      owner: {
+        id: number;
+      };
     };
   };
 }
@@ -219,17 +222,17 @@ export default function OrderSection() {
   }
   const handleOpenMessage = (
     orderId: number,
-    shop: { id: number; shopName: string },
+    shop: { id: number; shopName: string; owner: { id: number } },
   ) => {
     dispatch(
       openChatBox({
         orderId: orderId.toString(),
-        shopId: shop.id.toString(),
+        shopId: shop.owner.id.toString(),
         shopName: shop.shopName,
       }),
     );
     console.log(
-      `Open chat for order ID: ${orderId} with shop: ${shop.shopName}`,
+      `Open chat for order ID: ${orderId} with shop: ${shop.owner.id}`,
     );
   };
   return (
