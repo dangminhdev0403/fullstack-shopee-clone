@@ -8,30 +8,6 @@ This project is designed as a **portfolio-grade system**, focusing on **clean ar
 
 ## 🚀 Features
 
-📂 Project Structure
-fullstack-shopee-clone/
-│
-├── backend-springboot/
-│ ├── controller
-│ ├── service
-│ ├── repository
-│ ├── websocket
-│ └── security
-│
-├── frontend-react/
-│ ├── pages
-│ ├── redux
-│ ├── hooks
-│ ├── services
-│ └── components
-│
-├── docs/
-│ ├── demo/
-│ └── diagrams/
-│
-├── README.md
-└── ARCHITECTURE.md
-
 ### 👤 User
 
 - Register / Login (JWT Authentication)
@@ -109,18 +85,19 @@ VNPAY callback verified with secure hash
 
 Order status updated
 
-## 🎥 Demo (Screenshots / GIF)
+## 🎥 Demo (Screenshots / Video)
 
-
-🔗 Demo link:
+🔗 **Demo video**:  
 https://www.facebook.com/share/v/1DCTLwMs8d/
 
-```md
 ![Homepage](docs/demo/homepage.png)
 ![Productpage](docs/demo/productpage.png)
 ![Cartpage](docs/demo/Cartpage.png)
 ![Checkoutpage](docs/demo/Checkoutpage.png)
 ![VNPAY Payment](docs/demo/vnpay.png)
 ![Orderpage ](docs/demo/Orderpage.png)
-![Realtime Chat](docs/demo/chat.gif)
+![Realtime Chat](docs/demo/chat.png)
+
+```
+
 ```
