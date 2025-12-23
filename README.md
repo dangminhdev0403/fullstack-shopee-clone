@@ -97,7 +97,3 @@ https://www.facebook.com/share/v/1DCTLwMs8d/
 ![VNPAY Payment](docs/demo/vnpay.png)
 ![Orderpage ](docs/demo/Orderpage.png)
 ![Realtime Chat](docs/demo/chat.png)
-
-```
-
-```
