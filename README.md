@@ -87,13 +87,43 @@ Order status updated
 
 ## 🎥 Demo (Screenshots / Video)
 
+## 🎥 Demo
+
 🔗 **Demo video**:  
 https://www.facebook.com/share/v/1DCTLwMs8d/
 
+---
+
+### 🏠 Homepage
+
 ![Homepage](docs/demo/homepage.png)
-![Productpage](docs/demo/productpage.png)
-![Cartpage](docs/demo/Cartpage.png)
-![Checkoutpage](docs/demo/Checkoutpage.png)
+
+---
+
+### 🛍️ Product Page
+
+![Product Page](docs/demo/productpage.png)
+
+---
+
+### 🛒 Cart Page
+
+![Cart Page](docs/demo/cartpage.png)
+
+---
+
+### 💳 Checkout Page
+
+![Checkout Page](docs/demo/checkoutpage.png)
+
+---
+
+### 💰 VNPAY Payment
+
 ![VNPAY Payment](docs/demo/vnpay.png)
-![Orderpage ](docs/demo/Orderpage.png)
+
+---
+
+### 📦 Order Page + Chat
+
 ![Realtime Chat](docs/demo/chat.png)
